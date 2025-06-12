@@ -38,4 +38,15 @@ public class UserController {
         }
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody User loginRequest) {
+        User user = userService.Login(loginRequest.getEmail(), loginRequest.getPassword());
+        if (user != null) {
+            return ResponseEntity.ok(user); // You can return user info or token
+        } else {
+            return ResponseEntity.status(401).body("Invalid credentials");
+        }
+    }
+
+
 }
