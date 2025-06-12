@@ -1,3 +1,5 @@
+// Purpose: Contains business logic (e.g., how to find a user, create one, etc.).
+
 package com.lorachemicals.Backend.services;
 
 import com.lorachemicals.Backend.model.User;
@@ -21,4 +23,6 @@ public class UserService {
     public List<User> getAllUsers() {
         return userRepo.findAll();
     }
+
+    public User findByEmail(String email) { return userRepo.findByEmail(email); }
 }

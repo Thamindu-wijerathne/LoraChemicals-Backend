@@ -1,3 +1,5 @@
+// Purpose: Connects the application with the database. Uses JPA to access User data.
+
 package com.lorachemicals.Backend.repository;
 
 // repository/UserRepository.java
