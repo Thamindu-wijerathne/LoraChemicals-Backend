@@ -2,6 +2,8 @@
 
 package com.lorachemicals.Backend.controller;
 
+import com.lorachemicals.Backend.dto.LoginRequestDTO;
+import com.lorachemicals.Backend.dto.UserResponseDTO;
 import com.lorachemicals.Backend.model.User;
 import com.lorachemicals.Backend.services.UserService;
 import org.springframework.http.ResponseEntity;
@@ -39,10 +41,13 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody User loginRequest) {
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequestDTO loginRequest) {
         User user = userService.Login(loginRequest.getEmail(), loginRequest.getPassword());
         if (user != null) {
-            return ResponseEntity.ok(user); // You can return user info or token
+            UserResponseDTO response = new UserResponseDTO(
+                    user.getId(), user.getName(), user.getEmail(), user.getRole()
+            );
+            return ResponseEntity.ok(response);
         } else {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
