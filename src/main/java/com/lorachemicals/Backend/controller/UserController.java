@@ -8,7 +8,9 @@ import com.lorachemicals.Backend.model.User;
 import com.lorachemicals.Backend.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import com.lorachemicals.Backend.util.JwtUtil;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 
 @RestController
@@ -47,11 +49,21 @@ public class UserController {
             UserResponseDTO response = new UserResponseDTO(
                     user.getId(), user.getName(), user.getEmail(), user.getRole()
             );
-            return ResponseEntity.ok(response);
+            // Generate JWT
+            String token = JwtUtil.generateToken(user.getEmail(), user.getRole());
+
+
+            // Return both user info and token
+            Map<String, Object> result = new HashMap<>();
+            result.put("user", response);
+            result.put("token", token);
+
+            return ResponseEntity.ok(result);
         } else {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
     }
+
 
 
 }
