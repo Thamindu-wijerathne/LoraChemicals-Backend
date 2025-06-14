@@ -13,6 +13,12 @@ public class AdminService {
     private final UserRepository userRepository;
     private final AdminRepository adminRepository;
 
+    public AdminService(UserRepository userRepository, AdminRepository adminRepository) {
+        this.userRepository = userRepository;
+        this.adminRepository = adminRepository;
+    }
+
+
     public User addUser(User user) {
         return userRepository.save(user);
     }
