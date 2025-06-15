@@ -1,14 +1,17 @@
-// src/main/java/com/lorachemicals/Backend/util/JwtUtil.java
-
 package com.lorachemicals.Backend.util;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-
 import java.util.Date;
 
 public class JwtUtil {
@@ -21,7 +24,7 @@ public class JwtUtil {
                 .claim("role", role)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours
-                .signWith(KEY, SignatureAlgorithm.HS256)  // NEW preferred method
+                .signWith(KEY, SignatureAlgorithm.HS256)
                 .compact();
     }
 }

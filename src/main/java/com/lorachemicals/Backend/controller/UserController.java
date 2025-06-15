@@ -27,7 +27,7 @@ public class UserController {
         return userService.addUser(user);
     }
 
-    @GetMapping
+    @GetMapping("all-users")
     public List<User> getUsers() {
         return userService.getAllUsers();
     }
@@ -64,6 +64,31 @@ public class UserController {
         }
     }
 
+    @PostMapping("/add-users")
+    public ResponseEntity<?> addUser(@RequestBody User user) {
+        User savedUser = userService.addUser(user);
+        return ResponseEntity.ok(savedUser);
+    }
 
+    @PutMapping("{id}")
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+        User user = userService.updateUser(id, updatedUser);
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.status(404).body("User not found");
+        }
+    }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        boolean deleted = userService.deleteUser(id);
+        if (deleted) {
+            return ResponseEntity.ok("User deleted successfully");
+        } else {
+            return ResponseEntity.status(404).body("User not found");
+        }
+    }
 
 }
