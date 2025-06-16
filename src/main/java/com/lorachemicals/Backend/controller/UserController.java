@@ -6,6 +6,8 @@ import com.lorachemicals.Backend.dto.LoginRequestDTO;
 import com.lorachemicals.Backend.dto.UserResponseDTO;
 import com.lorachemicals.Backend.model.User;
 import com.lorachemicals.Backend.services.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.lorachemicals.Backend.util.JwtUtil;
@@ -82,7 +84,13 @@ public class UserController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<?> deleteUser(@PathVariable Long id, HttpServletRequest request) {
+        String role = (String) request.getAttribute("role"); // Or however you're setting it from JWT
+
+        if (!"admin".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied");
+        }
+
         boolean deleted = userService.deleteUser(id);
         if (deleted) {
             return ResponseEntity.ok("User deleted successfully");
