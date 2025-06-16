@@ -27,4 +27,26 @@ public class UserService {
     public User findByEmail(String email) { return userRepo.findByEmail(email); }
 
     public User Login(String email, String password) { return userRepo.findByEmailAndPassword(email, password); }
+
+    public User updateUser(Long id, User updatedUser) {
+        return userRepo.findById(id).map(existingUser -> {
+            existingUser.setName(updatedUser.getName());
+            existingUser.setEmail(updatedUser.getEmail());
+            existingUser.setRole(updatedUser.getRole());
+            // Only update password if it's not null or empty
+            if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
+                existingUser.setPassword(updatedUser.getPassword());
+            }
+            return userRepo.save(existingUser);
+        }).orElse(null);
+    }
+
+
+    public boolean deleteUser(Long id) {
+        if (userRepo.existsById(id)) {
+            userRepo.deleteById(id);
+            return true;
+        }
+        return false;
+    }
 }
