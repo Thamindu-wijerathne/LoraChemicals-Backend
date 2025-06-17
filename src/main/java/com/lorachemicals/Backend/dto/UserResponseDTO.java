@@ -1,10 +1,10 @@
 package com.lorachemicals.Backend.dto;
 
 public class UserResponseDTO {
-    private Long id;
-    private String name;
-    private String email;
-    private String role;
+    private final Long id;
+    private final String name;
+    private final String email;
+    private final String role;
     private String password;
 
 
