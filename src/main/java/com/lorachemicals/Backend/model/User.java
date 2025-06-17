@@ -1,6 +1,4 @@
 // Purpose: Defines the structure of the User table in the database.
-
-
 package com.lorachemicals.Backend.model;
 
 import jakarta.persistence.*;
