@@ -25,17 +25,21 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
+    public User createUser(@RequestBody User user,HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "admin");
         return userService.addUser(user);
     }
 
     @GetMapping("all-users")
-    public List<User> getUsers() {
+    public List<User> getUsers(HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "admin");
         return userService.getAllUsers();
     }
 
     @GetMapping("/check")
-    public ResponseEntity<?> checkUser(@RequestParam String email) {
+    public ResponseEntity<?> checkUser(@RequestParam String email,HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "admin");
+
         User user = userService.findByEmail(email);
         if (user != null) {
             return ResponseEntity.ok(user);
@@ -45,7 +49,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequestDTO loginRequest) {
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequestDTO loginRequest, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "admin");
         User user = userService.Login(loginRequest.getEmail(), loginRequest.getPassword());
         if (user != null) {
             UserResponseDTO response = new UserResponseDTO(
@@ -67,13 +72,17 @@ public class UserController {
     }
 
     @PostMapping("/add-users")
-    public ResponseEntity<?> addUser(@RequestBody User user) {
+    public ResponseEntity<?> addUser(@RequestBody User user, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "admin");
+
         User savedUser = userService.addUser(user);
         return ResponseEntity.ok(savedUser);
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User updatedUser , HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "admin");
+
         User user = userService.updateUser(id, updatedUser);
         if (user != null) {
             return ResponseEntity.ok(user);
@@ -86,12 +95,9 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id, HttpServletRequest request) {
 
-        ResponseEntity<String> accessCheck = AccessControlUtil.checkAccess(request, "admin");
-        if (accessCheck != null) {
-            return accessCheck; // Return 401 or 403 if access denied
-        }
+        AccessControlUtil.checkAccess(request, "admin");
 
-            boolean deleted = userService.deleteUser(id);
+        boolean deleted = userService.deleteUser(id);
             if (deleted) {
                 return ResponseEntity.ok("User deleted successfully");
             } else {
