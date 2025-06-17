@@ -85,18 +85,21 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id, HttpServletRequest request) {
-        String role = (String) request.getAttribute("role"); // Or however you're setting it from JWT
+            // Extract token from Authorization header
+            String authHeader = request.getHeader("Authorization");
+            String token = authHeader.substring(7);
+            String role = JwtUtil.getRoleFromToken(token);
 
-        if (!"admin".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied");
-        }
+            if (!"admin".equals(role)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied");
+            }
 
-        boolean deleted = userService.deleteUser(id);
-        if (deleted) {
-            return ResponseEntity.ok("User deleted successfully");
-        } else {
-            return ResponseEntity.status(404).body("User not found");
-        }
+            boolean deleted = userService.deleteUser(id);
+            if (deleted) {
+                return ResponseEntity.ok("User deleted successfully");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            }
     }
 
 }
