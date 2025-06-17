@@ -16,6 +16,4 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     // Find customer by route ID
     java.util.List<Customer> findByRouteRouteid(Long routeid);
 
-    // Optional: find customer by shop name
-    Customer findByShopName(String shop_name);
 }

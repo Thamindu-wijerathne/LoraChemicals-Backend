@@ -49,8 +49,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequestDTO loginRequest, HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "admin");
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequestDTO loginRequest) {
         User user = userService.Login(loginRequest.getEmail(), loginRequest.getPassword());
         if (user != null) {
             UserResponseDTO response = new UserResponseDTO(
