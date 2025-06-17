@@ -2,7 +2,6 @@
 
 package com.lorachemicals.Backend.controller;
 
-import com.lorachemicals.Backend.dto.LoginRequestDTO;
 import com.lorachemicals.Backend.dto.UserResponseDTO;
 import com.lorachemicals.Backend.model.User;
 import com.lorachemicals.Backend.services.UserService;
@@ -25,17 +24,21 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
+    public User createUser(@RequestBody User user,HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "admin");
         return userService.addUser(user);
     }
 
     @GetMapping("all-users")
-    public List<User> getUsers() {
+    public List<User> getUsers(HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "admin");
         return userService.getAllUsers();
     }
 
     @GetMapping("/check")
-    public ResponseEntity<?> checkUser(@RequestParam String email) {
+    public ResponseEntity<?> checkUser(@RequestParam String email,HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "admin");
+
         User user = userService.findByEmail(email);
         if (user != null) {
             return ResponseEntity.ok(user);
@@ -45,7 +48,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequestDTO loginRequest) {
+    public ResponseEntity<?> loginUser(@RequestBody UserResponseDTO loginRequest) {
         User user = userService.Login(loginRequest.getEmail(), loginRequest.getPassword());
         if (user != null) {
             UserResponseDTO response = new UserResponseDTO(
@@ -67,13 +70,17 @@ public class UserController {
     }
 
     @PostMapping("/add-users")
-    public ResponseEntity<?> addUser(@RequestBody User user) {
+    public ResponseEntity<?> addUser(@RequestBody User user, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "admin");
+
         User savedUser = userService.addUser(user);
         return ResponseEntity.ok(savedUser);
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User updatedUser , HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "admin");
+
         User user = userService.updateUser(id, updatedUser);
         if (user != null) {
             return ResponseEntity.ok(user);
@@ -85,18 +92,15 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id, HttpServletRequest request) {
-        String role = (String) request.getAttribute("role"); // Or however you're setting it from JWT
 
-        if (!"admin".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied");
-        }
+        AccessControlUtil.checkAccess(request, "admin");
 
         boolean deleted = userService.deleteUser(id);
-        if (deleted) {
-            return ResponseEntity.ok("User deleted successfully");
-        } else {
-            return ResponseEntity.status(404).body("User not found");
-        }
+            if (deleted) {
+                return ResponseEntity.ok("User deleted successfully");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            }
     }
 
 }

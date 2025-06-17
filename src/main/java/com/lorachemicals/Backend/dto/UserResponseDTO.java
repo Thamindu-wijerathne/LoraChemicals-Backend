@@ -1,10 +1,12 @@
 package com.lorachemicals.Backend.dto;
 
 public class UserResponseDTO {
-    private Long id;
-    private String name;
-    private String email;
-    private String role;
+    private final Long id;
+    private final String name;
+    private final String email;
+    private final String role;
+    private String password;
+
 
     // Constructor
     public UserResponseDTO(Long id, String name, String email, String role) {
@@ -19,4 +21,6 @@ public class UserResponseDTO {
     public String getName() { return name; }
     public String getEmail() { return email; }
     public String getRole() { return role; }
+    public String getPassword() { return password; }
+
 }

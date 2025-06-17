@@ -88,4 +88,18 @@ public class JwtUtil {
             return false;
         }
     }
+    // Fixed getRoleFromToken method
+    public static String getRoleFromToken(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(KEY)  // Use the SecretKey object, not the raw string
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.get("role", String.class);
+        } catch (JwtException e) {
+            logger.error("Error extracting role from token: ", e);
+            throw new RuntimeException("Invalid token", e);
+        }
+    }
 }
