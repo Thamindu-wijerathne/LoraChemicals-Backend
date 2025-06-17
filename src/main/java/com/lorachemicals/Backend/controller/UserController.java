@@ -85,14 +85,11 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id, HttpServletRequest request) {
-            // Extract token from Authorization header
-            String authHeader = request.getHeader("Authorization");
-            String token = authHeader.substring(7);
-            String role = JwtUtil.getRoleFromToken(token);
 
-            if (!"admin".equals(role)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied");
-            }
+        ResponseEntity<String> accessCheck = AccessControlUtil.checkAccess(request, "admin");
+        if (accessCheck != null) {
+            return accessCheck; // Return 401 or 403 if access denied
+        }
 
             boolean deleted = userService.deleteUser(id);
             if (deleted) {
