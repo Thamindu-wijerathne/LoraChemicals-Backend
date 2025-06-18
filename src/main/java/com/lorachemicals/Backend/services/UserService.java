@@ -54,4 +54,8 @@ public class UserService {
         }
         return false;
     }
+
+    public List<User> getAllCustomers() {
+        return userRepo.findAllCustomers();
+    }
 }

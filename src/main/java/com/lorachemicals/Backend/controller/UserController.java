@@ -35,6 +35,12 @@ public class UserController {
         return userService.getAllUsers();
     }
 
+    @GetMapping("/all-customers")
+    public List<User> getCustomers(HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "salesrep");
+        return userService.getAllCustomers();
+    }
+
     @GetMapping("/check")
     public ResponseEntity<?> checkUser(@RequestParam String email,HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "admin");
@@ -80,7 +86,7 @@ public class UserController {
 
     @PostMapping("/add-users")
     public ResponseEntity<?> addUser(@RequestBody User user, HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "admin");
+        AccessControlUtil.checkAccess(request, "admin", "salesrep");
 
         User savedUser = userService.addUser(user);
         return ResponseEntity.ok(savedUser);
@@ -88,7 +94,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User updatedUser , HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "admin");
+        AccessControlUtil.checkAccess(request, "admin", "salesrep");
 
         User user = userService.updateUser(id, updatedUser);
         if (user != null) {
@@ -101,15 +107,16 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id, HttpServletRequest request) {
-
-        AccessControlUtil.checkAccess(request, "admin");
+        // Allow both "admin" and "salesrep" roles
+        AccessControlUtil.checkAccess(request, "admin", "salesrep");
 
         boolean deleted = userService.deleteUser(id);
-            if (deleted) {
-                return ResponseEntity.ok("User deleted successfully");
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-            }
+        if (deleted) {
+            return ResponseEntity.ok("User deleted successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
     }
+
 
 }
