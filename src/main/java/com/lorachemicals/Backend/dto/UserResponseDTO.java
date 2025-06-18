@@ -6,15 +6,21 @@ public class UserResponseDTO {
     private final String lname;
     private final String email;
     private final String role;
+    private final String address;
+    private final String phone;
+    private final String nic;
     private String password;
 
     // Constructor
-    public UserResponseDTO(Long id, String fname, String lname, String email, String role) {
+    public UserResponseDTO(Long id, String fname, String lname, String email, String role, String address, String phone,String nic) {
         this.id = id;
         this.fname = fname;
         this.lname = lname;
         this.email = email;
         this.role = role;
+        this.address = address;
+        this.phone = phone;
+        this.nic = nic;
     }
 
     // Getters
@@ -29,6 +35,12 @@ public class UserResponseDTO {
     public String getEmail() { return email; }
 
     public String getRole() { return role; }
+
+    public String getPhone() { return phone; }
+
+    public String getAddress() { return address; }
+
+    public String getNic() { return nic; }
 
     public String getPassword() { return password; }
 

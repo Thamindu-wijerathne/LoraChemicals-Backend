@@ -56,7 +56,10 @@ public class UserController {
                     user.getFname(),
                     user.getLname(),
                     user.getEmail(),
-                    user.getRole()
+                    user.getRole(),
+                    user.getPhone(),
+                    user.getAddress(),
+                    user.getNic()
             );
 
             // Generate JWT
