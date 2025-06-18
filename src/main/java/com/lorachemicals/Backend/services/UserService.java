@@ -31,8 +31,13 @@ public class UserService {
     public User updateUser(Long id, User updatedUser) {
         return userRepo.findById(id).map(existingUser -> {
             existingUser.setFname(updatedUser.getFname());
+            existingUser.setLname(updatedUser.getLname());
             existingUser.setEmail(updatedUser.getEmail());
             existingUser.setRole(updatedUser.getRole());
+            existingUser.setPhone(updatedUser.getPhone());
+            existingUser.setAddress(updatedUser.getAddress());
+            existingUser.setNic(updatedUser.getNic());
+
             // Only update password if it's not null or empty
             if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
                 existingUser.setPassword(updatedUser.getPassword());

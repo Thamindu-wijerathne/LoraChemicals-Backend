@@ -86,7 +86,7 @@ public class UserController {
         return ResponseEntity.ok(savedUser);
     }
 
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User updatedUser , HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "admin");
 
