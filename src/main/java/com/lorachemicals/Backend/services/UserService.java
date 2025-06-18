@@ -30,7 +30,7 @@ public class UserService {
 
     public User updateUser(Long id, User updatedUser) {
         return userRepo.findById(id).map(existingUser -> {
-            existingUser.setName(updatedUser.getName());
+            existingUser.setFname(updatedUser.getFname());
             existingUser.setEmail(updatedUser.getEmail());
             existingUser.setRole(updatedUser.getRole());
             // Only update password if it's not null or empty

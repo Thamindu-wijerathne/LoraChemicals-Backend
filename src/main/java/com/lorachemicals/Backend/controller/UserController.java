@@ -52,8 +52,13 @@ public class UserController {
         User user = userService.Login(loginRequest.getEmail(), loginRequest.getPassword());
         if (user != null) {
             UserResponseDTO response = new UserResponseDTO(
-                    user.getId(), user.getName(), user.getEmail(), user.getRole()
+                    user.getId(),
+                    user.getFname(),
+                    user.getLname(),
+                    user.getEmail(),
+                    user.getRole()
             );
+
             // Generate JWT
             String token = JwtUtil.generateToken(user.getEmail(), user.getRole());
 
@@ -62,6 +67,7 @@ public class UserController {
             Map<String, Object> result = new HashMap<>();
             result.put("user", response);
             result.put("token", token);
+
 
             return ResponseEntity.ok(result);
         } else {
