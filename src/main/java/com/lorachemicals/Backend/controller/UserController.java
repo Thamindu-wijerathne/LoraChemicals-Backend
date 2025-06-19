@@ -165,11 +165,11 @@ public class UserController {
 
 
 
-
+//hard delete from user table
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id, HttpServletRequest request) {
         // Allow both "admin" and "salesrep" roles
-        AccessControlUtil.checkAccess(request, "admin", "salesrep");
+        AccessControlUtil.checkAccess(request, "admin", "sales");
 
         boolean deleted = userService.deleteUser(id);
         if (deleted) {
@@ -177,6 +177,33 @@ public class UserController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
+    }
+
+    //view my profile
+    @GetMapping("/viewaccount/{id}")
+    public ResponseEntity<?> ViewAccount(@PathVariable Long id, HttpServletRequest request) {
+
+        AccessControlUtil.checkAccess(request, "admin", "salesrep" , "customer" , "warehouse");
+
+        User user = userService.getUserById(id);
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.status(404).body("User Not Found");
+        }
+    }
+
+    //update my profile
+    @PutMapping("updateaccount/{id}")
+    public ResponseEntity<?> updateProfile(@PathVariable Long id, @RequestBody User updatedUser, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "admin", "salesrep" , "customer" , "warehouse");
+
+        // Get the current user
+        User savedUser = userService.updateUser(id, updatedUser);
+        if (savedUser == null) {
+            return ResponseEntity.status(404).body("User not found");
+        }
+        return ResponseEntity.ok(savedUser);
     }
 
 

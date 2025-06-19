@@ -31,4 +31,9 @@ public class SalesRep {
     // Constructor
     public SalesRep() {}
 
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+
 }
