@@ -24,15 +24,25 @@ public class UserService {
         return userRepo.findAll();
     }
 
+    public User getUserById(Long id) {
+        return userRepo.findById(id).orElse(null);
+    }
+
+
     public User findByEmail(String email) { return userRepo.findByEmail(email); }
 
     public User Login(String email, String password) { return userRepo.findByEmailAndPassword(email, password); }
 
     public User updateUser(Long id, User updatedUser) {
         return userRepo.findById(id).map(existingUser -> {
-            existingUser.setName(updatedUser.getName());
+            existingUser.setFname(updatedUser.getFname());
+            existingUser.setLname(updatedUser.getLname());
             existingUser.setEmail(updatedUser.getEmail());
             existingUser.setRole(updatedUser.getRole());
+            existingUser.setPhone(updatedUser.getPhone());
+            existingUser.setAddress(updatedUser.getAddress());
+            existingUser.setNic(updatedUser.getNic());
+
             // Only update password if it's not null or empty
             if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
                 existingUser.setPassword(updatedUser.getPassword());
@@ -48,5 +58,9 @@ public class UserService {
             return true;
         }
         return false;
+    }
+
+    public List<User> getAllCustomers() {
+        return userRepo.findAllCustomers();
     }
 }

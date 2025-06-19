@@ -7,7 +7,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 public class AccessControlUtil {
 
-    public static void checkAccess(HttpServletRequest request, String... allowedRoles) {
+    public static boolean checkAccess(HttpServletRequest request, String... allowedRoles) {
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing or invalid Authorization header");
@@ -22,7 +22,7 @@ public class AccessControlUtil {
 
         for (String role : allowedRoles) {
             if (role.equalsIgnoreCase(userRole)) {
-                return; // Access granted
+                return true; // ✅ Access granted
             }
         }
 
