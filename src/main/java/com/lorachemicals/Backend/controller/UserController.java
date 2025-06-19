@@ -3,10 +3,12 @@
 package com.lorachemicals.Backend.controller;
 
 import com.lorachemicals.Backend.dto.UserResponseDTO;
+import com.lorachemicals.Backend.model.Customer;
 import com.lorachemicals.Backend.model.User;
 import com.lorachemicals.Backend.model.WarehouseManager;
 import com.lorachemicals.Backend.repository.SalesRepRepository;
 import com.lorachemicals.Backend.repository.WarehouseManagerRepository;
+import com.lorachemicals.Backend.services.CustomerService;
 import com.lorachemicals.Backend.services.SalesrepService;
 import com.lorachemicals.Backend.services.UserService;
 import com.lorachemicals.Backend.services.WarehouseManagerService;
@@ -28,14 +30,21 @@ public class UserController {
     private final WarehouseManagerService warehouseManagerService;
     private final SalesRepRepository salesRepRepo;
     private final WarehouseManagerRepository warehouseManagerRepo;
+    private final CustomerService customerService;
 
-    public UserController(UserService userService, SalesrepService salesrepService, WarehouseManagerService warehouseManagerService, SalesRepRepository salesRepRepo, WarehouseManagerRepository warehouseManagerRepo) {
+    public UserController(UserService userService, SalesrepService salesrepService,
+                          WarehouseManagerService warehouseManagerService,
+                          SalesRepRepository salesRepRepo,
+                          WarehouseManagerRepository warehouseManagerRepo,
+                          CustomerService customerService) {
         this.userService = userService;
         this.salesrepService = salesrepService;
         this.warehouseManagerService = warehouseManagerService;
         this.salesRepRepo = salesRepRepo;
         this.warehouseManagerRepo = warehouseManagerRepo;
+        this.customerService = customerService; // ✅ FIXED
     }
+
 
     @PostMapping
     public User createUser(@RequestBody User user,HttpServletRequest request) {
@@ -113,6 +122,10 @@ public class UserController {
             WarehouseManager warehouseManager = new WarehouseManager();
             warehouseManager.setUser(savedUser);
             warehouseManagerService.saveWarehouseManager(warehouseManager);
+        } else if ("customer".equalsIgnoreCase(savedUser.getRole())) {
+            Customer newcustomer = new Customer();
+            newcustomer.setUser(savedUser);
+            customerService.saveCustomer(newcustomer);
         }
 
         return ResponseEntity.ok(savedUser);
@@ -169,7 +182,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id, HttpServletRequest request) {
         // Allow both "admin" and "salesrep" roles
-        AccessControlUtil.checkAccess(request, "admin", "sales");
+        AccessControlUtil.checkAccess(request, "admin", "salesrep");
 
         boolean deleted = userService.deleteUser(id);
         if (deleted) {
