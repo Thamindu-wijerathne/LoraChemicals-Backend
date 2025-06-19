@@ -14,7 +14,7 @@ public class WarehouseManager {
     @JoinColumn(
             name = "userid",
             referencedColumnName = "id",
-            foreignKey = @ForeignKey(name = "fk_wm_user", foreignKeyDefinition = "FOREIGN KEY (userid) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE")
+            foreignKey = @ForeignKey(name = "fk_wm_user", foreignKeyDefinition = "FOREIGN KEY (userid) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE")
     )
     private User user;
 
