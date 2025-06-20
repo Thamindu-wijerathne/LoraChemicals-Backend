@@ -3,7 +3,11 @@
 package com.lorachemicals.Backend.controller;
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import com.lorachemicals.Backend.dto.LoginRequestDTO;
+=======
+import com.lorachemicals.Backend.dto.UserRequestDTO;
+>>>>>>> Stashed changes
 =======
 import com.lorachemicals.Backend.dto.UserRequestDTO;
 >>>>>>> Stashed changes
@@ -21,7 +25,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +44,11 @@ public class UserController {
 <<<<<<< Updated upstream
     public UserController(UserService userService) {
 =======
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
+    @Autowired
+    private ModelMapper modelMapper;
+
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
@@ -95,10 +107,13 @@ public class UserController {
 
     @PostMapping("/add-users")
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     public ResponseEntity<?> addUser(@RequestBody User user) {
         User savedUser = userService.addUser(user);
         return ResponseEntity.ok(savedUser);
 =======
+=======
+>>>>>>> Stashed changes
     public ResponseEntity<?> addUser(@RequestBody UserRequestDTO userDTO, HttpServletRequest request) {
         try {
             AccessControlUtil.checkAccess(request, "admin", "salesrep");
@@ -137,6 +152,9 @@ public class UserController {
             logger.error("Error in addUser:", e);
             return ResponseEntity.status(500).body("Internal Server Error: " + e.getMessage());
         }
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     }
 
