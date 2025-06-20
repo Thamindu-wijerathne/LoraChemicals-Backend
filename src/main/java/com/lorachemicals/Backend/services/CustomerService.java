@@ -1,6 +1,7 @@
 package com.lorachemicals.Backend.services;
 
 import com.lorachemicals.Backend.model.Customer;
+import com.lorachemicals.Backend.model.SalesRep;
 import com.lorachemicals.Backend.repository.CustomerRepository;
 import org.springframework.stereotype.Service;
 
@@ -34,4 +35,9 @@ public class CustomerService {
     public List<Customer> getAllCustomers() {
         return customerRepository.findAll();
     }
+
+    public List<Customer> getCustomersBySalesRep(SalesRep salesRep) {
+        return customerRepository.findBySalesRep(salesRep);
+    }
+
 }

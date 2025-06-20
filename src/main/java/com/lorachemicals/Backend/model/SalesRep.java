@@ -31,6 +31,7 @@ public class SalesRep {
     // Constructor
     public SalesRep() {}
 
+    public Long getSrepid() { return this.srepid; }
     public void setUser(User user) {
         this.user = user;
     }

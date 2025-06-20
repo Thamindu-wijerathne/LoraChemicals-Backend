@@ -16,15 +16,17 @@ public class SalesrepService {
         salesrepRepo.save(salesRep);
     }
 
+    public SalesRep findById(Long id) {
+        return salesrepRepo.findByUserId(id);
+    }
+
     public void deleteByUserId(Long userId) {
         SalesRep rep = salesrepRepo.findByUserId(userId);
         if (rep != null) {
             salesrepRepo.delete(rep);
         }
     }
-
     public SalesRep getSalesRepById(Long Id) {
         return salesrepRepo.findByUserId(Id);
     }
-
 }

@@ -2,9 +2,12 @@
 
 package com.lorachemicals.Backend.controller;
 
+
+import com.lorachemicals.Backend.dto.CustomerUserDTO;
 import com.lorachemicals.Backend.dto.UserRequestDTO;
 import com.lorachemicals.Backend.dto.UserResponseDTO;
 import com.lorachemicals.Backend.model.Customer;
+import com.lorachemicals.Backend.model.SalesRep;
 import com.lorachemicals.Backend.model.User;
 import com.lorachemicals.Backend.model.WarehouseManager;
 import com.lorachemicals.Backend.repository.SalesRepRepository;
@@ -23,9 +26,10 @@ import com.lorachemicals.Backend.util.JwtUtil;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
-import com.lorachemicals.Backend.model.SalesRep;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/users")
@@ -41,8 +45,6 @@ public class UserController {
 
     @Autowired
     private ModelMapper modelMapper;
-
-
     public UserController(UserService userService, SalesrepService salesrepService,
                           WarehouseManagerService warehouseManagerService,
                           SalesRepRepository salesRepRepo,
@@ -69,11 +71,47 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @GetMapping("/all-customers")
-    public List<User> getCustomers(HttpServletRequest request) {
+//    @GetMapping("/all-customers")
+//    public List<User> getCustomers(HttpServletRequest request) {
+//        AccessControlUtil.checkAccess(request, "salesrep");
+//        return userService.getAllCustomers();
+//    }
+
+    @GetMapping("/my-customers")
+    public List<CustomerUserDTO> getMyCustomers(HttpServletRequest request) {
+        logger.info("GET /my-customers called");
         AccessControlUtil.checkAccess(request, "salesrep");
-        return userService.getAllCustomers();
+
+        String authHeader = request.getHeader("Authorization");
+        String token = authHeader != null ? authHeader.replace("Bearer ", "") : null;
+        Long userId = JwtUtil.extractUserId(token);
+
+        SalesRep salesRep = salesrepService.getSalesRepById(userId);
+        if (salesRep == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "SalesRep not found");
+        }
+
+        List<Customer> customers = customerService.getCustomersBySalesRep(salesRep);
+
+        // Map each customer + user into the combined DTO
+        return customers.stream().map(c -> new CustomerUserDTO(
+                c.getCustomerid(),
+                c.getShop_name(),
+                c.getSalesRep() != null ? c.getSalesRep().getSrepid() : null,
+                c.getRoute() != null ? c.getRoute().getRouteid() : null,
+                c.getUser().getId(),
+                c.getUser().getFname(),
+                c.getUser().getLname(),
+                c.getUser().getEmail(),
+                c.getUser().getRole(),
+                c.getUser().getAddress(),
+                c.getUser().getPhone(),
+                c.getUser().getNic()
+        )).toList();
     }
+
+
+
 
     @GetMapping("/check")
     public ResponseEntity<?> checkUser(@RequestParam String email,HttpServletRequest request) {
@@ -103,7 +141,7 @@ public class UserController {
             );
 
             // Generate JWT
-            String token = JwtUtil.generateToken(user.getEmail(), user.getRole());
+            String token = JwtUtil.generateToken(user.getEmail(), user.getRole(), user.getId());
 
 
             // Return both user info and token
