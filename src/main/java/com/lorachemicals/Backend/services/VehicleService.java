@@ -19,12 +19,10 @@ public class VehicleService {
 
     public VehicleResponseDTO createVehicle(VehicleRequestDTO requestDTO) {
         try {
-            Vehicle vehicle = new Vehicle(
-                    null, // ID is auto-generated
-                    requestDTO.getVehicleNo(),
-                    requestDTO.getVehicleType(),
-                    requestDTO.getCapacity()
-            );
+            Vehicle vehicle = new Vehicle(requestDTO.getVehicleNo(),requestDTO.getVehicleType(),requestDTO.getCapacity()); // Use default constructor
+//            vehicle.setVehicleNo(requestDTO.getVehicleNo());
+//            vehicle.setVehicleType(requestDTO.getVehicleType());
+//            vehicle.setCapacity(requestDTO.getCapacity());
             Vehicle savedVehicle = vehicleRepository.save(vehicle);
             return convertToResponseDTO(savedVehicle);
         } catch (Exception e) {
