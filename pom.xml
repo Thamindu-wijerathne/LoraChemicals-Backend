@@ -38,16 +38,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-<<<<<<< Updated upstream
-=======
-		<dependency>
-			<groupId>org.modelmapper</groupId>
-			<artifactId>modelmapper</artifactId>
-			<version>3.1.1</version> <!-- Or latest version -->
-		</dependency>
->>>>>>> Stashed changes
-
-
 
 		<dependency>
 			<groupId>org.postgresql</groupId>
