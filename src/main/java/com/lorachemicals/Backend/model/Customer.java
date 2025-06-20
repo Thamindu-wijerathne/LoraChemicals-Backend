@@ -24,7 +24,7 @@ public class Customer {
     @JoinColumn(
             name = "srepid",
             referencedColumnName = "srepid",
-            foreignKey = @ForeignKey(name = "fk_customer_salesrep", foreignKeyDefinition = "FOREIGN KEY (srepid) REFERENCES sales_rep(srepid) ON DELETE RESTRICT ON UPDATE SET NULL")
+            foreignKey = @ForeignKey(name = "fk_customer_salesrep", foreignKeyDefinition = "FOREIGN KEY (srepid) REFERENCES sales_rep(srepid) ON DELETE SET NULL ON UPDATE SET NULL")
     )
     private SalesRep salesRep;
 
@@ -32,7 +32,7 @@ public class Customer {
     @JoinColumn(
             name = "routeid",
             referencedColumnName = "routeid",
-            foreignKey = @ForeignKey(name = "fk_customer_route", foreignKeyDefinition = "FOREIGN KEY (routeid) REFERENCES route(routeid) ON DELETE RESTRICT ON UPDATE SET NULL")
+            foreignKey = @ForeignKey(name = "fk_customer_route", foreignKeyDefinition = "FOREIGN KEY (routeid) REFERENCES route(routeid) ON DELETE SET NULL ON UPDATE SET NULL")
     )
     private Route route;
 
