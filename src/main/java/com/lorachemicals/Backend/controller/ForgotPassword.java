@@ -8,8 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.SimpleMailMessage;
+//import org.springframework.mail.javamail.JavaMailSender;
+//import org.springframework.mail.SimpleMailMessage;
 
 
 import java.util.Random;
@@ -31,14 +31,14 @@ public class ForgotPassword {
         return String.valueOf(otp);
     }
 
-    private JavaMailSender mailSender;
-    private void sendOtpEmail(String email, String otp) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(email);
-        message.setSubject("Your OTP for Password Reset");
-        message.setText("Your OTP is: " + otp + "\nThis code will expire in 5 minutes.");
-        mailSender.send(message);
-    }
+//    private JavaMailSender mailSender;
+//    private void sendOtpEmail(String email, String otp) {
+//        SimpleMailMessage message = new SimpleMailMessage();
+//        message.setTo(email);
+//        message.setSubject("Your OTP for Password Reset");
+//        message.setText("Your OTP is: " + otp + "\nThis code will expire in 5 minutes.");
+//        mailSender.send(message);
+//    }
 
 
     @PostMapping("/forgot-password")
