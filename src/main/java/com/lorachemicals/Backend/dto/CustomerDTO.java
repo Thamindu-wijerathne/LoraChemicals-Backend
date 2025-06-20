@@ -7,7 +7,7 @@ public class CustomerDTO {
     private Long srepid;
     private Long routeid;
 
-    public CustomerDTO(Long customerid,Long userid,String shop_name,Long srepid,Long routeid) {
+    public CustomerDTO(Long customerid, Long userid, String shop_name, Long srepid, Long routeid) {
         this.customerid = customerid;
         this.userid = userid;
         this.shop_name = shop_name;
@@ -20,4 +20,15 @@ public class CustomerDTO {
     public String getShopName() { return shop_name; }
     public Long getSrepid() { return srepid; }
     public Long getRouteid() { return routeid; }
+
+    @Override
+    public String toString() {
+        return "CustomerDTO{" +
+                "customerid=" + customerid +
+                ", userid=" + userid +
+                ", shop_name='" + shop_name + '\'' +
+                ", srepid=" + srepid +
+                ", routeid=" + routeid +
+                '}';
+    }
 }

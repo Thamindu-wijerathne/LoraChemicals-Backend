@@ -58,4 +58,17 @@ public class Customer {
     public Route getRoute() {return route;}
 
     public void setRoute(Route route) {this.route = route;}
+
+    @Override
+    public String toString() {
+        return "Customer{" +
+                "customerid=" + customerid +
+                ", userId=" + (user != null ? user.getId() : "null") +
+                ", shop_name='" + shop_name + '\'' +
+                ", salesRepId=" + (salesRep != null ? salesRep.getSrepid() : "null") +
+                ", routeId=" + (route != null ? route.getRouteid() : "null") +
+                '}';
+    }
+
+
 }

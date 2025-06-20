@@ -3,6 +3,7 @@
 package com.lorachemicals.Backend.controller;
 
 
+import com.lorachemicals.Backend.dto.CustomerUserDTO;
 import com.lorachemicals.Backend.dto.UserRequestDTO;
 import com.lorachemicals.Backend.dto.UserResponseDTO;
 import com.lorachemicals.Backend.model.Customer;
@@ -77,15 +78,13 @@ public class UserController {
 //    }
 
     @GetMapping("/my-customers")
-    public List<User> getMyCustomers(HttpServletRequest request) {
+    public List<CustomerUserDTO> getMyCustomers(HttpServletRequest request) {
         logger.info("GET /my-customers called");
         AccessControlUtil.checkAccess(request, "salesrep");
 
         String authHeader = request.getHeader("Authorization");
         String token = authHeader != null ? authHeader.replace("Bearer ", "") : null;
         Long userId = JwtUtil.extractUserId(token);
-
-        logger.info("User ID: {}", userId);
 
         SalesRep salesRep = salesrepService.getSalesRepById(userId);
         if (salesRep == null) {
@@ -94,8 +93,23 @@ public class UserController {
 
         List<Customer> customers = customerService.getCustomersBySalesRep(salesRep);
 
-        return customers.stream().map(Customer::getUser).toList();
+        // Map each customer + user into the combined DTO
+        return customers.stream().map(c -> new CustomerUserDTO(
+                c.getCustomerid(),
+                c.getShop_name(),
+                c.getSalesRep() != null ? c.getSalesRep().getSrepid() : null,
+                c.getRoute() != null ? c.getRoute().getRouteid() : null,
+                c.getUser().getId(),
+                c.getUser().getFname(),
+                c.getUser().getLname(),
+                c.getUser().getEmail(),
+                c.getUser().getRole(),
+                c.getUser().getAddress(),
+                c.getUser().getPhone(),
+                c.getUser().getNic()
+        )).toList();
     }
+
 
 
 
