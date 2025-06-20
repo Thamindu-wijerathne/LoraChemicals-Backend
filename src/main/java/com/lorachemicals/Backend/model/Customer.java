@@ -20,13 +20,14 @@ public class Customer {
 
     private String shop_name;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(
             name = "srepid",
             referencedColumnName = "srepid",
             foreignKey = @ForeignKey(name = "fk_customer_salesrep", foreignKeyDefinition = "FOREIGN KEY (srepid) REFERENCES sales_rep(srepid) ON DELETE SET NULL ON UPDATE SET NULL")
     )
     private SalesRep salesRep;
+
 
     @OneToOne
     @JoinColumn(

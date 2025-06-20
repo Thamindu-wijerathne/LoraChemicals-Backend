@@ -2,6 +2,7 @@
 
 package com.lorachemicals.Backend.controller;
 
+import com.lorachemicals.Backend.dto.UserRequestDTO;
 import com.lorachemicals.Backend.dto.UserResponseDTO;
 import com.lorachemicals.Backend.model.Customer;
 import com.lorachemicals.Backend.model.User;
@@ -13,6 +14,8 @@ import com.lorachemicals.Backend.services.SalesrepService;
 import com.lorachemicals.Backend.services.UserService;
 import com.lorachemicals.Backend.services.WarehouseManagerService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import com.lorachemicals.Backend.model.SalesRep;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/users")
@@ -31,6 +36,12 @@ public class UserController {
     private final SalesRepRepository salesRepRepo;
     private final WarehouseManagerRepository warehouseManagerRepo;
     private final CustomerService customerService;
+
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
+    @Autowired
+    private ModelMapper modelMapper;
+
 
     public UserController(UserService userService, SalesrepService salesrepService,
                           WarehouseManagerService warehouseManagerService,
@@ -108,28 +119,44 @@ public class UserController {
     }
 
     @PostMapping("/add-users")
-    public ResponseEntity<?> addUser(@RequestBody User user, HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "admin", "salesrep");
+    public ResponseEntity<?> addUser(@RequestBody UserRequestDTO userDTO, HttpServletRequest request) {
+        try {
+            AccessControlUtil.checkAccess(request, "admin", "salesrep");
 
-        User savedUser = userService.addUser(user);
+            User user = modelMapper.map(userDTO, User.class);
 
-        // If role is sales rep or warehouse, also save to SalesRep/warehouse table
-        if ("salesrep".equalsIgnoreCase(savedUser.getRole())) {
-            SalesRep salesRep = new SalesRep();
-            salesRep.setUser(savedUser);
-            salesrepService.saveSalesRep(salesRep);
-        } else if ("warehouse".equalsIgnoreCase(savedUser.getRole())) {
-            WarehouseManager warehouseManager = new WarehouseManager();
-            warehouseManager.setUser(savedUser);
-            warehouseManagerService.saveWarehouseManager(warehouseManager);
-        } else if ("customer".equalsIgnoreCase(savedUser.getRole())) {
-            Customer newcustomer = new Customer();
-            newcustomer.setUser(savedUser);
-            customerService.saveCustomer(newcustomer);
+            User savedUser = userService.addUser(user);
+
+            if ("salesrep".equalsIgnoreCase(savedUser.getRole())) {
+                SalesRep salesRep = new SalesRep();
+                salesRep.setUser(savedUser);
+                salesrepService.saveSalesRep(salesRep);
+            } else if ("warehouse".equalsIgnoreCase(savedUser.getRole())) {
+                WarehouseManager warehouseManager = new WarehouseManager();
+                warehouseManager.setUser(savedUser);
+                warehouseManagerService.saveWarehouseManager(warehouseManager);
+            } else if ("customer".equalsIgnoreCase(savedUser.getRole())) {
+                Customer newCustomer = new Customer();
+                newCustomer.setUser(savedUser);
+                newCustomer.setShop_name(userDTO.getShop_name());
+
+                SalesRep relatedRep = salesrepService.getSalesRepById(userDTO.getSrepid());
+//                Route relatedRoute = routeService.getRouteById(userDTO.getRouteid());
+
+                newCustomer.setSalesRep(relatedRep);
+//                newCustomer.setRoute(relatedRoute);
+
+                customerService.saveCustomer(newCustomer);
+            }
+
+            return ResponseEntity.ok(savedUser);
+
+        } catch (Exception e) {
+            logger.error("Error in addUser:", e);
+            return ResponseEntity.status(500).body("Internal Server Error: " + e.getMessage());
         }
-
-        return ResponseEntity.ok(savedUser);
     }
+
 
 
     // File: UserController.java
