@@ -26,5 +26,7 @@ public class SalesrepService {
             salesrepRepo.delete(rep);
         }
     }
-
+    public SalesRep getSalesRepById(Long Id) {
+        return salesrepRepo.findByUserId(Id);
+    }
 }
