@@ -19,10 +19,11 @@ public class JwtUtil {
     private static final String SECRET_KEY = "your-256-bit-secret-key-should-be-32-bytes!";
     private static final SecretKey KEY = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
 
-    public static String generateToken(String email, String role) {
+    public static String generateToken(String email, String role, Long id) {
         return Jwts.builder()
                 .setSubject(email)
                 .claim("role", role)
+                .claim("userId", id)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours
                 .signWith(KEY, SignatureAlgorithm.HS256)
@@ -102,4 +103,19 @@ public class JwtUtil {
             throw new RuntimeException("Invalid token", e);
         }
     }
+
+    public static Long extractUserId(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(KEY) // ✅ use the correct key
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            return claims.get("userId", Long.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid JWT token", e);
+        }
+    }
+
 }

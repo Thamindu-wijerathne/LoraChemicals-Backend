@@ -3,10 +3,10 @@
 package com.lorachemicals.Backend.controller;
 
 
-import com.lorachemicals.Backend.dto.LoginRequestDTO;
 import com.lorachemicals.Backend.dto.UserRequestDTO;
 import com.lorachemicals.Backend.dto.UserResponseDTO;
 import com.lorachemicals.Backend.model.Customer;
+import com.lorachemicals.Backend.model.SalesRep;
 import com.lorachemicals.Backend.model.User;
 import com.lorachemicals.Backend.model.WarehouseManager;
 import com.lorachemicals.Backend.repository.SalesRepRepository;
@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/users")
@@ -69,11 +70,34 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @GetMapping("/all-customers")
-    public List<User> getCustomers(HttpServletRequest request) {
+//    @GetMapping("/all-customers")
+//    public List<User> getCustomers(HttpServletRequest request) {
+//        AccessControlUtil.checkAccess(request, "salesrep");
+//        return userService.getAllCustomers();
+//    }
+
+    @GetMapping("/my-customers")
+    public List<User> getMyCustomers(HttpServletRequest request) {
+        logger.info("GET /my-customers called");
         AccessControlUtil.checkAccess(request, "salesrep");
-        return userService.getAllCustomers();
+
+        String authHeader = request.getHeader("Authorization");
+        String token = authHeader != null ? authHeader.replace("Bearer ", "") : null;
+        Long userId = JwtUtil.extractUserId(token);
+
+        logger.info("User ID: {}", userId);
+
+        SalesRep salesRep = salesrepService.getSalesRepById(userId);
+        if (salesRep == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "SalesRep not found");
+        }
+
+        List<Customer> customers = customerService.getCustomersBySalesRep(salesRep);
+
+        return customers.stream().map(Customer::getUser).toList();
     }
+
+
 
     @GetMapping("/check")
     public ResponseEntity<?> checkUser(@RequestParam String email,HttpServletRequest request) {
@@ -103,7 +127,7 @@ public class UserController {
             );
 
             // Generate JWT
-            String token = JwtUtil.generateToken(user.getEmail(), user.getRole());
+            String token = JwtUtil.generateToken(user.getEmail(), user.getRole(), user.getId());
 
 
             // Return both user info and token
