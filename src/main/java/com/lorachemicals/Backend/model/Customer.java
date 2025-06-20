@@ -14,11 +14,11 @@ public class Customer {
     @JoinColumn(
             name = "userid",
             referencedColumnName = "id",
-            foreignKey = @ForeignKey(name = "fk_customer_user", foreignKeyDefinition = "FOREIGN KEY (userid) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE")
+            foreignKey = @ForeignKey(name = "fk_customer_user", foreignKeyDefinition = "FOREIGN KEY (userid) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE")
     )
     private User user;
 
-    private String shop_name;
+    private String shopName;
 
     @ManyToOne
     @JoinColumn(
@@ -47,9 +47,9 @@ public class Customer {
 
     public void setUser(User user) {this.user = user;}
 
-    public String getShop_name() {return shop_name;}
+    public String getShopName() {return shopName;}
 
-    public void setShop_name(String shop_name) {this.shop_name = shop_name;}
+    public void setShopName(String shopName) {this.shopName = shopName;}
 
     public SalesRep getSalesRep() {return salesRep;}
 
@@ -64,7 +64,7 @@ public class Customer {
         return "Customer{" +
                 "customerid=" + customerid +
                 ", userId=" + (user != null ? user.getId() : "null") +
-                ", shop_name='" + shop_name + '\'' +
+                ", shop_name='" + shopName + '\'' +
                 ", salesRepId=" + (salesRep != null ? salesRep.getSrepid() : "null") +
                 ", routeId=" + (route != null ? route.getRouteid() : "null") +
                 '}';

@@ -40,4 +40,8 @@ public class CustomerService {
         return customerRepository.findBySalesRep(salesRep);
     }
 
+    public Customer getCustomerByUserId(Long id) {
+        return customerRepository.findByUserId(id);
+    }
+
 }
