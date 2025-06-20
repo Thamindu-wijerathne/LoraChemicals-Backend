@@ -178,7 +178,7 @@ public class UserController {
 
 
 
-//hard delete from user table
+    //hard delete from user table
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id, HttpServletRequest request) {
         // Allow both "admin" and "salesrep" roles
