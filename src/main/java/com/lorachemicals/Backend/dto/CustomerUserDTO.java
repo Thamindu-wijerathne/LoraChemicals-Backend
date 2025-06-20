@@ -2,8 +2,8 @@ package com.lorachemicals.Backend.dto;
 
 public class CustomerUserDTO {
     private Long customerId;
-    private String shopName;
-    private Long salesRepId;
+    private String shop_name;
+    private Long srepid;
     private Long routeId;
 
     private Long userId;
@@ -20,8 +20,8 @@ public class CustomerUserDTO {
                            Long userId, String fname, String lname, String email, String role,
                            String address, String phone, String nic) {
         this.customerId = customerId;
-        this.shopName = shopName;
-        this.salesRepId = salesRepId;
+        this.shop_name = shopName;
+        this.srepid = salesRepId;
         this.routeId = routeId;
         this.userId = userId;
         this.fname = fname;
@@ -38,12 +38,12 @@ public class CustomerUserDTO {
         return customerId;
     }
 
-    public String getShopName() {
-        return shopName;
+    public String getShop_name() {
+        return shop_name;
     }
 
-    public Long getSalesRepId() {
-        return salesRepId;
+    public Long getSrepid() {
+        return srepid;
     }
 
     public Long getRouteId() {
@@ -86,8 +86,8 @@ public class CustomerUserDTO {
     public String toString() {
         return "CustomerUserDTO{" +
                 "customerId=" + customerId +
-                ", shopName='" + shopName + '\'' +
-                ", salesRepId=" + salesRepId +
+                ", shopName='" + shop_name + '\'' +
+                ", salesRepId=" + srepid +
                 ", routeId=" + routeId +
                 ", userId=" + userId +
                 ", fname='" + fname + '\'' +

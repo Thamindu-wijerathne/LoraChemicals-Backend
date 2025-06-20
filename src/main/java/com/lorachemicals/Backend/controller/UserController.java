@@ -26,7 +26,7 @@ import com.lorachemicals.Backend.util.JwtUtil;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
-import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.server.ResponseStatusException;
@@ -96,7 +96,7 @@ public class UserController {
         // Map each customer + user into the combined DTO
         return customers.stream().map(c -> new CustomerUserDTO(
                 c.getCustomerid(),
-                c.getShop_name(),
+                c.getShopName(),
                 c.getSalesRep() != null ? c.getSalesRep().getSrepid() : null,
                 c.getRoute() != null ? c.getRoute().getRouteid() : null,
                 c.getUser().getId(),
@@ -176,7 +176,7 @@ public class UserController {
             } else if ("customer".equalsIgnoreCase(savedUser.getRole())) {
                 Customer newCustomer = new Customer();
                 newCustomer.setUser(savedUser);
-                newCustomer.setShop_name(userDTO.getShop_name());
+                newCustomer.setShopName(userDTO.getShop_name());
 
                 SalesRep relatedRep = salesrepService.getSalesRepById(userDTO.getSrepid());
 //                Route relatedRoute = routeService.getRouteById(userDTO.getRouteid());
@@ -241,19 +241,75 @@ public class UserController {
         return ResponseEntity.ok(savedUser);
     }
 
+    @PutMapping("/update-customer/{userId}")
+    public ResponseEntity<?> updateCustomerWithUser(@PathVariable Long userId, @RequestBody CustomerUserDTO dto, HttpServletRequest request) {
+        try {
+            AccessControlUtil.checkAccess(request, "admin", "salesrep");
+
+            // Update User
+            User user = userService.getUserById(userId);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            }
+
+            user.setFname(dto.getFname());
+            user.setLname(dto.getLname());
+            user.setEmail(dto.getEmail());
+            user.setPhone(dto.getPhone());
+            user.setAddress(dto.getAddress());
+            user.setNic(dto.getNic());
+            user.setRole(dto.getRole());
+            userService.updateUser(userId, user);
+
+            // Update Customer
+            Customer customer = customerService.getCustomerByUserId(userId);
+            if (customer == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Customer not found");
+            }
+
+            customer.setShopName(dto.getShop_name());
+            logger.error("Updating Shop Name: {}", dto);
+
+
+            //        if (dto.getRouteId() != null) {
+    //            Route route = routeService.getRouteById(dto.getRouteId());
+    //            customer.setRoute(route);
+    //        }
+
+            if (dto.getSrepid() != null) {
+                SalesRep salesRep = salesrepService.getSalesRepById(dto.getSrepid());
+                customer.setSalesRep(salesRep);
+            }
+
+            customerService.saveCustomer(customer);
+
+            return ResponseEntity.ok("Customer and User updated successfully.");
+
+        } catch (Exception e) {
+            logger.error("Error in Update User:", e);
+            return ResponseEntity.status(500).body("Internal Server Error: " + e.getMessage());
+        }
+    }
+
+
 
 
     //hard delete from user table
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id, HttpServletRequest request) {
-        // Allow both "admin" and "salesrep" roles
-        AccessControlUtil.checkAccess(request, "admin", "salesrep");
+        try {
+            // Allow both "admin" and "salesrep" roles
+            AccessControlUtil.checkAccess(request, "admin", "salesrep");
 
-        boolean deleted = userService.deleteUser(id);
-        if (deleted) {
-            return ResponseEntity.ok("User deleted successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            boolean deleted = userService.deleteUser(id);
+            if (deleted) {
+                return ResponseEntity.ok("User deleted successfully");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            }
+        } catch (Exception e) {
+            logger.error("Error in Delete User:", e);
+            return ResponseEntity.status(500).body("Internal Server Error: " + e.getMessage());
         }
     }
 
