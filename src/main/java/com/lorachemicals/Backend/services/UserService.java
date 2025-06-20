@@ -63,4 +63,11 @@ public class UserService {
     public List<User> getAllCustomers() {
         return userRepo.findAllCustomers();
     }
+
+    public User findByEmailAndNic(String email, String nic) {
+        return userRepo.findByEmailAndNic(email, nic);
+    }
+
+
+
 }
