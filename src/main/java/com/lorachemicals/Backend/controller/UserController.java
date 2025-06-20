@@ -2,11 +2,17 @@
 
 package com.lorachemicals.Backend.controller;
 
+<<<<<<< Updated upstream
 import com.lorachemicals.Backend.dto.LoginRequestDTO;
+=======
+import com.lorachemicals.Backend.dto.UserRequestDTO;
+>>>>>>> Stashed changes
 import com.lorachemicals.Backend.dto.UserResponseDTO;
 import com.lorachemicals.Backend.model.User;
 import com.lorachemicals.Backend.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,13 +20,34 @@ import com.lorachemicals.Backend.util.JwtUtil;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+<<<<<<< Updated upstream
+=======
+import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.lorachemicals.Backend.model.SalesRep;
+>>>>>>> Stashed changes
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
 
+<<<<<<< Updated upstream
     public UserController(UserService userService) {
+=======
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
+    @Autowired
+    private ModelMapper modelMapper;
+
+    public UserController(UserService userService, SalesrepService salesrepService,
+                          WarehouseManagerService warehouseManagerService,
+                          SalesRepRepository salesRepRepo,
+                          WarehouseManagerRepository warehouseManagerRepo,
+                          CustomerService customerService) {
+>>>>>>> Stashed changes
         this.userService = userService;
     }
 
@@ -67,9 +94,50 @@ public class UserController {
     }
 
     @PostMapping("/add-users")
+<<<<<<< Updated upstream
     public ResponseEntity<?> addUser(@RequestBody User user) {
         User savedUser = userService.addUser(user);
         return ResponseEntity.ok(savedUser);
+=======
+    public ResponseEntity<?> addUser(@RequestBody UserRequestDTO userDTO, HttpServletRequest request) {
+        try {
+            AccessControlUtil.checkAccess(request, "admin", "salesrep");
+
+            User user = modelMapper.map(userDTO, User.class);
+
+            User savedUser = userService.addUser(user);
+            logger.info("Saved user: {}", savedUser);
+
+
+            if ("salesrep".equalsIgnoreCase(savedUser.getRole())) {
+                SalesRep salesRep = new SalesRep();
+                salesRep.setUser(savedUser);
+                salesrepService.saveSalesRep(salesRep);
+            } else if ("warehouse".equalsIgnoreCase(savedUser.getRole())) {
+                WarehouseManager warehouseManager = new WarehouseManager();
+                warehouseManager.setUser(savedUser);
+                warehouseManagerService.saveWarehouseManager(warehouseManager);
+            } else if ("customer".equalsIgnoreCase(savedUser.getRole())) {
+                Customer newCustomer = new Customer();
+                newCustomer.setUser(savedUser);
+                newCustomer.setShop_name(userDTO.getShop_name());
+
+                SalesRep relatedRep = salesrepService.findById(userDTO.getSrepid());
+//                Route relatedRoute = routeService.getRouteById(userDTO.getRouteid());
+
+                newCustomer.setSalesRep(relatedRep);
+//                newCustomer.setRoute(relatedRoute);
+
+                customerService.saveCustomer(newCustomer);
+            }
+
+            return ResponseEntity.ok(savedUser);
+
+        } catch (Exception e) {
+            logger.error("Error in addUser:", e);
+            return ResponseEntity.status(500).body("Internal Server Error: " + e.getMessage());
+        }
+>>>>>>> Stashed changes
     }
 
     @PutMapping("{id}")
