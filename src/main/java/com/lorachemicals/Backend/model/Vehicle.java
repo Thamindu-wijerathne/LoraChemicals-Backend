@@ -1,34 +1,41 @@
 package com.lorachemicals.Backend.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "vehicles")
 public class Vehicle {
-    public Vehicle() {
-    }
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String vehicleNo;
+    private String vehicleType;
+    private String capacity;
 
     public Vehicle(Long id, String vehicleNo, String vehicleType, String capacity) {
-        Id = id;
+        this.id = id;
         this.vehicleNo = vehicleNo;
         this.vehicleType = vehicleType;
         this.capacity = capacity;
     }
 
-    @Id
-    private Long Id;
-    private String vehicleNo;
-    private String vehicleType;
-    private String capacity;
+    public Vehicle(String vehicleNo, String vehicleType, String capacity) {
+        this.vehicleNo = vehicleNo;
+        this.vehicleType = vehicleType;
+        this.capacity = capacity;
+    }
+
+
+    public Vehicle() {
+    }
 
     public Long getId() {
-        return Id;
+        return id;
     }
 
     public void setId(Long id) {
-        Id = id;
+        id = id;
     }
 
     public String getVehicleNo() {
