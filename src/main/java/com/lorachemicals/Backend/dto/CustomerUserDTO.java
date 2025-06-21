@@ -4,7 +4,7 @@ public class CustomerUserDTO {
     private Long customerId;
     private String shop_name;
     private Long srepid;
-    private Long routeId;
+    private Long routeid;
 
     private Long userId;
     private String fname;
@@ -22,7 +22,7 @@ public class CustomerUserDTO {
         this.customerId = customerId;
         this.shop_name = shopName;
         this.srepid = salesRepId;
-        this.routeId = routeId;
+        this.routeid = routeId;
         this.userId = userId;
         this.fname = fname;
         this.lname = lname;
@@ -46,8 +46,8 @@ public class CustomerUserDTO {
         return srepid;
     }
 
-    public Long getRouteId() {
-        return routeId;
+    public Long getRouteid() {
+        return routeid;
     }
 
     public Long getUserId() {
@@ -88,7 +88,7 @@ public class CustomerUserDTO {
                 "customerId=" + customerId +
                 ", shopName='" + shop_name + '\'' +
                 ", salesRepId=" + srepid +
-                ", routeId=" + routeId +
+                ", routeId=" + routeid +
                 ", userId=" + userId +
                 ", fname='" + fname + '\'' +
                 ", lname='" + lname + '\'' +
