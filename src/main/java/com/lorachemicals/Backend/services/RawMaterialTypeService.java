@@ -5,6 +5,8 @@ import com.lorachemicals.Backend.repository.RawMaterialTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class RawMaterialTypeService {
 
@@ -18,4 +20,9 @@ public class RawMaterialTypeService {
     public RawMaterialType addRawMaterialType(RawMaterialType rawMaterialType) {
         return rawMaterialTypeRepo.save(rawMaterialType);
     }
+
+    public List<RawMaterialType> getAllRawMaterials() {
+        return rawMaterialTypeRepo.findAll();
+    }
+
 }
