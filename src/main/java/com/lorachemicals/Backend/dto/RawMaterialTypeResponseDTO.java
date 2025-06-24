@@ -2,6 +2,7 @@ package com.lorachemicals.Backend.dto;
 
 public class RawMaterialTypeResponseDTO {
 
+    private Long id;
     private String name;
     private String description;
     private String category;
@@ -10,7 +11,8 @@ public class RawMaterialTypeResponseDTO {
     // Constructors
     public RawMaterialTypeResponseDTO() {}
 
-    public RawMaterialTypeResponseDTO(String name, String description, String category, String status) {
+    public RawMaterialTypeResponseDTO(Long id, String name, String description, String category, String status) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.category = category;
@@ -18,6 +20,14 @@ public class RawMaterialTypeResponseDTO {
     }
 
     // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }
@@ -54,6 +64,7 @@ public class RawMaterialTypeResponseDTO {
     @Override
     public String toString() {
         return "RawMaterialTypeRequestDTO{" +
+                "id='" + id + '\'' +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", category='" + category + '\'' +

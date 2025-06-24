@@ -56,16 +56,28 @@ public class RawMaterialTypeController {
             List<RawMaterialTypeResponseDTO> dtoList = rawMaterials.stream()
                     .map(material -> modelMapper.map(material, RawMaterialTypeResponseDTO.class))
                     .toList();
-            logger.error("all Raw Materials: {}", dtoList);
+            logger.error("all Raw Materials 2: {}", dtoList);
 
             return ResponseEntity.ok(dtoList);
-
         } catch (Exception e) {
             logger.error("Error fetching raw materials:", e);
             return ResponseEntity.status(500).body("Internal Server Error: " + e.getMessage());
         }
-//        return ResponseEntity.status(500).body("Internal Server Error: ");
+    }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateRawMaterialType(@PathVariable Long id, @RequestBody RawMaterialTypeRequestDTO updateRawMaterialTypeDTO , HttpServletRequest request) {
+        try {
+            AccessControlUtil.checkAccess(request, "admin");
+
+            RawMaterialType updateRawMaterialType = rawMaterialTypeService.updateRawMaterialType(id, updateRawMaterialTypeDTO);
+
+            return ResponseEntity.ok(updateRawMaterialType);
+
+        } catch (Exception e) {
+            logger.error("Error Updating raw material:", e);
+            return ResponseEntity.status(500).body("Internal Server Error: " + e.getMessage());
+        }
     }
 
 }
