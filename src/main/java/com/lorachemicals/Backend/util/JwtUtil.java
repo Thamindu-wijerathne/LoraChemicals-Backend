@@ -118,4 +118,9 @@ public class JwtUtil {
         }
     }
 
+    public static String extractUserRole(String token) {
+        return getRoleFromToken(token);
+    }
+
+
 }
