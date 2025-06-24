@@ -36,4 +36,12 @@ public class RawMaterialTypeService {
         }).orElseThrow(() -> new RuntimeException("Raw Material Type not found with id: " + id));
     }
 
+    public boolean deleteRawMaterialType(Long id) {
+        if (rawMaterialTypeRepo.existsById(id)) {
+            rawMaterialTypeRepo.deleteById(id);
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

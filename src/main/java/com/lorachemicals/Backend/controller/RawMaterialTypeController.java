@@ -5,6 +5,7 @@ import com.lorachemicals.Backend.dto.RawMaterialTypeResponseDTO;
 import com.lorachemicals.Backend.model.RawMaterialType;
 import com.lorachemicals.Backend.services.RawMaterialTypeService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.modelmapper.ModelMapper;
@@ -80,4 +81,21 @@ public class RawMaterialTypeController {
         }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteRawMaterialType(@PathVariable Long id, HttpServletRequest request) {
+        try {
+            AccessControlUtil.checkAccess(request, "admin");
+
+            boolean deleted = rawMaterialTypeService.deleteRawMaterialType(id);
+            if (deleted) {
+                return ResponseEntity.ok("RawMaterialType deleted successfully");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("RawMaterialType not found");
+            }
+
+        } catch (Exception e) {
+            logger.error("Error Deleting raw material:", e);
+            return ResponseEntity.status(500).body("Internal Server Error: " + e.getMessage());
+        }
+    }
 }
