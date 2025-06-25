@@ -48,6 +48,7 @@ public class BottletypeService {
                 .orElseThrow(() -> new RuntimeException("Bottle type not found with id: " + id));
 
         bottle.setName(reqDTO.getName());
+        bottle.setVolume(reqDTO.getVolume());
         // Set other fields here...
 
         Bottletype updatedBottle = bottleRepo.save(bottle);

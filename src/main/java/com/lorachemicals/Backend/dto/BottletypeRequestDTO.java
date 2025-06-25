@@ -22,4 +22,13 @@ public class BottletypeRequestDTO {
     public void setVolume(String volume) {
         this.volume = volume;
     }
+
+    @Override
+    public String toString() {
+        return "BottletypeRequestDTO{" +
+                "name='" + name + '\'' +
+                ", volume='" + volume + '\'' +
+                '}';
+    }
+
 }

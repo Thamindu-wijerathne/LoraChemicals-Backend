@@ -30,4 +30,13 @@ public class BottletypeResponseDTO {
     public void setVolume(String volume) {
         this.volume = volume;
     }
+
+    @Override
+    public String toString() {
+        return "BottletypeResponseDTO{" +
+                "name='" + name + '\'' +
+                ", volume='" + volume + '\'' +
+                '}';
+    }
+
 }
