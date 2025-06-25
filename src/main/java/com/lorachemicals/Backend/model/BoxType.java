@@ -8,7 +8,7 @@ public class BoxType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long boxid;
-    private int capacity;
+    private int quantity_in_box;
     private String name;
 
     public BoxType() {}
@@ -21,12 +21,12 @@ public class BoxType {
         return boxid;
     }
 
-    public void setcapacity(int capacity) {
-        this.capacity = capacity;
+    public void setquantity_in_box(int quantity_in_box) {
+        this.quantity_in_box = quantity_in_box;
     }
 
-    public int getcapacity() {
-        return capacity;
+    public int getquantity_in_box() {
+        return quantity_in_box;
     }
 
     public void setName(String name) { this.name = name; }
