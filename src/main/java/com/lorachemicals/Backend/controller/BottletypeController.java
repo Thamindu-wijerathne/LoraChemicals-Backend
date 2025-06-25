@@ -2,8 +2,12 @@ package com.lorachemicals.Backend.controller;
 
 import com.lorachemicals.Backend.dto.BottletypeRequestDTO;
 import com.lorachemicals.Backend.dto.BottletypeResponseDTO;
+import com.lorachemicals.Backend.model.Bottletype;
 import com.lorachemicals.Backend.services.BottletypeService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +18,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/bottletype")
 public class BottletypeController {
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+    private ModelMapper modelMapper;
 
     @Autowired
     private BottletypeService bottletypeService;
@@ -65,6 +71,8 @@ public class BottletypeController {
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody BottletypeRequestDTO req, HttpServletRequest request){
         AccessControlUtil.checkAccess(request, "admin");
+        logger.error("Update Bottle: {}", req);
+
         try{
             BottletypeResponseDTO response = bottletypeService.updateBottletype(id, req);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
