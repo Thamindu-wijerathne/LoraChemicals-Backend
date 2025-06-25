@@ -4,6 +4,8 @@ import com.lorachemicals.Backend.dto.BoxTypeRequestDTO;
 import com.lorachemicals.Backend.dto.BoxTypeResponseDTO;
 import com.lorachemicals.Backend.services.BoxTypeService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/boxtype")
 public class BoxTypeController {
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     private BoxTypeService boxTypeService;
@@ -43,6 +46,7 @@ public class BoxTypeController {
     @PostMapping("/add")
     public ResponseEntity<?> createBoxType(@RequestBody BoxTypeRequestDTO dto, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "admin");
+        logger.error("Update Bottle: {}", dto);
         try {
             BoxTypeResponseDTO created = boxTypeService.createBoxType(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(created);
