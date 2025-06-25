@@ -1,17 +1,21 @@
 package com.lorachemicals.Backend.dto;
 
 public class BoxTypeRequestDTO {
-    private int quantity_in_box;
+    private int capacity;
+    private String name;
 
     public BoxTypeRequestDTO() {}
 
-    public void setQuantity_in_box(int quantity_in_box) {
-        this.quantity_in_box = quantity_in_box;
+    public void setcapacity(int capacity) {
+        this.capacity = capacity;
     }
 
-    public int getQuantity_in_box() {
-        return quantity_in_box;
+    public int getcapacity() {
+        return capacity;
     }
 
+    public void setName(String name) { this.name = name; }
+
+    public String getName() { return name; }
 
 }
