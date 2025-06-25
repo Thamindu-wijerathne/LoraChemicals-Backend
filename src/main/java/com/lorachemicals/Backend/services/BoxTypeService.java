@@ -39,7 +39,8 @@ public class BoxTypeService {
 
     public BoxTypeResponseDTO createBoxType(BoxTypeRequestDTO boxTypeRequestDTO) {
         BoxType newBox = new BoxType();
-        newBox.setQuantity_in_box(boxTypeRequestDTO.getQuantity_in_box());
+        newBox.setcapacity(boxTypeRequestDTO.getcapacity());
+        newBox.setName(boxTypeRequestDTO.getName());
 
         BoxType savedBoxType = boxTypeRepository.save(newBox);
         return convertToResponseDTO(savedBoxType);
@@ -49,7 +50,8 @@ public class BoxTypeService {
         BoxType boxType = boxTypeRepository.findById(boxId)
                 .orElseThrow(() -> new RuntimeException("Box type with id " + boxId + " does not exist"));
 
-        boxType.setQuantity_in_box(boxTypeRequestDTO.getQuantity_in_box());
+        boxType.setcapacity(boxTypeRequestDTO.getcapacity());
+        boxType.setName(boxTypeRequestDTO.getName());
         BoxType updated = boxTypeRepository.save(boxType);
         return convertToResponseDTO(updated);
     }
@@ -57,7 +59,8 @@ public class BoxTypeService {
     private BoxTypeResponseDTO convertToResponseDTO(BoxType boxType) {
         BoxTypeResponseDTO dto = new BoxTypeResponseDTO();
         dto.setBoxid(boxType.getBoxid());
-        dto.setQuantity_in_box(boxType.getQuantity_in_box());
+        dto.setcapacity(boxType.getcapacity());
+        dto.setName(boxType.getName());
         return dto;
     }
 }
