@@ -10,12 +10,15 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@AllArgsConstructor
 @RestController
 @RequestMapping("/announcements")
 public class AnnouncementController {
 
     private final AnnouncementService announcementService;
+
+    public AnnouncementController(AnnouncementService announcementService) {
+        this.announcementService = announcementService;
+    }
 
     // ✅ POST: Create new announcement using DTO
     @PostMapping
