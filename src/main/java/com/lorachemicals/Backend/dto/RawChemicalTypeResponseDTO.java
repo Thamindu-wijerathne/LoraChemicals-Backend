@@ -1,19 +1,15 @@
-package com.lorachemicals.Backend.model;
+package com.lorachemicals.Backend.dto;
 
-import jakarta.persistence.*;
-
-@Entity
-@Table(name = "raw_chemical_type")
-public class RawChemicalType {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // <-- FIXED HERE
+public class RawChemicalTypeResponseDTO {
     private Long chemid;
 
     private String name;
+
     private String type;
+
     private String description;
 
-    public RawChemicalType() {}
+    public RawChemicalTypeResponseDTO() {}
 
     public Long getChemid() {
         return chemid;
