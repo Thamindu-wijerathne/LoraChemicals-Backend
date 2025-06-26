@@ -1,11 +1,8 @@
 package com.lorachemicals.Backend.dto;
 
 public class BoxRequestDTO {
-    private Long boxid; // Optional, for update or where required
-
-    private Long boxTypeId; // Refers to BoxType.boxid
-    private Long rmtid;     // Refers to RawMaterialType.rmtid
-
+    private Long boxid; // This serves as both boxid and boxTypeId due to @MapsId
+    private Long rmtid; // Refers to RawMaterialType.id
     private int quantity;
 
     public BoxRequestDTO() {}
@@ -16,14 +13,6 @@ public class BoxRequestDTO {
 
     public void setBoxid(Long boxid) {
         this.boxid = boxid;
-    }
-
-    public Long getBoxTypeId() {
-        return boxTypeId;
-    }
-
-    public void setBoxTypeId(Long boxTypeId) {
-        this.boxTypeId = boxTypeId;
     }
 
     public Long getRmtid() {
@@ -46,7 +35,6 @@ public class BoxRequestDTO {
     public String toString() {
         return "BoxRequestDTO{" +
                 "boxid=" + boxid +
-                ", boxTypeId=" + boxTypeId +
                 ", rmtid=" + rmtid +
                 ", quantity=" + quantity +
                 '}';

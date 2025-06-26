@@ -48,15 +48,19 @@ public class BoxService {
 
     public BoxResponseDTO createBox(BoxRequestDTO reqDTO) {
         Box box = new Box();
-        box.setBoxid(reqDTO.getBoxid());
+
+        // DON'T set boxid manually when using @MapsId
+        // box.setBoxid(reqDTO.getBoxid()); // Remove this line
+
         box.setQuantity(reqDTO.getQuantity());
 
-        // Use boxid as boxTypeId since they're the same key in your model
-        Long boxTypeId = reqDTO.getBoxid();
-        BoxType boxType = boxTypeRepository.findById(boxTypeId)
-                .orElseThrow(() -> new RuntimeException("BoxType not found with id: " + boxTypeId));
+        // Set BoxType FIRST - @MapsId will automatically set the boxid
+        BoxType boxType = boxTypeRepository.findById(reqDTO.getBoxid())
+                .orElseThrow(() -> new RuntimeException("BoxType not found with id: " + reqDTO.getBoxid()));
         box.setBoxType(boxType);
+
         System.out.println("boxType: " + boxType);
+
         if (reqDTO.getRmtid() != null) {
             RawMaterialType rmt = rawMaterialTypeRepository.findById(reqDTO.getRmtid())
                     .orElseThrow(() -> new RuntimeException("RawMaterialType not found with rmtid: " + reqDTO.getRmtid()));
@@ -64,10 +68,11 @@ public class BoxService {
         } else {
             box.setRawMaterialType(null);
         }
+
         Box savedBox = boxRepository.save(box);
         System.out.println("savedBox: " + savedBox);
-        reqDTO.toString();
         System.out.println("reqDTO: " + reqDTO);
+
         return convertToResponseDTO(savedBox);
     }
 
