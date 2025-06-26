@@ -1,5 +1,10 @@
 package com.lorachemicals.Backend.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class RawChemicalTypeResponseDTO {
     private Long chemid;
 
@@ -11,35 +16,10 @@ public class RawChemicalTypeResponseDTO {
 
     public RawChemicalTypeResponseDTO() {}
 
-    public Long getChemid() {
-        return chemid;
-    }
-
-    public void setChemid(Long chemid) {
+    public RawChemicalTypeResponseDTO(Long chemid, String name, String description, String type) {
         this.chemid = chemid;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
         this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
         this.description = description;
+        this.type = type;
     }
 }
