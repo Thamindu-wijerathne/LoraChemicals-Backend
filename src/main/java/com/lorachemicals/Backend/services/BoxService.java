@@ -48,29 +48,26 @@ public class BoxService {
 
     public BoxResponseDTO createBox(BoxRequestDTO reqDTO) {
         Box box = new Box();
-
-        // Set ID (same as BoxType due to @MapsId)
         box.setBoxid(reqDTO.getBoxid());
-
-        // Set Quantity
         box.setQuantity(reqDTO.getQuantity());
 
-
-        // Set BoxType (Required)
-        BoxType boxType = boxTypeRepository.findById(reqDTO.getBoxTypeId())
-                .orElseThrow(() -> new RuntimeException("BoxType not found with id: " + reqDTO.getBoxTypeId()));
+        // Use boxid as boxTypeId since they're the same key in your model
+        Long boxTypeId = reqDTO.getBoxid();
+        BoxType boxType = boxTypeRepository.findById(boxTypeId)
+                .orElseThrow(() -> new RuntimeException("BoxType not found with id: " + boxTypeId));
         box.setBoxType(boxType);
-
-        // Set RawMaterialType (Optional)
-        if (reqDTO.getRawMaterialTypeId() != null) {
-            RawMaterialType rmt = rawMaterialTypeRepository.findById(reqDTO.getRawMaterialTypeId())
-                    .orElseThrow(() -> new RuntimeException("RawMaterialType not found with id: " + reqDTO.getRawMaterialTypeId()));
+        System.out.println("boxType: " + boxType);
+        if (reqDTO.getRmtid() != null) {
+            RawMaterialType rmt = rawMaterialTypeRepository.findById(reqDTO.getRmtid())
+                    .orElseThrow(() -> new RuntimeException("RawMaterialType not found with rmtid: " + reqDTO.getRmtid()));
             box.setRawMaterialType(rmt);
         } else {
             box.setRawMaterialType(null);
         }
-
         Box savedBox = boxRepository.save(box);
+        System.out.println("savedBox: " + savedBox);
+        reqDTO.toString();
+        System.out.println("reqDTO: " + reqDTO);
         return convertToResponseDTO(savedBox);
     }
 
@@ -81,9 +78,9 @@ public class BoxService {
         box.setQuantity(reqDTO.getQuantity());
 
         // Update RawMaterialType (Optional)
-        if (reqDTO.getRawMaterialTypeId() != null) {
-            RawMaterialType rmt = rawMaterialTypeRepository.findById(reqDTO.getRawMaterialTypeId())
-                    .orElseThrow(() -> new RuntimeException("RawMaterialType not found with id: " + reqDTO.getRawMaterialTypeId()));
+        if (reqDTO.getRmtid() != null) {
+            RawMaterialType rmt = rawMaterialTypeRepository.findById(reqDTO.getRmtid())
+                    .orElseThrow(() -> new RuntimeException("RawMaterialType not found with rmtid: " + reqDTO.getRmtid()));
             box.setRawMaterialType(rmt);
         } else {
             box.setRawMaterialType(null);
@@ -104,7 +101,7 @@ public class BoxService {
         }
 
         if (box.getRawMaterialType() != null) {
-            dto.setRawMaterialTypeId(box.getRawMaterialType().getId());
+            dto.setRmtid(box.getRawMaterialType().getId());
             dto.setRawMaterialTypeName(box.getRawMaterialType().getName()); // Assuming RawMaterialType has getName()
         }
 

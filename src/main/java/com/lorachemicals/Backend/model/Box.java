@@ -22,7 +22,7 @@ public class Box {
     @JoinColumn(
             name = "rmtid",
             referencedColumnName = "id",
-            foreignKey = @ForeignKey(name = "fk_rmtid", foreignKeyDefinition = "FOREIGN KEY (rmtid) REFERENCES raw_material_types(id) ON DELETE SET NULL ON UPDATE SET NULL")
+                foreignKey = @ForeignKey(name = "fk_rmtid", foreignKeyDefinition = "FOREIGN KEY (rmtid) REFERENCES raw_material_types(id) ON DELETE SET NULL ON UPDATE SET NULL")
     )
     private RawMaterialType rawMaterialType;
 
@@ -61,5 +61,15 @@ public class Box {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    @Override
+    public String toString() {
+        return "Box{" +
+                "boxid=" + boxid +
+                ", boxType=" + boxType +
+                ", rawMaterialType=" + rawMaterialType +
+                ", quantity=" + quantity +
+                '}';
     }
 }

@@ -4,10 +4,10 @@ public class BoxResponseDTO {
     private Long boxid;
 
     private Long boxTypeId;
-    private String boxTypeName; // If you want to display BoxType info
+    private String boxTypeName;
 
-    private Long rawMaterialTypeId;
-    private String rawMaterialTypeName; // Optional descriptive info
+    private Long rmtid;
+    private String rawMaterialTypeName;
 
     private int quantity;
 
@@ -37,12 +37,12 @@ public class BoxResponseDTO {
         this.boxTypeName = boxTypeName;
     }
 
-    public Long getRawMaterialTypeId() {
-        return rawMaterialTypeId;
+    public Long getRmtid() {
+        return rmtid;
     }
 
-    public void setRawMaterialTypeId(Long rawMaterialTypeId) {
-        this.rawMaterialTypeId = rawMaterialTypeId;
+    public void setRmtid(Long rmtid) {
+        this.rmtid = rmtid;
     }
 
     public String getRawMaterialTypeName() {
@@ -59,5 +59,17 @@ public class BoxResponseDTO {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    @Override
+    public String toString() {
+        return "BoxResponseDTO{" +
+                "boxid=" + boxid +
+                ", boxTypeId=" + boxTypeId +
+                ", boxTypeName='" + boxTypeName + '\'' +
+                ", rmtid=" + rmtid +
+                ", rawMaterialTypeName='" + rawMaterialTypeName + '\'' +
+                ", quantity=" + quantity +
+                '}';
     }
 }

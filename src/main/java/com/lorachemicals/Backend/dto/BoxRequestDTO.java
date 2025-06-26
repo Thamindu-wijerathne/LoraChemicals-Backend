@@ -1,10 +1,10 @@
 package com.lorachemicals.Backend.dto;
 
 public class BoxRequestDTO {
-    private Long boxid; // Optional for creation if auto-generated
+    private Long boxid; // Optional, for update or where required
 
     private Long boxTypeId; // Refers to BoxType.boxid
-    private Long rawMaterialTypeId; // Refers to RawMaterialType.id
+    private Long rmtid;     // Refers to RawMaterialType.rmtid
 
     private int quantity;
 
@@ -26,12 +26,12 @@ public class BoxRequestDTO {
         this.boxTypeId = boxTypeId;
     }
 
-    public Long getRawMaterialTypeId() {
-        return rawMaterialTypeId;
+    public Long getRmtid() {
+        return rmtid;
     }
 
-    public void setRawMaterialTypeId(Long rawMaterialTypeId) {
-        this.rawMaterialTypeId = rawMaterialTypeId;
+    public void setRmtid(Long rmtid) {
+        this.rmtid = rmtid;
     }
 
     public int getQuantity() {
@@ -40,5 +40,15 @@ public class BoxRequestDTO {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    @Override
+    public String toString() {
+        return "BoxRequestDTO{" +
+                "boxid=" + boxid +
+                ", boxTypeId=" + boxTypeId +
+                ", rmtid=" + rmtid +
+                ", quantity=" + quantity +
+                '}';
     }
 }
