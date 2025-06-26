@@ -1,39 +1,19 @@
 package com.lorachemicals.Backend.dto;
 
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class BottleRequestDTO {
-    // Getters and Setters
-    private Long bottleid;
-    private Long labelTypeId;
-    private Long rawMaterialTypeId;
+    private Long bottleId; // to link the BottleType
     private int quantity;
 
-    // Constructors
-    public BottleRequestDTO() {
-    }
+    public BottleRequestDTO() {}
 
-    public BottleRequestDTO(Long bottleid, Long labelTypeId, Long rawMaterialTypeId, int quantity) {
-        this.bottleid = bottleid;
-        this.labelTypeId = labelTypeId;
-        this.rawMaterialTypeId = rawMaterialTypeId;
-        this.quantity = quantity;
-    }
-
-    public void setBottleid(Long bottleid) {
-        this.bottleid = bottleid;
-    }
-
-    public void setLabelTypeId(Long labelTypeId) {
-        this.labelTypeId = labelTypeId;
-    }
-
-    public void setRawMaterialTypeId(Long rawMaterialTypeId) {
-        this.rawMaterialTypeId = rawMaterialTypeId;
-    }
-
-    public void setQuantity(int quantity) {
+    public BottleRequestDTO(Long bottleId, int quantity) {
+        this.bottleId = bottleId;
         this.quantity = quantity;
     }
 }
+

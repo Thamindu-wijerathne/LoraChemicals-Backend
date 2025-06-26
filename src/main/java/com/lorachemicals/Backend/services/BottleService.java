@@ -1,15 +1,16 @@
 package com.lorachemicals.Backend.services;
 
-import com.lorachemicals.Backend.dto.BottleRequestDTO;
-import com.lorachemicals.Backend.dto.BottleResponseDTO;
 import com.lorachemicals.Backend.model.Bottle;
-import com.lorachemicals.Backend.model.Labeltype;
-import com.lorachemicals.Backend.model.RawMaterialType;
+import com.lorachemicals.Backend.model.Bottletype;
 import com.lorachemicals.Backend.repository.BottleRepository;
-import com.lorachemicals.Backend.repository.LabeltypeRepository;
-import com.lorachemicals.Backend.repository.RawMaterialTypeRepository;
+import com.lorachemicals.Backend.repository.BottletypeRepository;
+import com.lorachemicals.Backend.dto.BottleRequestDTO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BottleService {
@@ -18,51 +19,77 @@ public class BottleService {
     private BottleRepository bottleRepository;
 
     @Autowired
-    private LabeltypeRepository labeltypeRepository;
+    private BottletypeRepository bottletypeRepository;
 
-    @Autowired
-    private RawMaterialTypeRepository rawMaterialTypeRepository;
-
-    // Create
-    public BottleResponseDTO createBottle(BottleRequestDTO bottleRequestDTO) {
+    // Get all bottles
+    public List<Bottle> getAllBottles() {
         try {
-            Labeltype labeltype = labeltypeRepository.findById(bottleRequestDTO.getLabelTypeId())
-                    .orElseThrow(() -> new RuntimeException("LabelType not found"));
-
-            RawMaterialType rawMaterialType = null;
-            if (bottleRequestDTO.getRawMaterialTypeId() != null) {
-                rawMaterialType = rawMaterialTypeRepository.findById(bottleRequestDTO.getRawMaterialTypeId())
-                        .orElseThrow(() -> new RuntimeException("RawMaterialType not found"));
-            }
-
-            Bottle bottle = new Bottle();
-            bottle.setBottleid(bottleRequestDTO.getBottleid()); // Optional if auto-generated
-            bottle.setLabelType(labeltype);
-            bottle.setRawMaterialType(rawMaterialType);
-            bottle.setQuantity(bottleRequestDTO.getQuantity());
-
-            Bottle savedBottle = bottleRepository.save(bottle);
-            return convertToResponseDTO(savedBottle);
+            return bottleRepository.findAll();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to create bottle: " + e.getMessage());
+            throw new RuntimeException("Failed to fetch bottles: " + e.getMessage(), e);
         }
     }
 
-    private BottleResponseDTO convertToResponseDTO(Bottle bottle) {
-        BottleResponseDTO dto = new BottleResponseDTO();
-        dto.setBottleid(bottle.getBottleid());
-
-        if (bottle.getLabelType() != null) {
-            dto.setLabelTypeId(bottle.getLabelType().getlabelid());
-            dto.setLabelTypeName(bottle.getLabelType().getName()); // adjust this field based on your entity
+    // Get bottle by inventory ID
+    public Optional<Bottle> getBottleById(Long inventoryId) {
+        try {
+            return bottleRepository.findById(inventoryId);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch bottle by ID: " + e.getMessage(), e);
         }
+    }
 
-        if (bottle.getRawMaterialType() != null) {
-            dto.setRawMaterialTypeId(bottle.getRawMaterialType().getId());
-            dto.setRawMaterialTypeName(bottle.getRawMaterialType().getName()); // adjust this field
+    // Create new bottle
+    public Bottle createBottle(BottleRequestDTO dto) {
+        try {
+            Bottletype bottleType = bottletypeRepository.findById(dto.getBottleId())
+                    .orElseThrow(() -> new RuntimeException("Bottle type not found"));
+
+            Bottle bottle = new Bottle();
+            bottle.setBottleType(bottleType);
+            bottle.setQuantity(dto.getQuantity());
+            // Set other RawMaterial fields if needed
+
+            return bottleRepository.save(bottle);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create bottle: " + e.getMessage(), e);
         }
+    }
 
-        dto.setQuantity(bottle.getQuantity());
-        return dto;
+    // Update existing bottle
+    public Bottle updateBottle(Long inventoryId, BottleRequestDTO dto) {
+        try {
+            Bottle bottle = bottleRepository.findById(inventoryId)
+                    .orElseThrow(() -> new RuntimeException("Bottle not found"));
+
+            Bottletype bottleType = bottletypeRepository.findById(dto.getBottleId())
+                    .orElseThrow(() -> new RuntimeException("Bottle type not found"));
+
+            bottle.setBottleType(bottleType);
+            bottle.setQuantity(dto.getQuantity());
+            // Update other RawMaterial fields if needed
+
+            return bottleRepository.save(bottle);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update bottle: " + e.getMessage(), e);
+        }
+    }
+
+    // Delete bottle by inventory ID
+    public void deleteBottle(Long inventoryId) {
+        try {
+            bottleRepository.deleteById(inventoryId);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete bottle: " + e.getMessage(), e);
+        }
+    }
+
+    // Sum of quantities grouped by bottle type
+    public List<Object[]> getTotalQuantityGroupedByBottleType() {
+        try {
+            return bottleRepository.sumQuantityGroupedByBottleType();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get quantity sums: " + e.getMessage(), e);
+        }
     }
 }
