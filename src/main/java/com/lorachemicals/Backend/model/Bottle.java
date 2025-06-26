@@ -3,18 +3,17 @@ package com.lorachemicals.Backend.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "lable")
-public class Lable {
-
+@Table(name = "bottle")
+public class Bottle {
     @Id
-    private Long labelid;
+    private Long bottleid;
 
     @OneToOne
     @MapsId
     @JoinColumn(
-            name = "labelid",
-            referencedColumnName = "labelid",
-            foreignKey = @ForeignKey(name = "fk_lableid", foreignKeyDefinition = "FOREIGN KEY (labelid) REFERENCES label_type(labelid) ON DELETE CASCADE ON UPDATE CASCADE")
+            name = "bottleid",
+            referencedColumnName = "bottleid",
+            foreignKey = @ForeignKey(name = "fk_bottle", foreignKeyDefinition = "FOREIGN KEY (bottleid) REFERENCES bottle_type(bottleid) ON DELETE CASCADE ON UPDATE CASCADE")
     )
     private Labeltype labelType;
 
@@ -28,16 +27,27 @@ public class Lable {
 
     private int quantity;
 
-    public Lable() {}
-
-    public Long getLabelid() {
-        return labelid;
+    // Constructors
+    public Bottle() {
     }
 
-    public void setLabelid(Long labelid) {
-        this.labelid = labelid;
+    public Bottle(Long bottleid, Labeltype labelType, RawMaterialType rawMaterialType, int quantity) {
+        this.bottleid = bottleid;
+        this.labelType = labelType;
+        this.rawMaterialType = rawMaterialType;
+        this.quantity = quantity;
     }
 
+    // Getter and Setter for bottleid
+    public Long getBottleid() {
+        return bottleid;
+    }
+
+    public void setBottleid(Long bottleid) {
+        this.bottleid = bottleid;
+    }
+
+    // Getter and Setter for labelType
     public Labeltype getLabelType() {
         return labelType;
     }
@@ -46,6 +56,7 @@ public class Lable {
         this.labelType = labelType;
     }
 
+    // Getter and Setter for rawMaterialType
     public RawMaterialType getRawMaterialType() {
         return rawMaterialType;
     }
@@ -54,6 +65,7 @@ public class Lable {
         this.rawMaterialType = rawMaterialType;
     }
 
+    // Getter and Setter for quantity
     public int getQuantity() {
         return quantity;
     }
