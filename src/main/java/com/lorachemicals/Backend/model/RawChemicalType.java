@@ -39,7 +39,6 @@ public class RawChemicalType {
         this.type = type;
     }
 
-    public String getDescription() {
         return description;
     }
 
