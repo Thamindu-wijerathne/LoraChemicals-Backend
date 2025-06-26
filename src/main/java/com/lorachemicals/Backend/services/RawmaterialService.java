@@ -98,6 +98,7 @@ public class RawmaterialService {
 
         if (rawmaterial.getInventory() != null) {
             dto.setInventoryid(rawmaterial.getInventory().getId()); // Fixed: using getInventoryid() instead of getId()
+            dto.setLocation(rawmaterial.getInventory().getLocation());
         }
 
         return dto;
