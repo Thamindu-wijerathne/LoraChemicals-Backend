@@ -5,6 +5,7 @@ public class RawmaterialResponseDTO {
     private Long rawMaterialTypeId;
     private String rawMaterialTypeName;
     private Long inventoryid;
+    private String location;
 
     public RawmaterialResponseDTO() {}
 
@@ -47,6 +48,13 @@ public class RawmaterialResponseDTO {
         this.inventoryid = inventoryid;
     }
 
+    public String getLocation() {
+        return location;
+    }
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
     @Override
     public String toString() {
         return "RawmaterialResponseDTO{" +
@@ -54,6 +62,7 @@ public class RawmaterialResponseDTO {
                 ", rawMaterialTypeId=" + rawMaterialTypeId +
                 ", rawMaterialTypeName='" + rawMaterialTypeName + '\'' +
                 ", inventoryid=" + inventoryid +
+                ", location='" + location + '\'' +
                 '}';
     }
 }
