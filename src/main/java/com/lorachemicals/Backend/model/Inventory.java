@@ -16,5 +16,9 @@ public class Inventory {
 
     private String location;
 
+    public Object getId() {
+        return inventoryid;
+    }
+
     // other fields, getters/setters
 }
