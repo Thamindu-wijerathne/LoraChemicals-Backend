@@ -4,19 +4,18 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
 @Getter
+@Setter
 @Entity
-@Table(name = "bottle_type")
-public class Bottletype {
+@Table(name = "box_type")
+public class BoxType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long bottleid;
+    private Long boxid;
     private String name;
-    private String volume;
 
-    public Bottletype(){
+    @Column(name = "quantity_in_box")
+    private int quantityInBox;
 
-    }
-
+    public BoxType() {}
 }
