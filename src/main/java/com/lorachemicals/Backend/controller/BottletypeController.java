@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/bottletype")
+@RequestMapping("/bottletype")
 public class BottletypeController {
 
     @Autowired
@@ -46,7 +46,7 @@ public class BottletypeController {
     // Get bottle type by ID
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable Long id, HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse_manager", "admin");
+        AccessControlUtil.checkAccess(request, "warehouse", "admin");
         try {
             BottletypeResponseDTO dto = bottletypeService.getBottleTypeById(id);
             return (dto != null) ? ResponseEntity.ok(dto) : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found");
@@ -56,7 +56,7 @@ public class BottletypeController {
     }
 
     // Update bottle type
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody BottletypeRequestDTO dto, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "admin");
         try {
@@ -68,7 +68,7 @@ public class BottletypeController {
     }
 
     // Delete bottle type
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "admin");
         try {

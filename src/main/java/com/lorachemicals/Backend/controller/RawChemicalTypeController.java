@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/raw-chemical-types")
+@RequestMapping("/raw-chemical-types")
 public class RawChemicalTypeController {
 
     @Autowired
@@ -58,7 +58,7 @@ public class RawChemicalTypeController {
     }
 
     // CREATE
-    @PostMapping("/create")
+    @PostMapping("/add")
     public ResponseEntity<?> create(@RequestBody RawChemicalType newType, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "admin");
         try {
@@ -70,7 +70,7 @@ public class RawChemicalTypeController {
     }
 
     // UPDATE
-    @PutMapping("/update/{chemid}")
+    @PutMapping("/{chemid}")
     public ResponseEntity<?> update(@PathVariable Long chemid,
                                     @RequestBody RawChemicalType updatedType,
                                     HttpServletRequest request) {
@@ -84,7 +84,7 @@ public class RawChemicalTypeController {
     }
 
     // DELETE
-    @DeleteMapping("/delete/{chemid}")
+    @DeleteMapping("/{chemid}")
     public ResponseEntity<?> delete(@PathVariable Long chemid, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "admin");
         try {

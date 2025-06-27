@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/boxtype")
+@RequestMapping("/boxtype")
 public class BoxTypeController {
 
     @Autowired
@@ -56,7 +56,7 @@ public class BoxTypeController {
     }
 
     // Update box type
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody BoxTypeRequestDTO dto, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "admin");
         try {
@@ -68,7 +68,7 @@ public class BoxTypeController {
     }
 
     // Delete box type
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "admin");
         try {

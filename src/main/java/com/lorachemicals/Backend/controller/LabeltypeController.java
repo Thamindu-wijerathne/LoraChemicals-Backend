@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/labeltype")
+@RequestMapping("/labeltype")
 public class LabeltypeController {
 
     @Autowired
@@ -56,7 +56,7 @@ public class LabeltypeController {
     }
 
     // Update label type
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody LabeltypeRequestDTO dto, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "admin");
         try {
@@ -68,7 +68,7 @@ public class LabeltypeController {
     }
 
     // Delete label type
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "admin");
         try {
