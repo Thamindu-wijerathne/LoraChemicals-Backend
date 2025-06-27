@@ -1,34 +1,19 @@
 package com.lorachemicals.Backend.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class BottletypeRequestDTO {
+
     private String name;
     private String volume;
 
-    public BottletypeRequestDTO(){
+    public BottletypeRequestDTO() {}
 
-    }
-
-    //getters and setyters
-    public String getName() {
-        return this.name;
-    }
-    public void setName(String name) {
+    public BottletypeRequestDTO(String name, String volume) {
         this.name = name;
-    }
-
-    public String getVolume() {
-        return this.volume;
-    }
-    public void setVolume(String volume) {
         this.volume = volume;
     }
-
-    @Override
-    public String toString() {
-        return "BottletypeRequestDTO{" +
-                "name='" + name + '\'' +
-                ", volume='" + volume + '\'' +
-                '}';
-    }
-
 }

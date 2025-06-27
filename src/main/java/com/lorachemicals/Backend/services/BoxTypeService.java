@@ -1,14 +1,14 @@
 package com.lorachemicals.Backend.services;
 
-import com.lorachemicals.Backend.dto.BoxTypeRequestDTO;
-import com.lorachemicals.Backend.dto.BoxTypeResponseDTO;
 import com.lorachemicals.Backend.model.BoxType;
 import com.lorachemicals.Backend.repository.BoxTypeRepository;
+import com.lorachemicals.Backend.dto.BoxTypeRequestDTO;
+import com.lorachemicals.Backend.dto.BoxTypeResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,50 +17,80 @@ public class BoxTypeService {
     @Autowired
     private BoxTypeRepository boxTypeRepository;
 
+    // Get all box types
     public List<BoxTypeResponseDTO> getAllBoxTypes() {
-        return boxTypeRepository.findAll()
-                .stream()
-                .map(this::convertToResponseDTO)
+        return boxTypeRepository.findAll().stream()
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
-    public void deleteBoxType(Long boxId) {
-        if (!boxTypeRepository.existsById(boxId)) {
-            throw new RuntimeException("Box type with id " + boxId + " does not exist");
+    // Get box type by ID
+    public BoxTypeResponseDTO getBoxTypeById(Long id) {
+        try {
+            Optional<BoxType> optional = boxTypeRepository.findById(id);
+            return optional.map(this::convertToDTO).orElse(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
-        boxTypeRepository.deleteById(boxId);
     }
 
-    public BoxTypeResponseDTO getBoxType(Long boxId) {
-        return boxTypeRepository.findById(boxId)
-                .map(this::convertToResponseDTO)
-                .orElseThrow(() -> new RuntimeException("Box type with id " + boxId + " not found"));
+    // Create a new box type
+    public BoxTypeResponseDTO createBoxType(BoxTypeRequestDTO dto) {
+        try {
+            BoxType boxType = new BoxType();
+            boxType.setName(dto.getName());
+            boxType.setQuantityInBox(dto.getQuantityInBox());
+
+            BoxType saved = boxTypeRepository.save(boxType);
+            return convertToDTO(saved);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public BoxTypeResponseDTO createBoxType(BoxTypeRequestDTO boxTypeRequestDTO) {
-        BoxType newBox = new BoxType();
-        newBox.setquantity_in_box(boxTypeRequestDTO.getquantity_in_box());
-        newBox.setName(boxTypeRequestDTO.getName());
+    // Update an existing box type
+    public BoxTypeResponseDTO updateBoxType(Long id, BoxTypeRequestDTO dto) {
+        try {
+            Optional<BoxType> optional = boxTypeRepository.findById(id);
+            if (optional.isPresent()) {
+                BoxType boxType = optional.get();
+                boxType.setName(dto.getName());
+                boxType.setQuantityInBox(dto.getQuantityInBox());
 
-        BoxType savedBoxType = boxTypeRepository.save(newBox);
-        return convertToResponseDTO(savedBoxType);
+                BoxType updated = boxTypeRepository.save(boxType);
+                return convertToDTO(updated);
+            } else {
+                return null; // not found
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public BoxTypeResponseDTO updateBoxType(Long boxId, BoxTypeRequestDTO boxTypeRequestDTO) {
-        BoxType boxType = boxTypeRepository.findById(boxId)
-                .orElseThrow(() -> new RuntimeException("Box type with id " + boxId + " does not exist"));
-
-        boxType.setquantity_in_box(boxTypeRequestDTO.getquantity_in_box());
-        boxType.setName(boxTypeRequestDTO.getName());
-        BoxType updated = boxTypeRepository.save(boxType);
-        return convertToResponseDTO(updated);
+    // Delete a box type
+    public boolean deleteBoxType(Long id) {
+        try {
+            if (boxTypeRepository.existsById(id)) {
+                boxTypeRepository.deleteById(id);
+                return true;
+            } else {
+                return false; // not found
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
-    private BoxTypeResponseDTO convertToResponseDTO(BoxType boxType) {
+    // Convert entity to response DTO
+    private BoxTypeResponseDTO convertToDTO(BoxType entity) {
         BoxTypeResponseDTO dto = new BoxTypeResponseDTO();
-        dto.setBoxid(boxType.getBoxid());
-        dto.setquantity_in_box(boxType.getquantity_in_box());
-        dto.setName(boxType.getName());
+        dto.setBoxid(entity.getBoxid());
+        dto.setName(entity.getName());
+        dto.setQuantityInBox(entity.getQuantityInBox());
         return dto;
     }
 }

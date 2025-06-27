@@ -1,5 +1,10 @@
 package com.lorachemicals.Backend.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class RawChemicalTypeRequestDTO {
 
     private String name;
@@ -10,27 +15,4 @@ public class RawChemicalTypeRequestDTO {
 
     public RawChemicalTypeRequestDTO() {}
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }
