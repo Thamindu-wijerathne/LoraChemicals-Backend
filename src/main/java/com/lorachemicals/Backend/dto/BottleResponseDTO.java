@@ -5,16 +5,17 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class LabelResponseDTO {
+public class BottleResponseDTO {
+
     private Long inventoryId;
-    private Long labelId;
+    private Long bottleId;
     private int quantity;
 
-    public LabelResponseDTO() {}
+    public BottleResponseDTO() {}
 
-    public LabelResponseDTO(Long inventoryId, Long labelId, int quantity) {
+    public BottleResponseDTO(Long inventoryId, Long bottleId, int quantity) {
         this.inventoryId = inventoryId;
-        this.labelId = labelId;
+        this.bottleId = bottleId;
         this.quantity = quantity;
     }
 }

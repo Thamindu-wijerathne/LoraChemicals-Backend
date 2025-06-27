@@ -5,15 +5,15 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "label")
+@Table(name = "bottle")
 @PrimaryKeyJoinColumn(name = "inventoryid")
 @Getter
 @Setter
-public class Label extends RawMaterial{
+public class Bottle extends RawMaterial {
 
     @ManyToOne
-    @JoinColumn(name = "labelid", nullable = false)
-    private Labeltype labeltype;
+    @JoinColumn(name = "bottleid", nullable = false)
+    private Bottletype bottleType;
 
     private int quantity;
 }

@@ -1,79 +1,97 @@
 package com.lorachemicals.Backend.controller;
 
-import com.lorachemicals.Backend.dto.RawChemicalTypeRequestDTO;
 import com.lorachemicals.Backend.dto.RawChemicalTypeResponseDTO;
+import com.lorachemicals.Backend.model.RawChemicalType;
 import com.lorachemicals.Backend.services.RawChemicalTypeService;
-import jakarta.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/rawchemicaltype")
+@RequestMapping("/raw-chemical-types")
 public class RawChemicalTypeController {
-    private static final Logger logger = LoggerFactory.getLogger(RawChemicalTypeController.class);
 
     @Autowired
     private RawChemicalTypeService rawChemicalTypeService;
 
+    // GET all
     @GetMapping("/all")
-    public ResponseEntity<?> getAllRawChemicalTypes(HttpServletRequest request) {
+    public ResponseEntity<?> getAll(HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "admin");
         try {
-            List<RawChemicalTypeResponseDTO> list = rawChemicalTypeService.getAllRawChemicalTypes();
-            return ResponseEntity.ok(list);
+            List<RawChemicalType> types = rawChemicalTypeService.getAllChemicalTypes();
+            List<RawChemicalTypeResponseDTO> response = types.stream()
+                    .map(type -> new RawChemicalTypeResponseDTO(
+                            type.getChemid(),
+                            type.getName(),
+                            type.getDescription(),
+                            type.getType()))
+                    .collect(Collectors.toList());
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to fetch raw chemical types");
+            return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @GetMapping("/byid/{id}")
-    public ResponseEntity<?> getRawChemicalType(@PathVariable Long id, HttpServletRequest request) {
+    // GET by ID
+    @GetMapping("/{chemid}")
+    public ResponseEntity<?> getById(@PathVariable Long chemid, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "admin");
         try {
-            RawChemicalTypeResponseDTO dto = rawChemicalTypeService.getRawChemicalType(id);
-            return ResponseEntity.ok(dto);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            RawChemicalType type = rawChemicalTypeService.getChemicalTypeById(chemid)
+                    .orElse(null);
+            if (type == null) {
+                return new ResponseEntity<>("Chemical type not found", HttpStatus.NOT_FOUND);
+            }
+            RawChemicalTypeResponseDTO response = new RawChemicalTypeResponseDTO(
+                    type.getChemid(), type.getName(), type.getDescription(), type.getType());
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+    // CREATE
     @PostMapping("/add")
-    public ResponseEntity<?> createRawChemicalType(@RequestBody RawChemicalTypeRequestDTO dto, HttpServletRequest request) {
+    public ResponseEntity<?> create(@RequestBody RawChemicalType newType, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "admin");
-        logger.info("Create RawChemicalType: {}", dto);
         try {
-            RawChemicalTypeResponseDTO created = rawChemicalTypeService.createRawChemicalType(dto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(created);
+            RawChemicalType saved = rawChemicalTypeService.createChemicalType(newType);
+            return new ResponseEntity<>("Chemical type created with ID: " + saved.getChemid(), HttpStatus.CREATED);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create raw chemical type");
+            return new ResponseEntity<>("Failed to create chemical type", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateRawChemicalType(@PathVariable Long id, @RequestBody RawChemicalTypeRequestDTO dto, HttpServletRequest request) {
+    // UPDATE
+    @PutMapping("/{chemid}")
+    public ResponseEntity<?> update(@PathVariable Long chemid,
+                                    @RequestBody RawChemicalType updatedType,
+                                    HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "admin");
         try {
-            RawChemicalTypeResponseDTO updated = rawChemicalTypeService.updateRawChemicalType(id, dto);
-            return ResponseEntity.ok(updated);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            RawChemicalType updated = rawChemicalTypeService.updateChemicalType(chemid, updatedType);
+            return new ResponseEntity<>("Chemical type updated for ID: " + updated.getChemid(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to update chemical type", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteRawChemicalType(@PathVariable Long id, HttpServletRequest request) {
+    // DELETE
+    @DeleteMapping("/{chemid}")
+    public ResponseEntity<?> delete(@PathVariable Long chemid, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "admin");
         try {
-            rawChemicalTypeService.deleteRawChemicalType(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            rawChemicalTypeService.deleteChemicalType(chemid);
+            return new ResponseEntity<>("Chemical type deleted successfully", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to delete chemical type", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

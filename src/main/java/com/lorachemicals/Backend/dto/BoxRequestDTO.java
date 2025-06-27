@@ -1,42 +1,22 @@
 package com.lorachemicals.Backend.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class BoxRequestDTO {
-    private Long boxid; // This serves as both boxid and boxTypeId due to @MapsId
-    private Long rmtid; // Refers to RawMaterialType.id
+
+    @JsonProperty("box_id")
+    private Long boxId;
+
     private int quantity;
 
     public BoxRequestDTO() {}
 
-    public Long getBoxid() {
-        return boxid;
-    }
-
-    public void setBoxid(Long boxid) {
-        this.boxid = boxid;
-    }
-
-    public Long getRmtid() {
-        return rmtid;
-    }
-
-    public void setRmtid(Long rmtid) {
-        this.rmtid = rmtid;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
+    public BoxRequestDTO(Long boxId, int quantity) {
+        this.boxId = boxId;
         this.quantity = quantity;
-    }
-
-    @Override
-    public String toString() {
-        return "BoxRequestDTO{" +
-                "boxid=" + boxid +
-                ", rmtid=" + rmtid +
-                ", quantity=" + quantity +
-                '}';
     }
 }

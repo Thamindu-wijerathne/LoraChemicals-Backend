@@ -1,17 +1,16 @@
 package com.lorachemicals.Backend.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class InventoryRequestDTO {
     private String location;
 
-    public InventoryRequestDTO(){
+    public InventoryRequestDTO(){}
 
-    }
-
-    public void setLocation(String location){
-        this.location=location;
-    }
-
-    public String getLocation(){
-        return this.location;
+    public InventoryRequestDTO(String location) {
+        this.location = location;
     }
 }

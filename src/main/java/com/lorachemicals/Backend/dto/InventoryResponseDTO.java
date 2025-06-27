@@ -1,26 +1,24 @@
 package com.lorachemicals.Backend.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class InventoryResponseDTO {
 
     private Long inventoryid;
+
     private String location;
 
-    public InventoryResponseDTO(){
+    public InventoryResponseDTO(){}
 
-    }
-
-    public void setID(Long inventoryid){
+    public InventoryResponseDTO(Long inventoryid, String location) {
         this.inventoryid = inventoryid;
-    }
-    public Long getId(){
-        return this.inventoryid;
+        this.location = location;
     }
 
-    public void setLocation(String location){
-        this.location=location;
-    }
-
-    public String getLocation(){
-        return this.location;
+    public void setID(Object id) {
+        this.inventoryid = (Long) id;
     }
 }

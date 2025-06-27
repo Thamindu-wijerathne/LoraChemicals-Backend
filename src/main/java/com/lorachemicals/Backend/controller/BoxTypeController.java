@@ -3,12 +3,11 @@ package com.lorachemicals.Backend.controller;
 import com.lorachemicals.Backend.dto.BoxTypeRequestDTO;
 import com.lorachemicals.Backend.dto.BoxTypeResponseDTO;
 import com.lorachemicals.Backend.services.BoxTypeService;
+import com.lorachemicals.Backend.util.AccessControlUtil;
 import jakarta.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,64 +15,67 @@ import java.util.List;
 @RestController
 @RequestMapping("/boxtype")
 public class BoxTypeController {
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     private BoxTypeService boxTypeService;
 
-    @GetMapping("/all")
-    public ResponseEntity<?> getAllBoxTypes(HttpServletRequest request) {
+    // Create box type
+    @PostMapping("/add")
+    public ResponseEntity<?> create(@RequestBody BoxTypeRequestDTO req, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "admin");
+        try {
+            BoxTypeResponseDTO response = boxTypeService.createBoxType(req);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Get all box types
+    @GetMapping("/all")
+    public ResponseEntity<?> getAll(HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse", "admin");
         try {
             List<BoxTypeResponseDTO> list = boxTypeService.getAllBoxTypes();
             return ResponseEntity.ok(list);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to fetch box types");
+            return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @GetMapping("/byid/{id}")
-    public ResponseEntity<?> getBoxType(@PathVariable Long id, HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "admin");
+    // Get box type by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getById(@PathVariable Long id, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse_manager", "admin");
         try {
-            BoxTypeResponseDTO dto = boxTypeService.getBoxType(id);
-            return ResponseEntity.ok(dto);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-    }
-
-    @PostMapping("/add")
-    public ResponseEntity<?> createBoxType(@RequestBody BoxTypeRequestDTO dto, HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "admin");
-        logger.error("Update Bottle: {}", dto);
-        try {
-            BoxTypeResponseDTO created = boxTypeService.createBoxType(dto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(created);
+            BoxTypeResponseDTO dto = boxTypeService.getBoxTypeById(id);
+            return (dto != null) ? ResponseEntity.ok(dto) : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create box type");
+            return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+    // Update box type
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateBoxType(@PathVariable Long id, @RequestBody BoxTypeRequestDTO dto, HttpServletRequest request) {
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody BoxTypeRequestDTO dto, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "admin");
         try {
             BoxTypeResponseDTO updated = boxTypeService.updateBoxType(id, dto);
-            return ResponseEntity.status(HttpStatus.OK).body(updated);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            return (updated != null) ? ResponseEntity.ok(updated) : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found");
+        } catch (Exception e) {
+            return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+    // Delete box type
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBoxType(@PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<?> delete(@PathVariable Long id, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "admin");
         try {
-            boxTypeService.deleteBoxType(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            boolean deleted = boxTypeService.deleteBoxType(id);
+            return deleted ? ResponseEntity.noContent().build() : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found");
+        } catch (Exception e) {
+            return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

@@ -2,15 +2,12 @@ package com.lorachemicals.Backend.controller;
 
 import com.lorachemicals.Backend.dto.BottletypeRequestDTO;
 import com.lorachemicals.Backend.dto.BottletypeResponseDTO;
-import com.lorachemicals.Backend.model.Bottletype;
 import com.lorachemicals.Backend.services.BottletypeService;
+import com.lorachemicals.Backend.util.AccessControlUtil;
 import jakarta.servlet.http.HttpServletRequest;
-import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,65 +15,66 @@ import java.util.List;
 @RestController
 @RequestMapping("/bottletype")
 public class BottletypeController {
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-    private ModelMapper modelMapper;
 
     @Autowired
     private BottletypeService bottletypeService;
 
-    @GetMapping("/all")
-    public ResponseEntity<?> getAll(HttpServletRequest request){
-        AccessControlUtil.checkAccess(request, "admin");
-        try{
-            List<BottletypeResponseDTO> bottletypes = bottletypeService.getAll();
-            return new ResponseEntity<>(bottletypes, HttpStatus.OK);
-        }catch(Exception e){
-            return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBottletype(@PathVariable Long id , HttpServletRequest request){
-        AccessControlUtil.checkAccess(request, "admin");
-        try{
-            bottletypeService.deleteBottletype(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }catch(RuntimeException e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @GetMapping("/byid/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id, HttpServletRequest request){
-        AccessControlUtil.checkAccess(request, "admin");
-        try{
-            BottletypeResponseDTO bottletype = bottletypeService.getById(id);
-            return ResponseEntity.ok(bottletype);
-        }catch(Exception e){
-            return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
+    // Create bottle type
     @PostMapping("/add")
-    public ResponseEntity<?> create(@RequestBody BottletypeRequestDTO req, HttpServletRequest request){
+    public ResponseEntity<?> create(@RequestBody BottletypeRequestDTO req, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "admin");
-        try{
-            BottletypeResponseDTO response = bottletypeService.createBottletype(req);
+        try {
+            BottletypeResponseDTO response = bottletypeService.createBottleType(req);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
-        }catch(Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody BottletypeRequestDTO req, HttpServletRequest request){
-        AccessControlUtil.checkAccess(request, "admin");
-        logger.error("Update Bottle: {}", req);
+    // Get all bottle types
+    @GetMapping("/all")
+    public ResponseEntity<?> getAll(HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse", "admin");
+        try {
+            List<BottletypeResponseDTO> list = bottletypeService.getAllBottletypes();
+            return ResponseEntity.ok(list);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
-        try{
-            BottletypeResponseDTO response = bottletypeService.updateBottletype(id, req);
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
-        }catch(Exception e){
+    // Get bottle type by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getById(@PathVariable Long id, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse", "admin");
+        try {
+            BottletypeResponseDTO dto = bottletypeService.getBottleTypeById(id);
+            return (dto != null) ? ResponseEntity.ok(dto) : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found");
+        } catch (Exception e) {
+            return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Update bottle type
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody BottletypeRequestDTO dto, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "admin");
+        try {
+            BottletypeResponseDTO updated = bottletypeService.updateBottleType(id, dto);
+            return (updated != null) ? ResponseEntity.ok(updated) : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found");
+        } catch (Exception e) {
+            return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Delete bottle type
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "admin");
+        try {
+            boolean deleted = bottletypeService.deleteBottleType(id);
+            return deleted ? ResponseEntity.noContent().build() : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found");
+        } catch (Exception e) {
             return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

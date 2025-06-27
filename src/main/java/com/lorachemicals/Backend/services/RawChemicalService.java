@@ -1,18 +1,15 @@
 package com.lorachemicals.Backend.services;
 
-import com.lorachemicals.Backend.dto.RawChemicalRequestDTO;
-import com.lorachemicals.Backend.dto.RawChemicalResponseDTO;
 import com.lorachemicals.Backend.model.RawChemical;
 import com.lorachemicals.Backend.model.RawChemicalType;
-import com.lorachemicals.Backend.model.RawMaterialType;
 import com.lorachemicals.Backend.repository.RawChemicalRepository;
 import com.lorachemicals.Backend.repository.RawChemicalTypeRepository;
-import com.lorachemicals.Backend.repository.RawMaterialTypeRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 public class RawChemicalService {
@@ -23,96 +20,54 @@ public class RawChemicalService {
     @Autowired
     private RawChemicalTypeRepository rawChemicalTypeRepository;
 
-    @Autowired
-    private RawMaterialTypeRepository rawMaterialTypeRepository;
-
-    public List<RawChemicalResponseDTO> getAll() {
-        return rawChemicalRepository.findAll()
-                .stream()
-                .map(this::convertToResponseDTO)
-                .collect(Collectors.toList());
+    // Get all raw chemicals
+    public List<RawChemical> getAllRawChemicals() {
+        try {
+            return rawChemicalRepository.findAll();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch raw chemicals: " + e.getMessage(), e);
+        }
     }
 
-    public void deleteRawChemical(Long id) {
-        if (!rawChemicalRepository.existsById(id)) {
-            throw new RuntimeException("RawChemical not found with id: " + id);
+    // Get by inventory ID
+    public Optional<RawChemical> getRawChemicalById(Long inventoryid) {
+        try {
+            return rawChemicalRepository.findById(inventoryid);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch raw chemical by ID: " + e.getMessage(), e);
         }
-        rawChemicalRepository.deleteById(id);
     }
 
-    public RawChemicalResponseDTO getById(Long id) {
-        return rawChemicalRepository.findById(id)
-                .map(this::convertToResponseDTO)
-                .orElseThrow(() -> new RuntimeException("RawChemical not found with id: " + id));
+    // Create new raw chemical
+    public RawChemical createRawChemical(Long chemid, Double volume) {
+        try {
+            RawChemicalType type = rawChemicalTypeRepository.findById(chemid)
+                    .orElseThrow(() -> new RuntimeException("Chemical type not found"));
+
+            RawChemical chemical = new RawChemical();
+            chemical.setChemicalType(type);
+            chemical.setVolume(volume);
+            return rawChemicalRepository.save(chemical);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create raw chemical: " + e.getMessage(), e);
+        }
     }
 
-    public RawChemicalResponseDTO createRawChemical(RawChemicalRequestDTO reqDTO) {
-        RawChemical rawChemical = new RawChemical();
-
-        // DON'T set chemid manually when using @MapsId
-        // rawChemical.setChemid(reqDTO.getChemid()); // Remove this line
-
-        rawChemical.setType(reqDTO.getType());
-        rawChemical.setVolume(reqDTO.getVolume());
-
-        // Set RawChemicalType FIRST - @MapsId will automatically set the chemid
-        RawChemicalType chemicalType = rawChemicalTypeRepository.findById(reqDTO.getChemid())
-                .orElseThrow(() -> new RuntimeException("RawChemicalType not found with id: " + reqDTO.getChemid()));
-        rawChemical.setChemicalType(chemicalType);
-
-        System.out.println("chemicalType: " + chemicalType);
-
-        if (reqDTO.getRmtid() != null) {
-            RawMaterialType rmt = rawMaterialTypeRepository.findById(reqDTO.getRmtid())
-                    .orElseThrow(() -> new RuntimeException("RawMaterialType not found with rmtid: " + reqDTO.getRmtid()));
-            rawChemical.setRawMaterialType(rmt);
-        } else {
-            rawChemical.setRawMaterialType(null);
+    // Delete
+    public void deleteRawChemical(Long inventoryid) {
+        try {
+            rawChemicalRepository.deleteById(inventoryid);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete raw chemical: " + e.getMessage(), e);
         }
-
-        RawChemical savedRawChemical = rawChemicalRepository.save(rawChemical);
-        System.out.println("savedRawChemical: " + savedRawChemical);
-        System.out.println("reqDTO: " + reqDTO);
-
-        return convertToResponseDTO(savedRawChemical);
     }
 
-    public RawChemicalResponseDTO updateRawChemical(Long id, RawChemicalRequestDTO reqDTO) {
-        RawChemical rawChemical = rawChemicalRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("RawChemical not found with id: " + id));
-
-        rawChemical.setType(reqDTO.getType());
-        rawChemical.setVolume(reqDTO.getVolume());
-
-        // Update RawMaterialType (Optional)
-        if (reqDTO.getRmtid() != null) {
-            RawMaterialType rmt = rawMaterialTypeRepository.findById(reqDTO.getRmtid())
-                    .orElseThrow(() -> new RuntimeException("RawMaterialType not found with rmtid: " + reqDTO.getRmtid()));
-            rawChemical.setRawMaterialType(rmt);
-        } else {
-            rawChemical.setRawMaterialType(null);
+    // Sum of volumes grouped by chemical type
+    public List<Object[]> getTotalVolumeGroupedByChemid() {
+        try {
+            return rawChemicalRepository.sumVolumeGroupedByChemid();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get volume sums: " + e.getMessage(), e);
         }
-
-        RawChemical updatedRawChemical = rawChemicalRepository.save(rawChemical);
-        return convertToResponseDTO(updatedRawChemical);
-    }
-
-    private RawChemicalResponseDTO convertToResponseDTO(RawChemical rawChemical) {
-        RawChemicalResponseDTO dto = new RawChemicalResponseDTO();
-        dto.setChemid(rawChemical.getChemid());
-        dto.setType(rawChemical.getType());
-        dto.setVolume(rawChemical.getVolume());
-
-        if (rawChemical.getChemicalType() != null) {
-            dto.setChemicalTypeId(rawChemical.getChemicalType().getChemid());
-            dto.setChemicalTypeName(rawChemical.getChemicalType().getName()); // Assuming RawChemicalType has getName()
-        }
-
-        if (rawChemical.getRawMaterialType() != null) {
-            dto.setrmtid(rawChemical.getRawMaterialType().getId());
-            dto.setRawMaterialTypeName(rawChemical.getRawMaterialType().getName()); // Assuming RawMaterialType has getName()
-        }
-
-        return dto;
     }
 }

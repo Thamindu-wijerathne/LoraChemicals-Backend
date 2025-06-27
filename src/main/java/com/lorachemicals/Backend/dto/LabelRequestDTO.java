@@ -1,39 +1,22 @@
 package com.lorachemicals.Backend.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class LabelRequestDTO {
-    private Long labelid; // This serves as both boxid and boxTypeId due to @MapsId
-    private Long rmtid; // Refers to RawMaterialType.id
+    private Long labelId;
     private int quantity;
 
     public LabelRequestDTO() {}
 
-    public Long getLabelid() {
-        return labelid;
-    }
-    public void setLabelid(Long labelid) {
-        this.labelid = labelid;
-    }
-    public Long getRmtid() {
-        return rmtid;
-    }
-    public void setRmtid(Long rmtid) {
-        this.rmtid = rmtid;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-    public void setQuantity(int quantity) {
+    public LabelRequestDTO(Long labelId, int quantity) {
+        this.labelId = labelId;
         this.quantity = quantity;
     }
 
-    @Override
-    public String toString() {
-        return "LabelRequestDTO{" +
-                "labelid=" + labelid +
-                ", rmtid=" + rmtid +
-                ", quantity=" + quantity +
-                '}';
+    public Long getLabelTypeId() {
+        return labelId;
     }
-
 }

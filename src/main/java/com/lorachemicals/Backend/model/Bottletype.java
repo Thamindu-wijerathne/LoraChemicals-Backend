@@ -1,7 +1,11 @@
 package com.lorachemicals.Backend.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "bottle_type")
 public class Bottletype {
@@ -15,25 +19,4 @@ public class Bottletype {
 
     }
 
-    //getters and setyters
-    public Long getBottleid() {
-        return this.bottleid;
-    }
-    public void setBottleid(Long bottleid) {
-        this.bottleid = bottleid;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getVolume() {
-        return this.volume;
-    }
-    public void setVolume(String volume) {
-        this.volume = volume;
-    }
 }
