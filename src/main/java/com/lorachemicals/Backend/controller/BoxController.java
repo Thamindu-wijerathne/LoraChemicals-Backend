@@ -51,8 +51,8 @@ public class BoxController {
     }
 
     // PUT update box by inventory ID
-    @PutMapping("/{inventoryId}")
-    public ResponseEntity<?> updateBox(@PathVariable Long inventoryId,
+    @PutMapping("/{boxid}")
+    public ResponseEntity<?> updateBox(@PathVariable Long boxid,
                                        @RequestBody BoxRequestDTO dto,
                                        HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
