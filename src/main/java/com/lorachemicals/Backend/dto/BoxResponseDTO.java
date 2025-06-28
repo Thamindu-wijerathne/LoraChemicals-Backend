@@ -15,4 +15,6 @@ public class BoxResponseDTO {
     private final Long boxId;
 
     private final int quantity;
+
+    private String location;
 }
