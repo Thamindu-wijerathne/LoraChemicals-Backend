@@ -5,9 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "label", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "labelid")
-})
+@Table(name = "label", uniqueConstraints = {@UniqueConstraint(columnNames = "labelid")})
 @PrimaryKeyJoinColumn(name = "inventoryid")
 @Getter
 @Setter

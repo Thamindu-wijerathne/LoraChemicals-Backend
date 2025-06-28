@@ -7,16 +7,8 @@ import lombok.Setter;
 @Getter
 public class RawChemicalRequestDTO {
 
-    // Getters and setters
     private Long chemid;
     private Double volume;
-
-    // Constructor(s)
-    public RawChemicalRequestDTO() {}
-
-    public RawChemicalRequestDTO(Long chemid, Double volume) {
-        this.chemid = chemid;
-        this.volume = volume;
-    }
+    private String location;
 
 }
