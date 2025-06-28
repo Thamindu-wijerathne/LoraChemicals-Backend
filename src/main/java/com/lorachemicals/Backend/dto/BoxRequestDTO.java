@@ -17,4 +17,9 @@ public class BoxRequestDTO {
 
     public BoxRequestDTO() {}
 
+    public BoxRequestDTO(Long boxId, int quantity, String location) {
+        this.boxId = boxId;
+        this.quantity = quantity;
+        this.location = location;
+    }
 }

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/boxes")
+@RequestMapping("/box")
 public class BoxController {
 
     @Autowired
@@ -23,7 +23,7 @@ public class BoxController {
     // GET all boxes
     @GetMapping("/all")
     public ResponseEntity<?> getAllBoxes(HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse");
+        AccessControlUtil.checkAccess(request, "warehouse", "admin");
         try {
             List<Box> boxes = boxService.getAllBoxes();
             return new ResponseEntity<>(boxes, HttpStatus.OK);
@@ -33,7 +33,7 @@ public class BoxController {
         }
     }
 
-    // GET box by inventory id
+    // GET box by inventory ID
     @GetMapping("/{inventoryId}")
     public ResponseEntity<?> getBoxById(@PathVariable Long inventoryId, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
@@ -50,22 +50,9 @@ public class BoxController {
         }
     }
 
-    // POST create new box
-    @PostMapping("/add")
-    public ResponseEntity<?> createBox(@RequestBody BoxRequestDTO dto, HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse");
-        try {
-            Box created = boxService.createBox(dto);
-            return new ResponseEntity<>(created, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Failed to create box: " + e.getMessage(),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    // PUT update box by inventory id
+    // PUT update box by inventory ID
     @PutMapping("/{inventoryId}")
-    public ResponseEntity<?> updateBox(@PathVariable Long boxid,
+    public ResponseEntity<?> updateBox(@PathVariable Long inventoryId,
                                        @RequestBody BoxRequestDTO dto,
                                        HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
@@ -78,7 +65,20 @@ public class BoxController {
         }
     }
 
-    // DELETE box by inventory id
+    // POST create new box
+    @PostMapping("/add")
+    public ResponseEntity<?> createBox(@RequestBody BoxRequestDTO dto, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse", "admin");
+        try {
+            Box created = boxService.createBox(dto);
+            return new ResponseEntity<>(created, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to create box: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // DELETE box by inventory ID
     @DeleteMapping("/{inventoryId}")
     public ResponseEntity<?> deleteBox(@PathVariable Long inventoryId, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
@@ -91,16 +91,4 @@ public class BoxController {
         }
     }
 
-    // GET sum of quantities grouped by box type
-    @GetMapping("/quantities")
-    public ResponseEntity<?> getQuantitySumGrouped(HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse");
-        try {
-            List<Object[]> quantitySums = boxService.getTotalQuantityGroupedByBoxType();
-            return new ResponseEntity<>(quantitySums, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Failed to get quantity sums: " + e.getMessage(),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 }

@@ -49,7 +49,6 @@ public class BoxService {
             box.setBoxType(boxType);
             box.setQuantity(dto.getQuantity());
             box.setLocation(dto.getLocation());
-            // Set other RawMaterial fields if needed
 
             return boxRepository.save(box);
         } catch (Exception e) {
@@ -68,7 +67,7 @@ public class BoxService {
 
             box.setBoxType(boxType);
             box.setQuantity(dto.getQuantity());
-            // Update other RawMaterial fields if needed
+            box.setLocation(dto.getLocation());
 
             return boxRepository.save(box);
         } catch (Exception e) {
@@ -85,12 +84,5 @@ public class BoxService {
         }
     }
 
-    // Sum of quantities grouped by box type
-    public List<Object[]> getTotalQuantityGroupedByBoxType() {
-        try {
-            return boxRepository.sumQuantityGroupedByBoxType();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get quantity sums: " + e.getMessage(), e);
-        }
-    }
+
 }
