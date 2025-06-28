@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/bottles")
+@RequestMapping("/bottles")
 public class BottleController {
 
     @Autowired
@@ -50,7 +50,7 @@ public class BottleController {
     }
 
     // POST create new bottle
-    @PostMapping("/create")
+    @PostMapping("/add")
     public ResponseEntity<?> createBottle(@RequestBody BottleRequestDTO dto, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
         try {
@@ -63,7 +63,7 @@ public class BottleController {
     }
 
     // PUT update bottle by inventory id
-    @PutMapping("/update/{inventoryId}")
+    @PutMapping("/{inventoryId}")
     public ResponseEntity<?> updateBottle(@PathVariable Long inventoryId,
                                           @RequestBody BottleRequestDTO dto,
                                           HttpServletRequest request) {
@@ -78,7 +78,7 @@ public class BottleController {
     }
 
     // DELETE bottle by inventory id
-    @DeleteMapping("/delete/{inventoryId}")
+    @DeleteMapping("/{inventoryId}")
     public ResponseEntity<?> deleteBottle(@PathVariable Long inventoryId, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
         try {

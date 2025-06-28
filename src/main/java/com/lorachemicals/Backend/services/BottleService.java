@@ -48,6 +48,7 @@ public class BottleService {
             Bottle bottle = new Bottle();
             bottle.setBottleType(bottleType);
             bottle.setQuantity(dto.getQuantity());
+            bottle.setLocation(dto.getLocation());
             // Set other RawMaterial fields if needed
 
             return bottleRepository.save(bottle);

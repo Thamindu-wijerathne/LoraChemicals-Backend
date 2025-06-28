@@ -1,5 +1,6 @@
 package com.lorachemicals.Backend.services;
 
+import com.lorachemicals.Backend.dto.RawChemicalRequestDTO;
 import com.lorachemicals.Backend.model.RawChemical;
 import com.lorachemicals.Backend.model.RawChemicalType;
 import com.lorachemicals.Backend.repository.RawChemicalRepository;
@@ -39,14 +40,15 @@ public class RawChemicalService {
     }
 
     // Create new raw chemical
-    public RawChemical createRawChemical(Long chemid, Double volume) {
+    public RawChemical createRawChemical(RawChemicalRequestDTO dto) {
         try {
-            RawChemicalType type = rawChemicalTypeRepository.findById(chemid)
+            RawChemicalType type = rawChemicalTypeRepository.findById(dto.getChemid())
                     .orElseThrow(() -> new RuntimeException("Chemical type not found"));
 
             RawChemical chemical = new RawChemical();
             chemical.setChemicalType(type);
-            chemical.setVolume(volume);
+            chemical.setVolume(dto.getVolume());
+            chemical.setLocation(dto.getLocation());
             return rawChemicalRepository.save(chemical);
         } catch (Exception e) {
             throw new RuntimeException("Failed to create raw chemical: " + e.getMessage(), e);
