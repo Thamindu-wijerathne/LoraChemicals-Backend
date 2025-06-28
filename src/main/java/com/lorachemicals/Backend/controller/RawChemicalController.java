@@ -54,7 +54,7 @@ public class RawChemicalController {
     // POST create new raw chemical
     @PostMapping("/add")
     public ResponseEntity<?> createRawChemical(@RequestBody RawChemicalRequestDTO dto, HttpServletRequest request) {
-        com.lorachemicals.Backend.util.AccessControlUtil.checkAccess(request, "warehouse");
+        com.lorachemicals.Backend.util.AccessControlUtil.checkAccess(request, "warehouse", "admin");
         try {
             RawChemical created = rawChemicalService.createRawChemical(dto);
             return new ResponseEntity<>(created, HttpStatus.CREATED);
