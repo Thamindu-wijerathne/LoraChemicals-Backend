@@ -8,15 +8,13 @@ import lombok.Setter;
 @Setter
 public class BoxRequestDTO {
 
-    @JsonProperty("box_id")
+    @JsonProperty("boxid")
     private Long boxId;
 
     private int quantity;
 
+    private String location;
+
     public BoxRequestDTO() {}
 
-    public BoxRequestDTO(Long boxId, int quantity) {
-        this.boxId = boxId;
-        this.quantity = quantity;
-    }
 }

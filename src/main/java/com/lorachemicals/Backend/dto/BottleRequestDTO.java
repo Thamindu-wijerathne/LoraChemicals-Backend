@@ -8,6 +8,7 @@ import lombok.Setter;
 public class BottleRequestDTO {
     private Long bottleId; // to link the BottleType
     private int quantity;
+    private String location;
 
     public BottleRequestDTO() {}
 

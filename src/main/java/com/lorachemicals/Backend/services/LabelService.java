@@ -48,6 +48,7 @@ public class LabelService {
             Label label = new Label();
             label.setLabeltype(labeltype);
             label.setQuantity(dto.getQuantity());
+            label.setLocation(dto.getLocation());
             // Set other RawMaterial fields if needed
 
             return labelRepository.save(label);

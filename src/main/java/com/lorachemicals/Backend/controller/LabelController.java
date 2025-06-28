@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/labels")
+@RequestMapping("/labels")
 public class LabelController {
 
     @Autowired
@@ -51,7 +51,7 @@ public class LabelController {
     }
 
     // POST create new label
-    @PostMapping("/create")
+    @PostMapping("/add")
     public ResponseEntity<?> createLabel(@RequestBody LabelRequestDTO dto, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
         try {
@@ -64,7 +64,7 @@ public class LabelController {
     }
 
     // PUT update label by inventory id
-    @PutMapping("/update/{inventoryId}")
+    @PutMapping("/{inventoryId}")
     public ResponseEntity<?> updateLabel(@PathVariable Long inventoryId,
                                          @RequestBody LabelRequestDTO dto,
                                          HttpServletRequest request) {
@@ -79,7 +79,7 @@ public class LabelController {
     }
 
     // DELETE label by inventory id
-    @DeleteMapping("/delete/{inventoryId}")
+    @DeleteMapping("/{inventoryId}")
     public ResponseEntity<?> deleteLabel(@PathVariable Long inventoryId, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
         try {

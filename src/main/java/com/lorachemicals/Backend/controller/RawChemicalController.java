@@ -1,5 +1,7 @@
 package com.lorachemicals.Backend.controller;
 
+import com.lorachemicals.Backend.dto.RawChemicalRequestDTO;
+import com.lorachemicals.Backend.model.Label;
 import com.lorachemicals.Backend.model.RawChemical;
 import com.lorachemicals.Backend.services.RawChemicalService;
 
@@ -13,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/raw-chemicals")
+@RequestMapping("/raw-chemicals")
 public class RawChemicalController {
 
     @Autowired
@@ -50,13 +52,11 @@ public class RawChemicalController {
     }
 
     // POST create new raw chemical
-    @PostMapping("/create")
-    public ResponseEntity<?> createRawChemical(@RequestParam Long chemid,
-                                               @RequestParam Double volume,
-                                               HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse");
+    @PostMapping("/add")
+    public ResponseEntity<?> createRawChemical(@RequestBody RawChemicalRequestDTO dto, HttpServletRequest request) {
+        com.lorachemicals.Backend.util.AccessControlUtil.checkAccess(request, "warehouse");
         try {
-            RawChemical created = rawChemicalService.createRawChemical(chemid, volume);
+            RawChemical created = rawChemicalService.createRawChemical(dto);
             return new ResponseEntity<>(created, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to create raw chemical: " + e.getMessage(),
@@ -65,7 +65,7 @@ public class RawChemicalController {
     }
 
     // DELETE raw chemical by inventory id
-    @DeleteMapping("/delete/{inventoryid}")
+    @DeleteMapping("/{inventoryid}")
     public ResponseEntity<?> deleteRawChemical(@PathVariable Long inventoryid, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
         try {
