@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/boxes")
+@RequestMapping("/boxes")
 public class BoxController {
 
     @Autowired
@@ -51,7 +51,7 @@ public class BoxController {
     }
 
     // POST create new box
-    @PostMapping("/create")
+    @PostMapping("/add")
     public ResponseEntity<?> createBox(@RequestBody BoxRequestDTO dto, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
         try {
@@ -64,13 +64,13 @@ public class BoxController {
     }
 
     // PUT update box by inventory id
-    @PutMapping("/update/{inventoryId}")
-    public ResponseEntity<?> updateBox(@PathVariable Long inventoryId,
+    @PutMapping("/{inventoryId}")
+    public ResponseEntity<?> updateBox(@PathVariable Long boxid,
                                        @RequestBody BoxRequestDTO dto,
                                        HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
         try {
-            Box updated = boxService.updateBox(inventoryId, dto);
+            Box updated = boxService.updateBox(boxid, dto);
             return new ResponseEntity<>(updated, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to update box: " + e.getMessage(),
@@ -79,7 +79,7 @@ public class BoxController {
     }
 
     // DELETE box by inventory id
-    @DeleteMapping("/delete/{inventoryId}")
+    @DeleteMapping("/{inventoryId}")
     public ResponseEntity<?> deleteBox(@PathVariable Long inventoryId, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
         try {
