@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/labels")
+@RequestMapping("/label")
 public class LabelController {
 
     @Autowired
@@ -23,7 +23,7 @@ public class LabelController {
     // GET all labels
     @GetMapping("/all")
     public ResponseEntity<?> getAllLabels(HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse");
+        AccessControlUtil.checkAccess(request, "warehouse", "admin");
         try {
             List<Label> labels = labelService.getAllLabels();
             return new ResponseEntity<>(labels, HttpStatus.OK);
@@ -33,7 +33,7 @@ public class LabelController {
         }
     }
 
-    // GET label by inventory id
+    // GET label by inventory ID
     @GetMapping("/{inventoryId}")
     public ResponseEntity<?> getLabelById(@PathVariable Long inventoryId, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
@@ -51,9 +51,9 @@ public class LabelController {
     }
 
     // POST create new label
-    @PostMapping("/create")
+    @PostMapping("/add")
     public ResponseEntity<?> createLabel(@RequestBody LabelRequestDTO dto, HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse");
+        AccessControlUtil.checkAccess(request, "warehouse", "admin");
         try {
             Label created = labelService.createLabel(dto);
             return new ResponseEntity<>(created, HttpStatus.CREATED);
@@ -63,8 +63,8 @@ public class LabelController {
         }
     }
 
-    // PUT update label by inventory id
-    @PutMapping("/update/{inventoryId}")
+    // PUT update label by inventory ID
+    @PutMapping("/{inventoryId}")
     public ResponseEntity<?> updateLabel(@PathVariable Long inventoryId,
                                          @RequestBody LabelRequestDTO dto,
                                          HttpServletRequest request) {
@@ -78,8 +78,8 @@ public class LabelController {
         }
     }
 
-    // DELETE label by inventory id
-    @DeleteMapping("/delete/{inventoryId}")
+    // DELETE label by inventory ID
+    @DeleteMapping("/{inventoryId}")
     public ResponseEntity<?> deleteLabel(@PathVariable Long inventoryId, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
         try {
@@ -87,19 +87,6 @@ public class LabelController {
             return new ResponseEntity<>("Label deleted successfully", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to delete label: " + e.getMessage(),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    // GET sum of quantities grouped by label type
-    @GetMapping("/quantities")
-    public ResponseEntity<?> getQuantitySumGrouped(HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse");
-        try {
-            List<Object[]> quantitySums = labelService.getTotalQuantityGroupedByLabelType();
-            return new ResponseEntity<>(quantitySums, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Failed to get quantity sums: " + e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

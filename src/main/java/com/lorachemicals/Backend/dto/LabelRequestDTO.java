@@ -6,17 +6,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class LabelRequestDTO {
-    private Long labelId;
+    private Long labelTypeId;
     private int quantity;
+    private String location;
 
-    public LabelRequestDTO() {}
-
-    public LabelRequestDTO(Long labelId, int quantity) {
-        this.labelId = labelId;
-        this.quantity = quantity;
-    }
-
-    public Long getLabelTypeId() {
-        return labelId;
-    }
 }

@@ -1,11 +1,15 @@
 package com.lorachemicals.Backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class BoxRequestDTO {
 
     @JsonProperty("box_id")
@@ -15,11 +19,4 @@ public class BoxRequestDTO {
 
     private String location;
 
-    public BoxRequestDTO() {}
-
-    public BoxRequestDTO(Long boxId, int quantity, String location) {
-        this.boxId = boxId;
-        this.quantity = quantity;
-        this.location = location;
-    }
 }

@@ -42,13 +42,13 @@ public class LabelService {
     // Create new label
     public Label createLabel(LabelRequestDTO dto) {
         try {
-            Labeltype labeltype = labeltypeRepository.findById(dto.getLabelTypeId())
+            Labeltype labelType = labeltypeRepository.findById(dto.getLabelTypeId())
                     .orElseThrow(() -> new RuntimeException("Label type not found"));
 
             Label label = new Label();
-            label.setLabeltype(labeltype);
+            label.setLabelType(labelType);
             label.setQuantity(dto.getQuantity());
-            // Set other RawMaterial fields if needed
+            label.setLocation(dto.getLocation());
 
             return labelRepository.save(label);
         } catch (Exception e) {
@@ -62,12 +62,12 @@ public class LabelService {
             Label label = labelRepository.findById(inventoryId)
                     .orElseThrow(() -> new RuntimeException("Label not found"));
 
-            Labeltype labeltype = labeltypeRepository.findById(dto.getLabelTypeId())
+            Labeltype labelType = labeltypeRepository.findById(dto.getLabelTypeId())
                     .orElseThrow(() -> new RuntimeException("Label type not found"));
 
-            label.setLabeltype(labeltype);
+            label.setLabelType(labelType);
             label.setQuantity(dto.getQuantity());
-            // Update other RawMaterial fields if needed
+            label.setLocation(dto.getLocation());
 
             return labelRepository.save(label);
         } catch (Exception e) {
@@ -81,15 +81,6 @@ public class LabelService {
             labelRepository.deleteById(inventoryId);
         } catch (Exception e) {
             throw new RuntimeException("Failed to delete label: " + e.getMessage(), e);
-        }
-    }
-
-    // Sum of quantities grouped by label type
-    public List<Object[]> getTotalQuantityGroupedByLabelType() {
-        try {
-            return labelRepository.sumQuantityGroupedByLabeltype();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get quantity sums: " + e.getMessage(), e);
         }
     }
 }
