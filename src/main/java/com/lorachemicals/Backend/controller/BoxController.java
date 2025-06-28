@@ -68,7 +68,7 @@ public class BoxController {
     // POST create new box
     @PostMapping("/add")
     public ResponseEntity<?> createBox(@RequestBody BoxRequestDTO dto, HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse", "admin");
+        AccessControlUtil.checkAccess(request, "admin" , "warehouse");
         try {
             Box created = boxService.createBox(dto);
             return new ResponseEntity<>(created, HttpStatus.CREATED);
