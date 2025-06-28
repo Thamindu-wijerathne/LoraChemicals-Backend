@@ -3,6 +3,7 @@ package com.lorachemicals.Backend.controller;
 import com.lorachemicals.Backend.dto.BottleRequestDTO;
 import com.lorachemicals.Backend.model.Bottle;
 import com.lorachemicals.Backend.services.BottleService;
+import com.lorachemicals.Backend.util.AccessControlUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/bottles")
+@RequestMapping("/bottle")
 public class BottleController {
 
     @Autowired
@@ -22,7 +23,7 @@ public class BottleController {
     // GET all bottles
     @GetMapping("/all")
     public ResponseEntity<?> getAllBottles(HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse");
+        AccessControlUtil.checkAccess(request, "warehouse", "admin");
         try {
             List<Bottle> bottles = bottleService.getAllBottles();
             return new ResponseEntity<>(bottles, HttpStatus.OK);
@@ -32,7 +33,7 @@ public class BottleController {
         }
     }
 
-    // GET bottle by inventory id
+    // GET bottle by inventory ID
     @GetMapping("/{inventoryId}")
     public ResponseEntity<?> getBottleById(@PathVariable Long inventoryId, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
@@ -50,9 +51,9 @@ public class BottleController {
     }
 
     // POST create new bottle
-    @PostMapping("/create")
+    @PostMapping("/add")
     public ResponseEntity<?> createBottle(@RequestBody BottleRequestDTO dto, HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse");
+        AccessControlUtil.checkAccess(request, "warehouse", "admin");
         try {
             Bottle created = bottleService.createBottle(dto);
             return new ResponseEntity<>(created, HttpStatus.CREATED);
@@ -62,8 +63,8 @@ public class BottleController {
         }
     }
 
-    // PUT update bottle by inventory id
-    @PutMapping("/update/{inventoryId}")
+    // PUT update bottle by inventory ID
+    @PutMapping("/{inventoryId}")
     public ResponseEntity<?> updateBottle(@PathVariable Long inventoryId,
                                           @RequestBody BottleRequestDTO dto,
                                           HttpServletRequest request) {
@@ -77,8 +78,8 @@ public class BottleController {
         }
     }
 
-    // DELETE bottle by inventory id
-    @DeleteMapping("/delete/{inventoryId}")
+    // DELETE bottle by inventory ID
+    @DeleteMapping("/{inventoryId}")
     public ResponseEntity<?> deleteBottle(@PathVariable Long inventoryId, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
         try {
@@ -90,16 +91,4 @@ public class BottleController {
         }
     }
 
-    // GET sum of quantities grouped by bottle type
-    @GetMapping("/quantities")
-    public ResponseEntity<?> getQuantitySumGrouped(HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse");
-        try {
-            List<Object[]> quantitySums = bottleService.getTotalQuantityGroupedByBottleType();
-            return new ResponseEntity<>(quantitySums, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Failed to get quantity sums: " + e.getMessage(),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 }

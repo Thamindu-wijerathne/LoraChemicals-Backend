@@ -42,13 +42,13 @@ public class BottleService {
     // Create new bottle
     public Bottle createBottle(BottleRequestDTO dto) {
         try {
-            Bottletype bottleType = bottletypeRepository.findById(dto.getBottleId())
+            Bottletype bottleType = bottletypeRepository.findById(dto.getBottleTypeId())
                     .orElseThrow(() -> new RuntimeException("Bottle type not found"));
 
             Bottle bottle = new Bottle();
             bottle.setBottleType(bottleType);
             bottle.setQuantity(dto.getQuantity());
-            // Set other RawMaterial fields if needed
+            bottle.setLocation(dto.getLocation());
 
             return bottleRepository.save(bottle);
         } catch (Exception e) {
@@ -67,7 +67,7 @@ public class BottleService {
 
             bottle.setBottleType(bottleType);
             bottle.setQuantity(dto.getQuantity());
-            // Update other RawMaterial fields if needed
+            bottle.setLocation(dto.getLocation()); // add if location is part of Bottle
 
             return bottleRepository.save(bottle);
         } catch (Exception e) {
@@ -81,15 +81,6 @@ public class BottleService {
             bottleRepository.deleteById(inventoryId);
         } catch (Exception e) {
             throw new RuntimeException("Failed to delete bottle: " + e.getMessage(), e);
-        }
-    }
-
-    // Sum of quantities grouped by bottle type
-    public List<Object[]> getTotalQuantityGroupedByBottleType() {
-        try {
-            return bottleRepository.sumQuantityGroupedByBottleType();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get quantity sums: " + e.getMessage(), e);
         }
     }
 }
