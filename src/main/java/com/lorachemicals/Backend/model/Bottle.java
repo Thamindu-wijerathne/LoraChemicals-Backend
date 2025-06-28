@@ -1,33 +1,19 @@
 package com.lorachemicals.Backend.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "bottle")
+@PrimaryKeyJoinColumn(name = "inventoryid")
+@Getter
+@Setter
 public class Bottle extends RawMaterial {
 
-    @OneToOne
-    @MapsId // Inherited id from RawMaterial
+    @ManyToOne
     @JoinColumn(name = "bottleid", nullable = false)
-    private Bottletype bottletype;
+    private Bottletype bottleType;
 
     private int quantity;
-
-    // Getters and setters
-
-    public Bottletype getBottletype() {
-        return bottletype;
-    }
-
-    public void setBottletype(Bottletype bottletype) {
-        this.bottletype = bottletype;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
 }

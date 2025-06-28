@@ -1,6 +1,5 @@
 package com.lorachemicals.Backend.model;
 
-
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,11 +10,9 @@ import lombok.Setter;
 @Setter
 public class Label extends RawMaterial {
 
-    @OneToOne
-    @MapsId // Uses inherited id as both PK and FK
+    @ManyToOne
     @JoinColumn(name = "labelid", nullable = false)
     private Labeltype labeltype;
 
-    private Long quantity;
+    private int quantity;
 }
-

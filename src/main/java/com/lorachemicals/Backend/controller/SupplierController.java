@@ -64,7 +64,7 @@
 //    }
 //}
 
-package com.lorachemicals.Backend.controller;
+        package com.lorachemicals.Backend.controller;
 
 import com.lorachemicals.Backend.dto.SupplierDTO;
 import com.lorachemicals.Backend.model.Supplier;
@@ -76,7 +76,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+        import java.util.List;
 
 @RestController
 @RequestMapping("/suppliers")
@@ -195,4 +195,3 @@ public class SupplierController {
         }
     }
 }
-

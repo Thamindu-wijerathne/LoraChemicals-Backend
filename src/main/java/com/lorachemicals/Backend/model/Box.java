@@ -1,31 +1,28 @@
 package com.lorachemicals.Backend.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Table(name = "box")
+@Table(
+        name = "box",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = "boxid")
+        }
+)
+@PrimaryKeyJoinColumn(name = "inventoryid")
+@Getter
+@Setter
 public class Box extends RawMaterial {
 
-    @OneToOne
-    @MapsId // Inherited id used as both PK and FK to BoxType
-    @JoinColumn(name = "boxid")
-    private BoxType boxtype;
+    @ManyToOne
+    @JoinColumn(name = "boxid", nullable = false)
+    private BoxType boxType;
 
     private int quantity;
 
-    public BoxType getBoxtype() {
-        return boxtype;
-    }
-
-    public void setBoxtype(BoxType boxtype) {
-        this.boxtype = boxtype;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setId(Long id) {
+        this.setInventoryid(id);
     }
 }

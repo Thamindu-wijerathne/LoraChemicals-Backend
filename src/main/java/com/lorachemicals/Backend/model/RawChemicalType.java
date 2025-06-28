@@ -1,48 +1,24 @@
 package com.lorachemicals.Backend.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "raw_chemical_type")
 public class RawChemicalType {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // <-- FIXED HERE
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long chemid;
 
-    private String name;
-    private String type;
+    private String name;      // e.g., "Hydrochloric Acid", "Ammonia"
+
     private String description;
 
-    public RawChemicalType() {}
+    private String type;
 
-    public Long getChemid() {
-        return chemid;
-    }
-
-    public void setChemid(Long chemid) {
-        this.chemid = chemid;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    // Optional: description, hazard label, etc.
 }
