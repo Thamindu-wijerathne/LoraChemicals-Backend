@@ -1,5 +1,6 @@
 package com.lorachemicals.Backend.services;
 
+import com.lorachemicals.Backend.model.Box;
 import com.lorachemicals.Backend.model.Label;
 import com.lorachemicals.Backend.model.Labeltype;
 import com.lorachemicals.Backend.repository.LabelRepository;
@@ -53,6 +54,18 @@ public class LabelService {
             return labelRepository.save(label);
         } catch (Exception e) {
             throw new RuntimeException("Failed to create label: " + e.getMessage(), e);
+        }
+    }
+
+    public Label updateQuantity(Long inventoryId, int quantity) {
+        try {
+            Label raw = labelRepository.findById(inventoryId)
+                    .orElseThrow(() -> new RuntimeException("Bottle not found"));
+
+            raw.setQuantity(quantity);
+            return labelRepository.save(raw);
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating volume: " + e.getMessage());
         }
     }
 

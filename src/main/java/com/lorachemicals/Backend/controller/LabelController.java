@@ -1,6 +1,9 @@
 package com.lorachemicals.Backend.controller;
 
+import com.lorachemicals.Backend.dto.BoxQuantityUpdateDTO;
+import com.lorachemicals.Backend.dto.LabelQuantityUpdateDTO;
 import com.lorachemicals.Backend.dto.LabelRequestDTO;
+import com.lorachemicals.Backend.model.Box;
 import com.lorachemicals.Backend.model.Label;
 import com.lorachemicals.Backend.services.LabelService;
 import com.lorachemicals.Backend.util.AccessControlUtil;
@@ -46,6 +49,20 @@ public class LabelController {
             }
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to get label: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/{inventoryId}/quantity")
+    public ResponseEntity<?> updateQuantity(@PathVariable Long inventoryId,
+                                            @RequestBody LabelQuantityUpdateDTO dto,
+                                            HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse");
+        try {
+            Label updated = labelService.updateQuantity(inventoryId, dto.getQuantity());
+            return new ResponseEntity<>(updated, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to update quantity: " + e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
