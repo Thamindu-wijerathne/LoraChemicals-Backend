@@ -2,6 +2,7 @@ package com.lorachemicals.Backend.services;
 
 import com.lorachemicals.Backend.model.Bottle;
 import com.lorachemicals.Backend.model.Bottletype;
+import com.lorachemicals.Backend.model.RawChemical;
 import com.lorachemicals.Backend.repository.BottleRepository;
 import com.lorachemicals.Backend.repository.BottletypeRepository;
 import com.lorachemicals.Backend.dto.BottleRequestDTO;
@@ -72,6 +73,18 @@ public class BottleService {
             return bottleRepository.save(bottle);
         } catch (Exception e) {
             throw new RuntimeException("Failed to update bottle: " + e.getMessage(), e);
+        }
+    }
+
+    public Bottle updateQuantity(Long inventoryId, int quantity) {
+        try {
+            Bottle raw = bottleRepository.findById(inventoryId)
+                    .orElseThrow(() -> new RuntimeException("Bottle not found"));
+
+            raw.setQuantity(quantity);
+            return bottleRepository.save(raw);
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating volume: " + e.getMessage());
         }
     }
 

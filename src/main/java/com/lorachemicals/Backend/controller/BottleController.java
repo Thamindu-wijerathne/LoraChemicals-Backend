@@ -1,7 +1,10 @@
 package com.lorachemicals.Backend.controller;
 
+import com.lorachemicals.Backend.dto.BottleQuantityUpdateDTO;
 import com.lorachemicals.Backend.dto.BottleRequestDTO;
+import com.lorachemicals.Backend.dto.ChemicalVolumeUpdateDTO;
 import com.lorachemicals.Backend.model.Bottle;
+import com.lorachemicals.Backend.model.RawChemical;
 import com.lorachemicals.Backend.services.BottleService;
 import com.lorachemicals.Backend.util.AccessControlUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,6 +49,20 @@ public class BottleController {
             }
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to get bottle: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/{inventoryId}/quantity")
+    public ResponseEntity<?> updateQuantity(@PathVariable Long inventoryId,
+                                            @RequestBody BottleQuantityUpdateDTO dto,
+                                            HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse");
+        try {
+            Bottle updated = bottleService.updateQuantity(inventoryId, dto.getQuantity());
+            return new ResponseEntity<>(updated, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to update volume: " + e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
