@@ -80,7 +80,7 @@ public class RawChemicalController {
         }
     }
 
-    @PutMapping("/{inventoryId}/volume")
+    @PutMapping("/{inventoryId}/quantity")
     public ResponseEntity<?> updateVolume(@PathVariable Long inventoryId,
                                           @RequestBody ChemicalVolumeUpdateDTO dto,
                                           HttpServletRequest request) {

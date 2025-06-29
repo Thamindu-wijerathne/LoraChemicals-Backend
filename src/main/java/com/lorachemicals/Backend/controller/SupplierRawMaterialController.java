@@ -20,7 +20,7 @@ public class SupplierRawMaterialController {
     @Autowired
     private SupplierRawMaterialService supplierRawMaterialService;
 
-    @PostMapping
+    @PostMapping("/add")
     public ResponseEntity<?> create(@RequestBody SupplierRawMaterialRequestDTO dto, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
         try {
@@ -32,7 +32,7 @@ public class SupplierRawMaterialController {
         }
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<?> getAll(HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
         try {
