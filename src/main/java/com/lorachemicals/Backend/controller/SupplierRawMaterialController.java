@@ -1,0 +1,95 @@
+package com.lorachemicals.Backend.controller;
+
+import com.lorachemicals.Backend.dto.*;
+import com.lorachemicals.Backend.services.SupplierRawMaterialService;
+import com.lorachemicals.Backend.util.AccessControlUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/srp")
+public class SupplierRawMaterialController {
+
+    @Autowired
+    private SupplierRawMaterialService supplierRawMaterialService;
+
+    @PostMapping
+    public ResponseEntity<?> create(@RequestBody SupplierRawMaterialRequestDTO dto, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse");
+        try {
+            SupplierRawMaterialResponseDTO created = supplierRawMaterialService.create(dto);
+            return ResponseEntity.ok(created);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to create: " + e.getMessage());
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getAll(HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse");
+        try {
+            List<SupplierRawMaterialResponseDTO> list = supplierRawMaterialService.getAll();
+            return ResponseEntity.ok(list);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to fetch records: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/{inventoryId}/{supplierId}/{date}")
+    public ResponseEntity<?> getById(@PathVariable Long inventoryId,
+                                     @PathVariable Long supplierId,
+                                     @PathVariable String date,
+                                     HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse");
+        try {
+            LocalDate parsedDate = LocalDate.parse(date);
+            SupplierRawMaterialResponseDTO dto = supplierRawMaterialService.getById(inventoryId, supplierId, parsedDate);
+            return ResponseEntity.ok(dto);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Record not found: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/{inventoryId}/{supplierId}/{date}")
+    public ResponseEntity<?> updateById(@PathVariable Long inventoryId,
+                                        @PathVariable Long supplierId,
+                                        @PathVariable String date,
+                                        @RequestBody SupplierRawMaterialRequestDTO dto,
+                                        HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse");
+        try {
+            LocalDate parsedDate = LocalDate.parse(date);
+            SupplierRawMaterialResponseDTO updated = supplierRawMaterialService.updateById(inventoryId, supplierId, parsedDate, dto);
+            return ResponseEntity.ok(updated);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to update: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{inventoryId}/{supplierId}/{date}")
+    public ResponseEntity<?> deleteById(@PathVariable Long inventoryId,
+                                        @PathVariable Long supplierId,
+                                        @PathVariable String date,
+                                        HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse");
+        try {
+            LocalDate parsedDate = LocalDate.parse(date);
+            supplierRawMaterialService.deleteById(inventoryId, supplierId, parsedDate);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to delete: " + e.getMessage());
+        }
+    }
+}
