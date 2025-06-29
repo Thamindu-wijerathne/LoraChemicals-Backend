@@ -1,5 +1,6 @@
 package com.lorachemicals.Backend.controller;
 
+import com.lorachemicals.Backend.dto.ChemicalVolumeUpdateDTO;
 import com.lorachemicals.Backend.dto.RawChemicalRequestDTO;
 import com.lorachemicals.Backend.model.RawChemical;
 import com.lorachemicals.Backend.services.RawChemicalService;
@@ -75,6 +76,20 @@ public class RawChemicalController {
             return new ResponseEntity<>(updated, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to update raw chemical: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/{inventoryId}/volume")
+    public ResponseEntity<?> updateVolume(@PathVariable Long inventoryId,
+                                          @RequestBody ChemicalVolumeUpdateDTO dto,
+                                          HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse");
+        try {
+            RawChemical updated = rawChemicalService.updateVolume(inventoryId, dto.getVolume());
+            return new ResponseEntity<>(updated, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to update volume: " + e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

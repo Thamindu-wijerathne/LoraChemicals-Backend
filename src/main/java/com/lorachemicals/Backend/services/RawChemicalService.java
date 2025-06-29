@@ -39,6 +39,20 @@ public class RawChemicalService {
         }
     }
 
+    public RawChemical updateVolume(Long inventoryId, double volume) {
+        try {
+            RawChemical raw = rawChemicalRepository.findById(inventoryId)
+                    .orElseThrow(() -> new RuntimeException("Raw chemical not found"));
+
+            raw.setVolume(volume);
+            return rawChemicalRepository.save(raw);
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating volume: " + e.getMessage());
+        }
+    }
+
+
+
     // Create new raw chemical
     public RawChemical createRawChemical(RawChemicalRequestDTO dto) {
         try {
