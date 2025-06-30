@@ -5,9 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class LabelRequestDTO {
-    private Long labelTypeId;
+public class BoxQuantityUpdateDTO {
     private int quantity;
-    private String location;
-
 }

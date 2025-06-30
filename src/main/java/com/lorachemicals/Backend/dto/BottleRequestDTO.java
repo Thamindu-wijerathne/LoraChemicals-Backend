@@ -6,15 +6,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class BottleRequestDTO {
-    private Long bottleId; // to link the BottleType
+    private Long bottleTypeId;
     private int quantity;
     private String location;
 
-    public BottleRequestDTO() {}
 
-    public BottleRequestDTO(Long bottleId, int quantity) {
-        this.bottleId = bottleId;
-        this.quantity = quantity;
+    public Long getBottleId() {
+        return bottleTypeId;
     }
 }
-

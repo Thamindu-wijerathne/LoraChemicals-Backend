@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "label")
+@Table(name = "label", uniqueConstraints = {@UniqueConstraint(columnNames = "labelid")})
 @PrimaryKeyJoinColumn(name = "inventoryid")
 @Getter
 @Setter
@@ -16,4 +16,8 @@ public class Label extends RawMaterial{
     private Labeltype labeltype;
 
     private int quantity;
+
+    public void setLabelType(Labeltype labelType) {
+        this.labeltype = labelType;
+    }
 }

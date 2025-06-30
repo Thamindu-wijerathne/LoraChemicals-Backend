@@ -17,20 +17,24 @@ public class SupplierRawMaterial {
     @EmbeddedId
     private SupplierRawMaterialId id;
 
-    @MapsId("supplierid")  // from SupplierRawMaterialId
+    @MapsId("supplierid")  // maps to supplierid in SupplierRawMaterialId
     @ManyToOne
     @JoinColumn(name = "supplierid", referencedColumnName = "supplierid")
     private Supplier supplier;
 
-    @MapsId("rmtid")  // from SupplierRawMaterialId, matches inventoryid of RawMaterial (named rmtid in this table)
+    @MapsId("inventoryid")  // maps to inventoryid in SupplierRawMaterialId
     @ManyToOne
-    @JoinColumn(name = "rmtid", referencedColumnName = "inventoryid")
+    @JoinColumn(name = "inventoryid", referencedColumnName = "inventoryid")
     private RawMaterial rawMaterial;
 
     @Column(name = "exp_date")
     private LocalDate expDate;
 
     private Integer quantity;
+
+    @ManyToOne
+    @JoinColumn(name = "wmid", referencedColumnName = "wmid")
+    private WarehouseManager warehouseManager;
 
     @Column(name = "unit_price")
     private Double unitPrice;

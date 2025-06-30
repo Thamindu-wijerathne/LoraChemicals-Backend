@@ -2,11 +2,14 @@
 package com.lorachemicals.Backend.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
+@Getter
 @Entity
 @Table(name = "users")
 public class User {
 
+    // Getters
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -39,25 +42,6 @@ public class User {
         this.role = role;
     }
 
-    // Getters
-    public Long getId() { return id; }
-
-    public String getFname() { return fname; }
-
-    public String getLname() { return lname; }
-
-    public String getNic() { return nic; }
-
-    public String getPhone() { return phone; }
-
-    public String getAddress() { return address; }
-
-    public String getEmail() { return email; }
-
-    public String getPassword() { return password; }
-
-    public String getRole() { return role; }
-
     // Setters
     public void setId(Long id) { this.id = id; }
 
@@ -87,4 +71,7 @@ public class User {
                 '}';
     }
 
+    public String getName() {
+        return fname + " " + lname;
+    }
 }

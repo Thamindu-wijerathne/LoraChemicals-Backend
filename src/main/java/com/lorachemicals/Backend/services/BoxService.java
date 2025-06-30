@@ -1,5 +1,6 @@
 package com.lorachemicals.Backend.services;
 
+import com.lorachemicals.Backend.model.Bottle;
 import com.lorachemicals.Backend.model.Box;
 import com.lorachemicals.Backend.model.BoxType;
 import com.lorachemicals.Backend.repository.BoxRepository;
@@ -49,11 +50,22 @@ public class BoxService {
             box.setBoxType(boxType);
             box.setQuantity(dto.getQuantity());
             box.setLocation(dto.getLocation());
-            // Set other RawMaterial fields if needed
 
             return boxRepository.save(box);
         } catch (Exception e) {
             throw new RuntimeException("Failed to create box: " + e.getMessage(), e);
+        }
+    }
+
+    public Box updateQuantity(Long inventoryId, int quantity) {
+        try {
+            Box raw = boxRepository.findById(inventoryId)
+                    .orElseThrow(() -> new RuntimeException("Bottle not found"));
+
+            raw.setQuantity(quantity);
+            return boxRepository.save(raw);
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating volume: " + e.getMessage());
         }
     }
 
@@ -68,7 +80,7 @@ public class BoxService {
 
             box.setBoxType(boxType);
             box.setQuantity(dto.getQuantity());
-            // Update other RawMaterial fields if needed
+            box.setLocation(dto.getLocation());
 
             return boxRepository.save(box);
         } catch (Exception e) {
@@ -85,12 +97,5 @@ public class BoxService {
         }
     }
 
-    // Sum of quantities grouped by box type
-    public List<Object[]> getTotalQuantityGroupedByBoxType() {
-        try {
-            return boxRepository.sumQuantityGroupedByBoxType();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get quantity sums: " + e.getMessage(), e);
-        }
-    }
+
 }

@@ -1,6 +1,9 @@
 package com.lorachemicals.Backend.controller;
 
+import com.lorachemicals.Backend.dto.BottleQuantityUpdateDTO;
+import com.lorachemicals.Backend.dto.BoxQuantityUpdateDTO;
 import com.lorachemicals.Backend.dto.BoxRequestDTO;
+import com.lorachemicals.Backend.model.Bottle;
 import com.lorachemicals.Backend.model.Box;
 import com.lorachemicals.Backend.services.BoxService;
 import com.lorachemicals.Backend.util.AccessControlUtil;
@@ -14,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/boxes")
+@RequestMapping("/box")
 public class BoxController {
 
     @Autowired
@@ -23,7 +26,7 @@ public class BoxController {
     // GET all boxes
     @GetMapping("/all")
     public ResponseEntity<?> getAllBoxes(HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse");
+        AccessControlUtil.checkAccess(request, "warehouse", "admin");
         try {
             List<Box> boxes = boxService.getAllBoxes();
             return new ResponseEntity<>(boxes, HttpStatus.OK);
@@ -33,7 +36,7 @@ public class BoxController {
         }
     }
 
-    // GET box by inventory id
+    // GET box by inventory ID
     @GetMapping("/{inventoryId}")
     public ResponseEntity<?> getBoxById(@PathVariable Long inventoryId, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
@@ -50,21 +53,8 @@ public class BoxController {
         }
     }
 
-    // POST create new box
-    @PostMapping("/add")
-    public ResponseEntity<?> createBox(@RequestBody BoxRequestDTO dto, HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse");
-        try {
-            Box created = boxService.createBox(dto);
-            return new ResponseEntity<>(created, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Failed to create box: " + e.getMessage(),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    // PUT update box by inventory id
-    @PutMapping("/{inventoryId}")
+    // PUT update box by inventory ID
+    @PutMapping("/{boxid}")
     public ResponseEntity<?> updateBox(@PathVariable Long boxid,
                                        @RequestBody BoxRequestDTO dto,
                                        HttpServletRequest request) {
@@ -78,7 +68,34 @@ public class BoxController {
         }
     }
 
-    // DELETE box by inventory id
+    // POST create new box
+    @PostMapping("/add")
+    public ResponseEntity<?> createBox(@RequestBody BoxRequestDTO dto, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "admin" , "warehouse");
+        try {
+            Box created = boxService.createBox(dto);
+            return new ResponseEntity<>(created, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to create box: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/{inventoryId}/quantity")
+    public ResponseEntity<?> updateQuantity(@PathVariable Long inventoryId,
+                                            @RequestBody BoxQuantityUpdateDTO dto,
+                                            HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse");
+        try {
+            Box updated = boxService.updateQuantity(inventoryId, dto.getQuantity());
+            return new ResponseEntity<>(updated, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to update quantity: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // DELETE box by inventory ID
     @DeleteMapping("/{inventoryId}")
     public ResponseEntity<?> deleteBox(@PathVariable Long inventoryId, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
@@ -91,16 +108,4 @@ public class BoxController {
         }
     }
 
-    // GET sum of quantities grouped by box type
-    @GetMapping("/quantities")
-    public ResponseEntity<?> getQuantitySumGrouped(HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse");
-        try {
-            List<Object[]> quantitySums = boxService.getTotalQuantityGroupedByBoxType();
-            return new ResponseEntity<>(quantitySums, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Failed to get quantity sums: " + e.getMessage(),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 }
