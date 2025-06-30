@@ -1,5 +1,6 @@
 package com.lorachemicals.Backend.services;
 
+import com.lorachemicals.Backend.model.Bottle;
 import com.lorachemicals.Backend.model.Box;
 import com.lorachemicals.Backend.model.BoxType;
 import com.lorachemicals.Backend.repository.BoxRepository;
@@ -53,6 +54,18 @@ public class BoxService {
             return boxRepository.save(box);
         } catch (Exception e) {
             throw new RuntimeException("Failed to create box: " + e.getMessage(), e);
+        }
+    }
+
+    public Box updateQuantity(Long inventoryId, int quantity) {
+        try {
+            Box raw = boxRepository.findById(inventoryId)
+                    .orElseThrow(() -> new RuntimeException("Bottle not found"));
+
+            raw.setQuantity(quantity);
+            return boxRepository.save(raw);
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating volume: " + e.getMessage());
         }
     }
 

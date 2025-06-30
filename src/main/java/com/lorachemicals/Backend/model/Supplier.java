@@ -129,4 +129,8 @@ public class Supplier {
                 ", status='" + status + '\'' +
                 '}';
     }
+
+    public String getName() {
+        return firstName + " " + lastName;
+    }
 }

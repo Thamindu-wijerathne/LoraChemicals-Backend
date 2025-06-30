@@ -2,6 +2,7 @@ package com.lorachemicals.Backend.services;
 
 import com.lorachemicals.Backend.model.Bottle;
 import com.lorachemicals.Backend.model.Bottletype;
+import com.lorachemicals.Backend.model.RawChemical;
 import com.lorachemicals.Backend.repository.BottleRepository;
 import com.lorachemicals.Backend.repository.BottletypeRepository;
 import com.lorachemicals.Backend.dto.BottleRequestDTO;
@@ -42,14 +43,13 @@ public class BottleService {
     // Create new bottle
     public Bottle createBottle(BottleRequestDTO dto) {
         try {
-            Bottletype bottleType = bottletypeRepository.findById(dto.getBottleId())
+            Bottletype bottleType = bottletypeRepository.findById(dto.getBottleTypeId())
                     .orElseThrow(() -> new RuntimeException("Bottle type not found"));
 
             Bottle bottle = new Bottle();
             bottle.setBottleType(bottleType);
             bottle.setQuantity(dto.getQuantity());
             bottle.setLocation(dto.getLocation());
-            // Set other RawMaterial fields if needed
 
             return bottleRepository.save(bottle);
         } catch (Exception e) {
@@ -68,11 +68,23 @@ public class BottleService {
 
             bottle.setBottleType(bottleType);
             bottle.setQuantity(dto.getQuantity());
-            // Update other RawMaterial fields if needed
+            bottle.setLocation(dto.getLocation()); // add if location is part of Bottle
 
             return bottleRepository.save(bottle);
         } catch (Exception e) {
             throw new RuntimeException("Failed to update bottle: " + e.getMessage(), e);
+        }
+    }
+
+    public Bottle updateQuantity(Long inventoryId, int quantity) {
+        try {
+            Bottle raw = bottleRepository.findById(inventoryId)
+                    .orElseThrow(() -> new RuntimeException("Bottle not found"));
+
+            raw.setQuantity(quantity);
+            return bottleRepository.save(raw);
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating volume: " + e.getMessage());
         }
     }
 
@@ -82,15 +94,6 @@ public class BottleService {
             bottleRepository.deleteById(inventoryId);
         } catch (Exception e) {
             throw new RuntimeException("Failed to delete bottle: " + e.getMessage(), e);
-        }
-    }
-
-    // Sum of quantities grouped by bottle type
-    public List<Object[]> getTotalQuantityGroupedByBottleType() {
-        try {
-            return bottleRepository.sumQuantityGroupedByBottleType();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get quantity sums: " + e.getMessage(), e);
         }
     }
 }

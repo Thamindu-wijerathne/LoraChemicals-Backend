@@ -1,6 +1,9 @@
 package com.lorachemicals.Backend.controller;
 
+import com.lorachemicals.Backend.dto.BottleQuantityUpdateDTO;
+import com.lorachemicals.Backend.dto.BoxQuantityUpdateDTO;
 import com.lorachemicals.Backend.dto.BoxRequestDTO;
+import com.lorachemicals.Backend.model.Bottle;
 import com.lorachemicals.Backend.model.Box;
 import com.lorachemicals.Backend.services.BoxService;
 import com.lorachemicals.Backend.util.AccessControlUtil;
@@ -74,6 +77,20 @@ public class BoxController {
             return new ResponseEntity<>(created, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to create box: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/{inventoryId}/quantity")
+    public ResponseEntity<?> updateQuantity(@PathVariable Long inventoryId,
+                                            @RequestBody BoxQuantityUpdateDTO dto,
+                                            HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse");
+        try {
+            Box updated = boxService.updateQuantity(inventoryId, dto.getQuantity());
+            return new ResponseEntity<>(updated, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to update quantity: " + e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
