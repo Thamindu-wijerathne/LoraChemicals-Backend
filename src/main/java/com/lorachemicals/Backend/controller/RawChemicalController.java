@@ -5,7 +5,6 @@ import com.lorachemicals.Backend.dto.RawChemicalRequestDTO;
 import com.lorachemicals.Backend.model.RawChemical;
 import com.lorachemicals.Backend.services.RawChemicalService;
 import com.lorachemicals.Backend.util.AccessControlUtil;
-
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,7 +16,11 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/chemical")
+public class RawChemicalController { // ✅ You missed this line
+
+    @Autowired
     private RawChemicalService rawChemicalService;
+
     // GET all raw chemicals
     @GetMapping("/all")
     public ResponseEntity<?> getAllRawChemicals(HttpServletRequest request) {
@@ -76,6 +79,7 @@ import java.util.Optional;
         }
     }
 
+    // PUT update volume
     @PutMapping("/{inventoryId}/quantity")
     public ResponseEntity<?> updateVolume(@PathVariable Long inventoryId,
                                           @RequestBody ChemicalVolumeUpdateDTO dto,
