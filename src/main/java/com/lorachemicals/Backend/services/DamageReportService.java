@@ -61,7 +61,7 @@ public class DamageReportService {
         dto.setReportDate(report.getReportDate());
         dto.setReportedUser(report.getReportedUser());
         dto.setSourceType(report.getSourceType());
-        report.setStatus(dto.getStatus());
+        dto.setStatus(report.getStatus());
         return dto;
     }
 }

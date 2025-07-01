@@ -50,6 +50,7 @@ public class DamageReportController {
         logger.info("Get /damage-report called");
         try {
             List<DamageReportResponseDTO> list = service.getAllReports();
+            logger.info("damge report list: {}", list);
             return ResponseEntity.ok(list);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to fetch reports");
