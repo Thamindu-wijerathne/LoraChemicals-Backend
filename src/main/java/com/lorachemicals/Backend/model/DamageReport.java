@@ -16,6 +16,7 @@ public class DamageReport {
     private LocalDate reportDate;
     private String reportedUser;
     private String sourceType;
+    private String status;
 
     // Getters and Setters
 
@@ -81,6 +82,14 @@ public class DamageReport {
 
     public void setSourceType(String sourceType) {
         this.sourceType = sourceType;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
 

@@ -11,6 +11,7 @@ public class DamageReportRequestDTO {
     private LocalDate reportDate;
     private String reportedUser;
     private String sourceType;
+    private String status;
 
     // Getters and Setters
 
@@ -70,6 +71,14 @@ public class DamageReportRequestDTO {
         this.sourceType = sourceType;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         return "DamageReportResponseDTO{" +
@@ -78,6 +87,7 @@ public class DamageReportRequestDTO {
                 ", description='" + description + '\'' +
 //                ", imageUrl='" + imageUrl + '\'' +
                 ", reportDate=" + reportDate +
+                ", status=" + status +
                 ", reportedUser='" + reportedUser + '\'' +
                 ", sourceType='" + sourceType + '\'' +
                 '}';

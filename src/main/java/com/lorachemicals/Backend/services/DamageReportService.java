@@ -26,6 +26,7 @@ public class DamageReportService {
         report.setReportDate(dto.getReportDate());
         report.setReportedUser(dto.getReportedUser());
         report.setSourceType(dto.getSourceType());
+        report.setStatus(dto.getStatus());
 
         // Handle image upload (save file and set URL)
         if (dto.getImage() != null && !dto.getImage().isEmpty()) {
@@ -60,6 +61,7 @@ public class DamageReportService {
         dto.setReportDate(report.getReportDate());
         dto.setReportedUser(report.getReportedUser());
         dto.setSourceType(report.getSourceType());
+        report.setStatus(dto.getStatus());
         return dto;
     }
 }

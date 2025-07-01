@@ -2,6 +2,7 @@ package com.lorachemicals.Backend.controller;
 
 import com.lorachemicals.Backend.dto.DamageReportRequestDTO;
 import com.lorachemicals.Backend.dto.DamageReportResponseDTO;
+import com.lorachemicals.Backend.model.DamageReport;
 import com.lorachemicals.Backend.services.DamageReportService;
 import com.lorachemicals.Backend.util.AccessControlUtil;
 import jakarta.servlet.http.HttpServletRequest;
