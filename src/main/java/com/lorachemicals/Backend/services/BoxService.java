@@ -70,9 +70,9 @@ public class BoxService {
     }
 
     // Update existing box
-    public Box updateBox(Long inventoryId, BoxRequestDTO dto) {
+    public Box updateBox(Long boxid, BoxRequestDTO dto) {
         try {
-            Box box = boxRepository.findById(inventoryId)
+            Box box = boxRepository.findById(boxid)
                     .orElseThrow(() -> new RuntimeException("Box not found"));
 
             BoxType boxType = boxTypeRepository.findById(dto.getBoxId())

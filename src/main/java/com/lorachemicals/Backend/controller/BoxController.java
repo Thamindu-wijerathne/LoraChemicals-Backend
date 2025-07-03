@@ -54,13 +54,13 @@ public class BoxController {
     }
 
     // PUT update box by inventory ID
-    @PutMapping("/{inventoryId}")
-    public ResponseEntity<?> updateBox(@PathVariable Long inventoryId,
+    @PutMapping("/{boxid}")
+    public ResponseEntity<?> updateBox(@PathVariable Long boxid,
                                        @RequestBody BoxRequestDTO dto,
                                        HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
         try {
-            Box updated = boxService.updateBox(inventoryId, dto);
+            Box updated = boxService.updateBox(boxid, dto);
             return new ResponseEntity<>(updated, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to update box: " + e.getMessage(),
@@ -71,7 +71,7 @@ public class BoxController {
     // POST create new box
     @PostMapping("/add")
     public ResponseEntity<?> createBox(@RequestBody BoxRequestDTO dto, HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse", "admin");
+        AccessControlUtil.checkAccess(request, "admin" , "warehouse");
         try {
             Box created = boxService.createBox(dto);
             return new ResponseEntity<>(created, HttpStatus.CREATED);

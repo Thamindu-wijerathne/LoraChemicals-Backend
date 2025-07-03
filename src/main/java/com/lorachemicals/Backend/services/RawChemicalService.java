@@ -1,5 +1,6 @@
 package com.lorachemicals.Backend.services;
 
+import com.lorachemicals.Backend.dto.RawChemicalRequestDTO;
 import com.lorachemicals.Backend.model.RawChemical;
 import com.lorachemicals.Backend.model.RawChemicalType;
 import com.lorachemicals.Backend.repository.RawChemicalRepository;

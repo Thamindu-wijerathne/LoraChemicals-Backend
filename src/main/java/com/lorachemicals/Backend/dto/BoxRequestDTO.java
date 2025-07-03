@@ -12,7 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class BoxRequestDTO {
 
-    @JsonProperty("box_id")
+    @JsonProperty("boxid")
     private Long boxId;
 
     private int quantity;
