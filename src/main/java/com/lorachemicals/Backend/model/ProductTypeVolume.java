@@ -23,6 +23,8 @@ public class ProductTypeVolume {
 
     private String image;
 
+    private String catergory;
+
     @ManyToOne
     @JoinColumn(name = "bottleid", nullable = false)
     private Bottletype bottletype;

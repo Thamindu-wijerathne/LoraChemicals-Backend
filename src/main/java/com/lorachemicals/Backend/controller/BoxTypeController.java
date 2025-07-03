@@ -5,16 +5,21 @@ import com.lorachemicals.Backend.dto.BoxTypeResponseDTO;
 import com.lorachemicals.Backend.services.BoxTypeService;
 import com.lorachemicals.Backend.util.AccessControlUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/boxtype")
 public class BoxTypeController {
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     private BoxTypeService boxTypeService;
@@ -35,6 +40,7 @@ public class BoxTypeController {
     @GetMapping("/all")
     public ResponseEntity<?> getAll(HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse", "admin");
+        logger.info("GET /Box types called");
         try {
             List<BoxTypeResponseDTO> list = boxTypeService.getAllBoxTypes();
             return ResponseEntity.ok(list);
