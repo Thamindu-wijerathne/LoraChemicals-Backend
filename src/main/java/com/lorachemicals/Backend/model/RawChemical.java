@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "raw_chemical")
+@Table(name = "raw_chemical", uniqueConstraints = {@UniqueConstraint(columnNames = "chemid")})
 @PrimaryKeyJoinColumn(name = "inventoryid")
 @Getter
 @Setter

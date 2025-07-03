@@ -16,4 +16,6 @@ public class BottletypeRequestDTO {
         this.name = name;
         this.volume = volume;
     }
+
+
 }

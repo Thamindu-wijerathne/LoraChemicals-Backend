@@ -11,15 +11,15 @@ public class RawChemicalResponseDTO {
     private Long chemid;
     private String chemicalName;
     private Double volume;
+    private String location;
 
-    public RawChemicalResponseDTO() {
-    }
+    public RawChemicalResponseDTO() {}
 
-    public RawChemicalResponseDTO(Long inventoryid, Long chemid, String chemicalName, Double volume) {
+    public RawChemicalResponseDTO(Long inventoryid, Long chemid, String chemicalName, Double volume, String location) {
         this.inventoryid = inventoryid;
         this.chemid = chemid;
         this.chemicalName = chemicalName;
         this.volume = volume;
+        this.location = location;
     }
-
 }

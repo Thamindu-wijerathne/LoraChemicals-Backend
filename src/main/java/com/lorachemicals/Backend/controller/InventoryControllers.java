@@ -2,7 +2,7 @@ package com.lorachemicals.Backend.controller;
 
 import com.lorachemicals.Backend.dto.InventoryRequestDTO;
 import com.lorachemicals.Backend.dto.InventoryResponseDTO;
-import com.lorachemicals.Backend.services.InventoryServices;
+import com.lorachemicals.Backend.services.InventoryService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +15,7 @@ import java.util.List;
 @RequestMapping("/inventory")
 public class InventoryControllers {
     @Autowired
-    private InventoryServices invservice;
+    private InventoryService invservice;
 
     @GetMapping("/all")
     public ResponseEntity<?> getall(HttpServletRequest request){

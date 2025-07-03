@@ -1,21 +1,18 @@
 package com.lorachemicals.Backend.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Setter
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class BottleResponseDTO {
 
     private Long inventoryId;
     private Long bottleId;
     private int quantity;
-
-    public BottleResponseDTO() {}
-
-    public BottleResponseDTO(Long inventoryId, Long bottleId, int quantity) {
-        this.inventoryId = inventoryId;
-        this.bottleId = bottleId;
-        this.quantity = quantity;
-    }
+    private String location;
 }

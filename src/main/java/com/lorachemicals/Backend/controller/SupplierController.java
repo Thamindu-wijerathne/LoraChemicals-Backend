@@ -92,7 +92,7 @@ public class SupplierController {
     // GET: Get all suppliers
     @GetMapping("/all")
     public ResponseEntity<List<SupplierDTO>> getAllSuppliers(HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse");
+        AccessControlUtil.checkAccess(request, "warehouse", "admin");
 
         List<Supplier> suppliers = supplierService.getAllSuppliers();
 
@@ -118,7 +118,7 @@ public class SupplierController {
     // POST: Add new supplier
     @PostMapping("/add")
     public ResponseEntity<SupplierDTO> addSupplier(@RequestBody SupplierDTO supplierDto, HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse");
+        AccessControlUtil.checkAccess(request, "warehouse", "admin");
 
         Supplier supplier = new Supplier();
         supplier.setSupplierid(supplierDto.getSupplierid());
@@ -150,7 +150,7 @@ public class SupplierController {
     // PUT: Update supplier by ID
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateSupplier(@PathVariable Long id, @RequestBody SupplierDTO supplierDto, HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse");
+        AccessControlUtil.checkAccess(request, "warehouse", "admin");
 
         Supplier supplier = new Supplier();
         supplier.setSupplierid(supplierDto.getSupplierid());
@@ -185,7 +185,7 @@ public class SupplierController {
     // DELETE: Delete supplier by ID
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteSupplier(@PathVariable Long id, HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse");
+        AccessControlUtil.checkAccess(request, "warehouse", "admin");
 
         boolean deleted = supplierService.deleteSupplier(id);
         if (deleted) {
