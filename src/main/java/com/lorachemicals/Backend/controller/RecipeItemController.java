@@ -42,6 +42,17 @@ public class RecipeItemController {
         }
     }
 
+    @GetMapping("/recipe/{id}")
+    public ResponseEntity<?> getAllByRecipeId(@PathVariable("id") Long id, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "admin");
+        try {
+            List<RecipeItem> recipeItems = recipeItemService.getRecipeItemsByRecipeId(id);
+            return new ResponseEntity<>(recipeItems, HttpStatus.OK);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get recipe items: " + e.getMessage(), e);
+        }
+    }
+
     @PostMapping
     public ResponseEntity<?> createRecipeItem(@RequestBody RecipeItemCreateRequest requestBody, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "admin");

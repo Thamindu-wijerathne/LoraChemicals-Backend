@@ -58,6 +58,15 @@ public class RecipeItemService {
         }
     }
 
+    //get by recipe id
+    public List<RecipeItem> getRecipeitemsByRecipeId(Long recipeid) {
+        try{
+            return recipeItemRepository.findByRecipeRecipeid(recipeid);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get recipe items for recipe id: " + recipeid, e);
+        }
+    }
+
     // Create recipe item and recipeitemrawchemical
     public RecipeItem createRecipeItem(RecipeItemRequestDTO recipeItemRequestDTO, RecipeItemRawChemicalRequestDTO recipeItemRawChemicalRequestDTO) {
         try {
@@ -88,7 +97,6 @@ public class RecipeItemService {
             throw new RuntimeException("Failed to create recipe item and its raw chemical links", e);
         }
     }
-
 
     // Update recipe item by recipe item id
     // Update recipe item by recipe item id
