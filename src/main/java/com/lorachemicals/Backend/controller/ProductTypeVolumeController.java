@@ -3,14 +3,12 @@ package com.lorachemicals.Backend.controller;
 import com.lorachemicals.Backend.dto.ProductTypeVolumeRequestDTO;
 import com.lorachemicals.Backend.dto.ProductTypeVolumeResponseDTO;
 import com.lorachemicals.Backend.services.ProductTypeVolumeService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,7 +18,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
-@RequestMapping("/product-type-volumes")
+@RequestMapping("/producttypevolumes")
 public class ProductTypeVolumeController {
 
     private final ProductTypeVolumeService service;
@@ -33,92 +31,124 @@ public class ProductTypeVolumeController {
         this.service = service;
     }
 
+    // READ ALL
     @GetMapping("/all")
     public ResponseEntity<?> getAll() {
         try {
-            logger.info("GET /product-type-volumes/all called");
             List<ProductTypeVolumeResponseDTO> all = service.getAll();
             return ResponseEntity.ok(all);
         } catch (Exception e) {
-            logger.error("Error fetching product list: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching products");
+            logger.error("Error fetching product list: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error fetching products: " + e.getMessage());
         }
     }
 
+    // READ ONE
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable Long id) {
-        ProductTypeVolumeResponseDTO dto = service.getById(id);
-        return dto != null ? ResponseEntity.ok(dto) : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found");
-    }
-
-    @PostMapping(consumes = {"multipart/form-data"})
-    public ResponseEntity<?> create(
-            @RequestPart("data") ProductTypeVolumeRequestDTO dto,
-            @RequestPart(value = "image", required = false) MultipartFile imageFile
-    ) {
         try {
-            String imagePath = null;
-            if (imageFile != null && !imageFile.isEmpty()) {
-                imagePath = saveImageFile(imageFile);
-            }
-            ProductTypeVolumeResponseDTO created = service.create(dto, imagePath);
-            return ResponseEntity.status(HttpStatus.CREATED).body(created);
+            ProductTypeVolumeResponseDTO dto = service.getById(id);
+            return dto != null ? ResponseEntity.ok(dto)
+                    : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found with id: " + id);
         } catch (Exception e) {
-            logger.error("Error creating ProductTypeVolume", e);
-            return ResponseEntity.internalServerError().body("Failed to create product");
+            logger.error("Error fetching product with id {}: {}", id, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error fetching product: " + e.getMessage());
         }
     }
 
-    @PutMapping(value = "/{id}", consumes = {"multipart/form-data"})
+    // CREATE
+    @PostMapping("/add")
+    public ResponseEntity<?> addproduct(
+            @RequestPart("dto") ProductTypeVolumeRequestDTO dto,
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
+        try {
+            ProductTypeVolumeResponseDTO newProduct = service.addProductvolumetype(dto, imageFile, uploadDir);
+            return new ResponseEntity<>(newProduct, HttpStatus.CREATED);
+        } catch (Exception e) {
+            logger.error("Error adding product: {}", e.getMessage(), e);
+            return new ResponseEntity<>("Internal server error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // UPDATE
+    @PutMapping("/update/{id}")
     public ResponseEntity<?> update(
             @PathVariable Long id,
-            @RequestPart("data") ProductTypeVolumeRequestDTO dto,
-            @RequestPart(value = "image", required = false) MultipartFile imageFile
-    ) {
+            @RequestPart("dto") ProductTypeVolumeRequestDTO dto,
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
         try {
-            String imagePath = null;
+            String imageFilename = null;
             if (imageFile != null && !imageFile.isEmpty()) {
-                imagePath = saveImageFile(imageFile);
+                imageFilename = System.currentTimeMillis() + "_" + imageFile.getOriginalFilename().replaceAll("[^a-zA-Z0-9.]", "_");
+                File dir = new File(uploadDir);
+                if (!dir.exists()) dir.mkdirs();
+                File file = new File(dir, imageFilename);
+                imageFile.transferTo(file);
             }
-            ProductTypeVolumeResponseDTO updated = service.update(id, dto, imagePath);
-            return updated != null ? ResponseEntity.ok(updated)
-                    : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found");
+            ProductTypeVolumeResponseDTO updated = service.update(id, dto, imageFilename);
+            if (updated == null)
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found");
+            return ResponseEntity.ok(updated);
         } catch (Exception e) {
-            logger.error("Error updating ProductTypeVolume", e);
-            return ResponseEntity.internalServerError().body("Failed to update product");
+            logger.error("Error updating product: {}", e.getMessage(), e);
+            return new ResponseEntity<>("Internal server error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+    // DELETE
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
-        boolean deleted = service.delete(id);
-        return deleted ? ResponseEntity.ok("Deleted successfully")
-                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found");
+        try {
+            boolean deleted = service.delete(id);
+            if (deleted)
+                return ResponseEntity.ok().body("Deleted");
+            else
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found");
+        } catch (Exception e) {
+            logger.error("Error deleting product: {}", e.getMessage(), e);
+            return new ResponseEntity<>("Internal server error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    // Optional: Serve uploaded images
+    // IMAGE SERVING
     @GetMapping("/images/{filename:.+}")
     public ResponseEntity<Resource> serveImage(@PathVariable String filename) {
         try {
             File file = Paths.get(uploadDir, filename).toFile();
-            if (!file.exists()) return ResponseEntity.notFound().build();
+            if (!file.exists()) {
+                logger.warn("Image file not found: {}", filename);
+                return ResponseEntity.notFound().build();
+            }
 
             Resource resource = new FileSystemResource(file);
+            String contentType = determineContentType(filename);
+
             return ResponseEntity.ok()
-                    .contentType(MediaType.IMAGE_JPEG) // or determine type dynamically
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
                     .body(resource);
         } catch (Exception e) {
-            logger.error("Error serving image {}", filename, e);
+            logger.error("Error serving image {}: {}", filename, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    private String saveImageFile(MultipartFile file) throws IOException {
-        String fileName = System.currentTimeMillis() + "_" + StringUtils.cleanPath(file.getOriginalFilename());
-        File uploadPath = new File(uploadDir);
-        if (!uploadPath.exists()) uploadPath.mkdirs();
-        File dest = new File(uploadPath, fileName);
-        file.transferTo(dest);
-        return uploadDir + "/" + fileName;
+    private String determineContentType(String filename) {
+        String extension = filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
+        switch (extension) {
+            case "jpg":
+            case "jpeg":
+                return "image/jpeg";
+            case "png":
+                return "image/png";
+            case "gif":
+                return "image/gif";
+            case "webp":
+                return "image/webp";
+            default:
+                return "application/octet-stream";
+        }
     }
 }

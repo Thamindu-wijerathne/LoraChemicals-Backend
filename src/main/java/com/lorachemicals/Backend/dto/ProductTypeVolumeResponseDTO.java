@@ -1,42 +1,25 @@
 package com.lorachemicals.Backend.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Setter
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductTypeVolumeResponseDTO {
     private Long ptvid;
     private String name;
-    private Long unitprice;
-    private String image;
-    private String category;
-    private Long volume;
-    private Long bottleid;
-    private Long labelid;
     private Long ptid;
-
-    public ProductTypeVolumeResponseDTO(
-            Long ptvid,
-            String name,
-            Long unitprice,
-            String image,
-            String category,
-            Long bottleid,
-            Long volume,
-            Long labelid,
-            Long ptid
-    ) {
-        this.ptvid = ptvid;
-        this.name = name;
-        this.unitprice = unitprice;
-        this.image = image;
-        this.category = category;
-        this.bottleid = bottleid;
-        this.volume = volume;
-        this.labelid = labelid;
-        this.ptid = ptid;
-    }
-
-
+    private String productTypeName;
+    private Long volume;
+    private Long unitprice;
+    private String imageUrl; // Provide URL for frontend to preview/download image
+    private String category;
+    private Long bottleid;
+    private String bottleTypeName;
+    private Long labelid;
+    private String labelTypeName;
 }

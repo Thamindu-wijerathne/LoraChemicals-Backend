@@ -2,13 +2,20 @@ package com.lorachemicals.Backend.services;
 
 import com.lorachemicals.Backend.dto.ProductTypeVolumeRequestDTO;
 import com.lorachemicals.Backend.dto.ProductTypeVolumeResponseDTO;
-import com.lorachemicals.Backend.model.*;
+import com.lorachemicals.Backend.model.Bottletype;
+import com.lorachemicals.Backend.model.Labeltype;
+import com.lorachemicals.Backend.model.ProductType;
+import com.lorachemicals.Backend.model.ProductTypeVolume;
 import com.lorachemicals.Backend.repository.BottletypeRepository;
 import com.lorachemicals.Backend.repository.LabeltypeRepository;
 import com.lorachemicals.Backend.repository.ProductTypeRepository;
 import com.lorachemicals.Backend.repository.ProductTypeVolumeRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -41,17 +48,35 @@ public class ProductTypeVolumeService {
         return repository.findById(id).map(this::toDto).orElse(null);
     }
 
-    public ProductTypeVolumeResponseDTO create(ProductTypeVolumeRequestDTO dto, String imagePath) {
+    public ProductTypeVolumeResponseDTO addProductvolumetype(ProductTypeVolumeRequestDTO dto,
+                                                             MultipartFile imageFile, String uploadDir) throws IOException {
         ProductTypeVolume entity = new ProductTypeVolume();
-        fillEntityFromDto(entity, dto, imagePath);
-        return toDto(repository.save(entity));
+        // Set basic fields and relations
+        fillEntityFromDto(entity, dto);
+
+        String imageFilename = null;
+        if (imageFile != null && !imageFile.isEmpty()) {
+            imageFilename = System.currentTimeMillis() + "_" + imageFile.getOriginalFilename().replaceAll("[^a-zA-Z0-9.]", "_");
+            File dir = new File(uploadDir);
+            if (!dir.exists()) dir.mkdirs();
+            File file = new File(dir, imageFilename);
+            imageFile.transferTo(file);
+        }
+        entity.setImage(imageFilename);
+
+        ProductTypeVolume saved = repository.save(entity);
+        return toDto(saved);
     }
 
-    public ProductTypeVolumeResponseDTO update(Long id, ProductTypeVolumeRequestDTO dto, String imagePath) {
+    public ProductTypeVolumeResponseDTO update(Long id, ProductTypeVolumeRequestDTO dto, String imageFilename) {
         Optional<ProductTypeVolume> opt = repository.findById(id);
         if (opt.isEmpty()) return null;
         ProductTypeVolume entity = opt.get();
-        fillEntityFromDto(entity, dto, imagePath);
+        fillEntityFromDto(entity, dto);
+        // Optionally update image filename if provided
+        if (imageFilename != null) {
+            entity.setImage(imageFilename);
+        }
         return toDto(repository.save(entity));
     }
 
@@ -61,29 +86,38 @@ public class ProductTypeVolumeService {
         return true;
     }
 
-    private void fillEntityFromDto(ProductTypeVolume entity, ProductTypeVolumeRequestDTO dto, String imagePath) {
+    // FIX: Map all fields properly including name and corrected category
+    private void fillEntityFromDto(ProductTypeVolume entity, ProductTypeVolumeRequestDTO dto) {
+        entity.setName(dto.getName());
         entity.setUnitprice(dto.getUnitprice());
         entity.setCategory(dto.getCategory());
         entity.setVolume(dto.getVolume());
-        entity.setBottletype(bottleRepo.findById(dto.getBottleid()).orElse(null));
-        entity.setLabeltype(labelRepo.findById(dto.getLabelid()).orElse(null));
-        entity.setProductType(productTypeRepo.findById(dto.getPtid()).orElse(null));
-        if (imagePath != null) {
-            entity.setImage(imagePath);
-        }
+        Bottletype bottle = bottleRepo.findById(dto.getBottleid()).orElse(null);
+        entity.setBottletype(bottle);
+        Labeltype label = labelRepo.findById(dto.getLabelid()).orElse(null);
+        entity.setLabeltype(label);
+        ProductType pt = productTypeRepo.findById(dto.getPtid()).orElse(null);
+        entity.setProductType(pt);
     }
 
     private ProductTypeVolumeResponseDTO toDto(ProductTypeVolume ptv) {
+        String imageUrl = ptv.getImage() != null
+                ? "/producttypevolumes/images/" + ptv.getImage()
+                : null;
+
         return new ProductTypeVolumeResponseDTO(
                 ptv.getPtvid(),
+                ptv.getName(),
+                ptv.getProductType() != null ? ptv.getProductType().getProductTypeId() : null,
                 ptv.getProductType() != null ? ptv.getProductType().getName() : null,
+                ptv.getVolume(),
                 ptv.getUnitprice(),
-                ptv.getImage(),
+                imageUrl,
                 ptv.getCategory(),
                 ptv.getBottletype() != null ? ptv.getBottletype().getBottleid() : null,
-                ptv.getVolume(),
+                ptv.getBottletype() != null ? ptv.getBottletype().getName() : null,
                 ptv.getLabeltype() != null ? ptv.getLabeltype().getLabelid() : null,
-                ptv.getProductType() != null ? ptv.getProductType().getProductTypeId() : null
+                ptv.getLabeltype() != null ? ptv.getLabeltype().getName() : null
         );
     }
 }
