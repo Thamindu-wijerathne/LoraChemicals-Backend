@@ -20,5 +20,9 @@ public class RawChemicalType {
 
     private String type;
 
+    public Long getId() {
+        return chemid;
+    }
+
     // Optional: description, hazard label, etc.
 }
