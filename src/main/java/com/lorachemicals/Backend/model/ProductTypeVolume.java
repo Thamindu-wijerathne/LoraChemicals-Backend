@@ -17,13 +17,14 @@ public class ProductTypeVolume {
     @JoinColumn(name = "ptid",nullable = false)
     private ProductType productType;
 
-    private String volume;
+    private Long volume;
 
-    private String unitprice;
+    private Long unitprice;
 
     private String image;
 
     private String catergory;
+
 
     @ManyToOne
     @JoinColumn(name = "bottleid", nullable = false)
@@ -32,6 +33,5 @@ public class ProductTypeVolume {
     @ManyToOne
     @JoinColumn(name = "labelid", nullable = false)
     private Labeltype labeltype;
-
 
 }

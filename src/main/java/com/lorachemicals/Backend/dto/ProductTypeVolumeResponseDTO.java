@@ -16,14 +16,27 @@ public class ProductTypeVolumeResponseDTO {
     private Long labelid;
     private Long ptid;
 
-    public ProductTypeVolumeResponseDTO(Long ptvid, String name, Long unitprice, String catergory, Long bottleid,  Long volume, Long labelid, Long ptid) {
+    public ProductTypeVolumeResponseDTO(
+            Long ptvid,
+            String name,
+            Long unitprice,
+            String image,
+            String catergory,
+            Long bottleid,
+            Long volume,
+            Long labelid,
+            Long ptid
+    ) {
         this.ptvid = ptvid;
         this.name = name;
         this.unitprice = unitprice;
+        this.image = image;
         this.catergory = catergory;
-        this.volume = volume;
         this.bottleid = bottleid;
+        this.volume = volume;
         this.labelid = labelid;
         this.ptid = ptid;
     }
+
+
 }
