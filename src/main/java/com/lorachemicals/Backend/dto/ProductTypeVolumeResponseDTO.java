@@ -15,6 +15,7 @@ public class ProductTypeVolumeResponseDTO {
     private Long bottleid;
     private Long labelid;
     private Long ptid;
+    private String details;  // <-- add this field
 
     public ProductTypeVolumeResponseDTO(
             Long ptvid,
@@ -25,8 +26,8 @@ public class ProductTypeVolumeResponseDTO {
             Long bottleid,
             Long volume,
             Long labelid,
-            Long ptid
-    ) {
+            Long ptid,
+            String details) {
         this.ptvid = ptvid;
         this.name = name;
         this.unitprice = unitprice;
@@ -36,7 +37,22 @@ public class ProductTypeVolumeResponseDTO {
         this.volume = volume;
         this.labelid = labelid;
         this.ptid = ptid;
+        this.details = details;  // <-- set it here
     }
 
-
+    @Override
+    public String toString() {
+        return "ProductTypeVolumeResponseDTO{" +
+                "ptvid=" + ptvid +
+                ", name='" + name + '\'' +
+                ", unitprice=" + unitprice +
+                ", image='" + image + '\'' +
+                ", catergory='" + catergory + '\'' +
+                ", volume=" + volume +
+                ", bottleid=" + bottleid +
+                ", labelid=" + labelid +
+                ", ptid=" + ptid +
+                ", details='" + details + '\'' +
+                '}';
+    }
 }

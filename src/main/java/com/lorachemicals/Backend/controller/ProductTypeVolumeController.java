@@ -30,6 +30,7 @@ public class ProductTypeVolumeController {
             logger.info("GET /Get All ProductTypeVolumes API called");
             AccessControlUtil.checkAccess(request, "customer");
             List<ProductTypeVolumeResponseDTO> all = service.getAll();
+            logger.info("Product type volumes : {}", all);
             return ResponseEntity.ok(all);
         } catch (Exception e) {
             logger.error("Internal server error: {}", e.getMessage());

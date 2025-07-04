@@ -34,7 +34,8 @@ public class ProductTypeVolumeService {
                 ptv.getBottletype().getBottleid(),
                 ptv.getVolume(),
                 ptv.getLabeltype().getLabelid(),
-                ptv.getProductType().getProductTypeId()  // or correct getter for ProductType id
+                ptv.getProductType().getProductTypeId(),  // or correct getter for ProductType id
+                ptv.getProductType().getDetails()  // fetching details from ProductType table via relation
         );
     }
 
