@@ -91,37 +91,25 @@ public class RecipeItemService {
 
 
     // Update recipe item by recipe item id
-
+    // Update recipe item by recipe item id
     public RecipeItem updateRecipeItemById(Long recipeItemid, RecipeItemRequestDTO updatedRecipeItemDTO) {
         try {
-            RecipeItem existing = recipeItemRepository.findById(recipeItemid)
+            RecipeItem recipeItem = recipeItemRepository.findById(recipeItemid)
                     .orElseThrow(() -> new RuntimeException("RecipeItem not found with id: " + recipeItemid));
 
-            // Delete existing RecipeItemRawChemical record
-            recipeItemRawChemicalRepository.deleteByRecipeItemRecipeitemid(recipeItemid);
-
-            existing.setQuantity(updatedRecipeItemDTO.getQuantity());
-            existing.setUnit(updatedRecipeItemDTO.getUnit());
-
-            // Fetch the chemical using the ID from DTO
             RawChemicalType chemical = rawChemicalTypeRepository.findById(updatedRecipeItemDTO.getRawchemicalid())
-                    .orElseThrow(() -> new RuntimeException("Chemical not found with ID: " + updatedRecipeItemDTO.getRawchemicalid()));
-            existing.setRawChemical(chemical);
+                    .orElseThrow(() -> new RuntimeException("Chemical not found with id: " + updatedRecipeItemDTO.getRawchemicalid()));
 
-            // Fetch the recipe using the ID from DTO
             Recipe recipe = recipeRepository.findById(updatedRecipeItemDTO.getRecipeid())
-                    .orElseThrow(() -> new RuntimeException("Recipe not found with ID: " + updatedRecipeItemDTO.getRecipeid()));
-            existing.setRecipe(recipe);
+                    .orElseThrow(() -> new RuntimeException("Recipe not found with id: " + updatedRecipeItemDTO.getRecipeid()));
 
-            RecipeItem savedRecipeItem = recipeItemRepository.save(existing);
+            // Update all fields
+            recipeItem.setRawChemical(chemical);
+            recipeItem.setRecipe(recipe);
+            recipeItem.setUnit(updatedRecipeItemDTO.getUnit());
+            recipeItem.setQuantity(updatedRecipeItemDTO.getQuantity());
 
-            // Create new RecipeItemRawChemical record
-            RecipeItemRawChemical recipeItemRawChemical = new RecipeItemRawChemical();
-            recipeItemRawChemical.setRawChemical(chemical);
-            recipeItemRawChemical.setRecipeItem(savedRecipeItem);
-            recipeItemRawChemicalRepository.save(recipeItemRawChemical);
-
-            return savedRecipeItem;
+            return recipeItemRepository.save(recipeItem);
         } catch (Exception e) {
             throw new RuntimeException("Failed to update recipe item with id: " + recipeItemid, e);
         }

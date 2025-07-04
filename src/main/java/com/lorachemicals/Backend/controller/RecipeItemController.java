@@ -56,7 +56,6 @@ public class RecipeItemController {
         }
     }
 
-
     @PutMapping("/{id}")
     public ResponseEntity<?> updateRecipeItem(@PathVariable Long id, @RequestBody RecipeItemRequestDTO recipeItemRequestDTO, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "admin");
