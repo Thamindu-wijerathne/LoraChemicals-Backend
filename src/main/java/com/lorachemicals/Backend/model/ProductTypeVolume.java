@@ -23,7 +23,7 @@ public class ProductTypeVolume {
 
     private String image;
 
-    private String catergory;
+    private String category;
 
 
     @ManyToOne

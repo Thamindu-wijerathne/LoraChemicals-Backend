@@ -10,7 +10,7 @@ public class ProductTypeVolumeResponseDTO {
     private String name;
     private Long unitprice;
     private String image;
-    private String catergory;
+    private String category;
     private Long volume;
     private Long bottleid;
     private Long labelid;
@@ -21,7 +21,7 @@ public class ProductTypeVolumeResponseDTO {
             String name,
             Long unitprice,
             String image,
-            String catergory,
+            String category,
             Long bottleid,
             Long volume,
             Long labelid,
@@ -31,7 +31,7 @@ public class ProductTypeVolumeResponseDTO {
         this.name = name;
         this.unitprice = unitprice;
         this.image = image;
-        this.catergory = catergory;
+        this.category = category;
         this.bottleid = bottleid;
         this.volume = volume;
         this.labelid = labelid;
