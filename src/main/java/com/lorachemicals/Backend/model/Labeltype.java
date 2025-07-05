@@ -14,6 +14,7 @@ public class Labeltype {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "labelid")
     private Long labelId;
 
     @Column(nullable = false)

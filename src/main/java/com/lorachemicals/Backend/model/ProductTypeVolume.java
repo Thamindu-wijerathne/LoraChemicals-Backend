@@ -13,15 +13,19 @@ public class ProductTypeVolume {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long ptvid;
 
+    private String name;
+
     @ManyToOne
-    @JoinColumn(name = "ptid",nullable = false)
+    @JoinColumn(name = "ptid", nullable = false)
     private ProductType productType;
 
-    private String volume;
-
-    private String unitprice;
+    private Long volume;
+    private Long unitprice;
 
     private String image;
+
+    // FIX: corrected spelling from catergory → category
+    private String category;
 
     @ManyToOne
     @JoinColumn(name = "bottleid", nullable = false)
@@ -30,6 +34,4 @@ public class ProductTypeVolume {
     @ManyToOne
     @JoinColumn(name = "labelid", nullable = false)
     private Labeltype labeltype;
-
-
 }
