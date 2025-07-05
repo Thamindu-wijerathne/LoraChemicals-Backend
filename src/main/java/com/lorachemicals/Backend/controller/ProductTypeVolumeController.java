@@ -3,6 +3,7 @@ package com.lorachemicals.Backend.controller;
 import com.lorachemicals.Backend.dto.ProductTypeVolumeRequestDTO;
 import com.lorachemicals.Backend.dto.ProductTypeVolumeResponseDTO;
 import com.lorachemicals.Backend.services.ProductTypeVolumeService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -135,8 +136,25 @@ public class ProductTypeVolumeController {
 
     // IMAGE SERVING
     @GetMapping("/images/{filename:.+}")
-    public ResponseEntity<Resource> serveImage(@PathVariable String filename) {
+    public ResponseEntity<Resource> serveImage(
+            @PathVariable String filename,
+            @RequestParam(required = false) String token,
+            HttpServletRequest request) {
         try {
+            // Check for token in query parameter first, then in Authorization header
+            String authToken = token;
+            if (authToken == null || authToken.isEmpty()) {
+                String authHeader = request.getHeader("Authorization");
+                if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                    authToken = authHeader.substring(7);
+                }
+            }
+
+            // Validate token (you'll need to implement this based on your auth service)
+            if (authToken == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
             Path imagePath = Paths.get(uploadDir).resolve(filename);
             File file = imagePath.toFile();
 
