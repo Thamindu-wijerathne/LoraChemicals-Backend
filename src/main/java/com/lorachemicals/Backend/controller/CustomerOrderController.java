@@ -15,18 +15,21 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/customer-order")
 public class CustomerOrderController {
 
-    private final CustomerOrderService cusotmerOrderService;
+    private final CustomerOrderService customerOrderService;
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     public CustomerOrderController(CustomerOrderService customerOrderService) {
-        this.cusotmerOrderService = customerOrderService;
+        this.customerOrderService = customerOrderService;
     }
 
     @PostMapping("/add")
     public ResponseEntity<?> createOrder(@RequestBody CustomerOrderRequestDTO data, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "customer"); // Adjust roles as needed
+//      return ResponseEntity.internalServerError().body("Order creation failed: ");
+
         try {
-            CustomerOrder created = cusotmerOrderService.createOrder(data);
+            CustomerOrder created = customerOrderService.createOrder(data);
+            logger.info("order items : {}", data);
             return ResponseEntity.ok(created);
         } catch (Exception e) {
             logger.error("Order creation failed", e);

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Setter
@@ -13,13 +14,14 @@ import java.util.Date;
 public class CustomerOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long orderiid;
+    @Column(name = "orderid")
+    private Long orderid;
 
     private Date delivered_date;
 
     private String status;
 
-    private Long total;
+    private BigDecimal total;
 
     @ManyToOne
     @JoinColumn(

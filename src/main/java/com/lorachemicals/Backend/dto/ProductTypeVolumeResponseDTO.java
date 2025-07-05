@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Setter
 @Getter
 @NoArgsConstructor
@@ -16,7 +18,7 @@ public class ProductTypeVolumeResponseDTO {
     private String details;  // <-- add this field
     private String productTypeName;
     private Long volume;
-    private Long unitprice;
+    private BigDecimal unitprice;
     private String imageUrl; // Provide URL for frontend to preview/download image
     private String category;
     private Long bottleid;
@@ -27,9 +29,7 @@ public class ProductTypeVolumeResponseDTO {
     public ProductTypeVolumeResponseDTO(
             Long ptvid,
             String name,
-            Long unitprice,
-            String image,
-            String catergory,
+            BigDecimal unitprice,
             Long bottleid,
             Long volume,
             Long labelid,
@@ -38,8 +38,6 @@ public class ProductTypeVolumeResponseDTO {
         this.ptvid = ptvid;
         this.name = name;
         this.unitprice = unitprice;
-        this.image = image;
-        this.catergory = catergory;
         this.bottleid = bottleid;
         this.volume = volume;
         this.labelid = labelid;
@@ -47,14 +45,42 @@ public class ProductTypeVolumeResponseDTO {
         this.details = details;  // <-- set it here
     }
 
+    public ProductTypeVolumeResponseDTO(
+            Long ptvid,
+            String name,
+            Long ptid,
+            String details,
+            Long volume,
+            BigDecimal unitprice,
+            String imageUrl,
+            String category,
+            Long bottleid,
+            String bottleTypeName,
+            Long labelid,
+            String labelTypeName
+    ) {
+        this.ptvid = ptvid;
+        this.name = name;
+        this.ptid = ptid;
+        this.details = details;
+        this.volume = volume;
+        this.unitprice = unitprice;
+        this.imageUrl = imageUrl;
+        this.category = category;
+        this.bottleid = bottleid;
+        this.bottleTypeName = bottleTypeName;
+        this.labelid = labelid;
+        this.labelTypeName = labelTypeName;
+    }
+
+
+
     @Override
     public String toString() {
         return "ProductTypeVolumeResponseDTO{" +
                 "ptvid=" + ptvid +
                 ", name='" + name + '\'' +
                 ", unitprice=" + unitprice +
-                ", image='" + image + '\'' +
-                ", catergory='" + catergory + '\'' +
                 ", volume=" + volume +
                 ", bottleid=" + bottleid +
                 ", labelid=" + labelid +
