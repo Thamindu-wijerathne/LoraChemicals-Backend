@@ -17,5 +17,4 @@ public class SupplierRawMaterialRequestDTO {
     private Integer currentQuantity;
     private Double unitPrice;
     private Long warehouseManagerId;
-
 }
