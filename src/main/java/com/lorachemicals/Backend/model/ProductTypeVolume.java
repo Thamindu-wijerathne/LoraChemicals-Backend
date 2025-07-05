@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Setter
 @Getter
 @Entity
@@ -20,7 +22,9 @@ public class ProductTypeVolume {
     private ProductType productType;
 
     private Long volume;
-    private Long unitprice;
+
+    @Column(name = "unitprice")
+    private BigDecimal UnitPrice;
 
     private String image;
 
@@ -34,4 +38,6 @@ public class ProductTypeVolume {
     @ManyToOne
     @JoinColumn(name = "labelid", nullable = false)
     private Labeltype labeltype;
+
+
 }

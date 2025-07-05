@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -80,7 +81,7 @@ public class ProductTypeVolumeService {
         product.setName(dto.getName());
         product.setProductType(productType);
         product.setVolume(dto.getVolume());
-        product.setUnitprice(dto.getUnitprice());
+        product.setUnitPrice(BigDecimal.valueOf(dto.getUnitprice()));
         product.setCategory(dto.getCategory());
         product.setBottletype(bottletype);
         product.setLabeltype(labeltype);
@@ -159,7 +160,7 @@ public class ProductTypeVolumeService {
 
     private void fillEntityFromDto(ProductTypeVolume entity, ProductTypeVolumeRequestDTO dto) {
         entity.setName(dto.getName());
-        entity.setUnitprice(dto.getUnitprice());
+        entity.setUnitPrice(BigDecimal.valueOf(dto.getUnitprice()));
         entity.setCategory(dto.getCategory());
         entity.setVolume(dto.getVolume());
 
@@ -189,7 +190,7 @@ public class ProductTypeVolumeService {
                 ptv.getProductType() != null ? ptv.getProductType().getProductTypeId() : null,
                 ptv.getProductType() != null ? ptv.getProductType().getName() : null,
                 ptv.getVolume(),
-                ptv.getUnitprice(),
+                ptv.getUnitPrice(),
                 imageUrl,
                 ptv.getCategory(),
                 ptv.getBottletype() != null ? ptv.getBottletype().getBottleid() : null,
