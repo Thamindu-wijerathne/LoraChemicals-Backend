@@ -38,7 +38,7 @@ public class Supplier {
         this.address = address;
         this.email = email;
         this.supplierType = supplierType;
-        this.status = status;
+        this.status = "1";
     }
 
     // Getters
