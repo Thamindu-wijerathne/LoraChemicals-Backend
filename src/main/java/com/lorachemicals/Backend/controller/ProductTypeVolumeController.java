@@ -8,14 +8,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/producttypevolumes")
@@ -29,6 +34,31 @@ public class ProductTypeVolumeController {
 
     public ProductTypeVolumeController(ProductTypeVolumeService service) {
         this.service = service;
+    }
+
+    // CREATE
+    @PostMapping("/add")
+    public ResponseEntity<?> addproduct(
+            @RequestPart("dto") ProductTypeVolumeRequestDTO dto,
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
+        try {
+            // Validate image file if provided
+            if (imageFile != null && !imageFile.isEmpty()) {
+                validateImageFile(imageFile);
+            }
+
+            ProductTypeVolumeResponseDTO newProduct = service.addProductvolumetype(dto, imageFile, uploadDir);
+            return new ResponseEntity<>(newProduct, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid input: {}", e.getMessage());
+            return new ResponseEntity<>("Invalid input: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (IOException e) {
+            logger.error("Error saving image: {}", e.getMessage(), e);
+            return new ResponseEntity<>("Error saving image: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            logger.error("Error adding product: {}", e.getMessage(), e);
+            return new ResponseEntity<>("Internal server error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     // READ ALL
@@ -58,20 +88,6 @@ public class ProductTypeVolumeController {
         }
     }
 
-    // CREATE
-    @PostMapping("/add")
-    public ResponseEntity<?> addproduct(
-            @RequestPart("dto") ProductTypeVolumeRequestDTO dto,
-            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
-        try {
-            ProductTypeVolumeResponseDTO newProduct = service.addProductvolumetype(dto, imageFile, uploadDir);
-            return new ResponseEntity<>(newProduct, HttpStatus.CREATED);
-        } catch (Exception e) {
-            logger.error("Error adding product: {}", e.getMessage(), e);
-            return new ResponseEntity<>("Internal server error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     // UPDATE
     @PutMapping("/update/{id}")
     public ResponseEntity<?> update(
@@ -79,18 +95,22 @@ public class ProductTypeVolumeController {
             @RequestPart("dto") ProductTypeVolumeRequestDTO dto,
             @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
         try {
-            String imageFilename = null;
+            // Validate image file if provided
             if (imageFile != null && !imageFile.isEmpty()) {
-                imageFilename = System.currentTimeMillis() + "_" + imageFile.getOriginalFilename().replaceAll("[^a-zA-Z0-9.]", "_");
-                File dir = new File(uploadDir);
-                if (!dir.exists()) dir.mkdirs();
-                File file = new File(dir, imageFilename);
-                imageFile.transferTo(file);
+                validateImageFile(imageFile);
             }
-            ProductTypeVolumeResponseDTO updated = service.update(id, dto, imageFilename);
-            if (updated == null)
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found");
+
+            ProductTypeVolumeResponseDTO updated = service.update(id, dto, imageFile, uploadDir);
+            if (updated == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found with id: " + id);
+            }
             return ResponseEntity.ok(updated);
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid input: {}", e.getMessage());
+            return new ResponseEntity<>("Invalid input: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (IOException e) {
+            logger.error("Error saving image: {}", e.getMessage(), e);
+            return new ResponseEntity<>("Error saving image: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             logger.error("Error updating product: {}", e.getMessage(), e);
             return new ResponseEntity<>("Internal server error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -102,10 +122,11 @@ public class ProductTypeVolumeController {
     public ResponseEntity<?> delete(@PathVariable Long id) {
         try {
             boolean deleted = service.delete(id);
-            if (deleted)
-                return ResponseEntity.ok().body("Deleted");
-            else
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found");
+            if (deleted) {
+                return ResponseEntity.ok().body("Product deleted successfully");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found with id: " + id);
+            }
         } catch (Exception e) {
             logger.error("Error deleting product: {}", e.getMessage(), e);
             return new ResponseEntity<>("Internal server error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -116,7 +137,9 @@ public class ProductTypeVolumeController {
     @GetMapping("/images/{filename:.+}")
     public ResponseEntity<Resource> serveImage(@PathVariable String filename) {
         try {
-            File file = Paths.get(uploadDir, filename).toFile();
+            Path imagePath = Paths.get(uploadDir).resolve(filename);
+            File file = imagePath.toFile();
+
             if (!file.exists()) {
                 logger.warn("Image file not found: {}", filename);
                 return ResponseEntity.notFound().build();
@@ -135,6 +158,32 @@ public class ProductTypeVolumeController {
         }
     }
 
+    // Image validation method
+    private void validateImageFile(MultipartFile imageFile) {
+        // Check file size (5MB limit)
+        if (imageFile.getSize() > 5 * 1024 * 1024) {
+            throw new IllegalArgumentException("Image file size must be less than 5MB");
+        }
+
+        // Check file type
+        String contentType = imageFile.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new IllegalArgumentException("File must be an image");
+        }
+
+        // Check allowed image types
+        Set<String> allowedTypes = Set.of("image/jpeg", "image/jpg", "image/png", "image/gif", "image/bmp");
+        if (!allowedTypes.contains(contentType.toLowerCase())) {
+            throw new IllegalArgumentException("Only JPEG, PNG, GIF, and BMP images are allowed");
+        }
+
+        // Check filename
+        String filename = imageFile.getOriginalFilename();
+        if (filename == null || filename.trim().isEmpty()) {
+            throw new IllegalArgumentException("Image filename cannot be empty");
+        }
+    }
+
     private String determineContentType(String filename) {
         String extension = filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
         switch (extension) {
@@ -145,6 +194,8 @@ public class ProductTypeVolumeController {
                 return "image/png";
             case "gif":
                 return "image/gif";
+            case "bmp":
+                return "image/bmp";
             case "webp":
                 return "image/webp";
             default:
