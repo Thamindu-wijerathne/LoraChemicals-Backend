@@ -11,9 +11,10 @@ public class BoxTypeResponseDTO {
     private Long boxid;
 
     @JsonProperty("quantity_in_box")
-    private int quantityInBox;
+    private Integer quantityInBox;
 
     private String name;
 
-    public BoxTypeResponseDTO() {}
+    public BoxTypeResponseDTO() {
+    }
 }
