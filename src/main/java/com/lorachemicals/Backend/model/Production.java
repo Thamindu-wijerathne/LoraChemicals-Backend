@@ -37,4 +37,6 @@ public class Production {
 
     private Double currentvolume;
 
+    private String status;
+
 }

@@ -14,6 +14,7 @@ public class SupplierRawMaterialRequestDTO {
     private LocalDate date;
     private LocalDate expDate;
     private Integer quantity;
+    private Integer currentQuantity;
     private Double unitPrice;
     private Long warehouseManagerId;
 

@@ -44,6 +44,20 @@ public class SupplierRawMaterialController {
         }
     }
 
+    @GetMapping("/all/exp")
+    public ResponseEntity<?> getAllExp(HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse");
+        try{
+            List<SupplierRawMaterialResponseDTO> list = supplierRawMaterialService.getAllByexp();
+            return ResponseEntity.ok(list);
+
+        }
+        catch(Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to fetch records: " + e.getMessage());
+        }
+    }
+
     @GetMapping("/{inventoryId}/{supplierId}/{date}")
     public ResponseEntity<?> getById(@PathVariable Long inventoryId,
                                      @PathVariable Long supplierId,
@@ -75,6 +89,25 @@ public class SupplierRawMaterialController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to update: " + e.getMessage());
         }
+    }
+
+    @PutMapping("/{inventoryId}/{supplierId}/{date}/cquantity")
+    public ResponseEntity<?> updateQuantity(@PathVariable Long inventoryId,
+                                            @PathVariable Long supplierId,
+                                            @PathVariable String date,
+                                            @RequestBody SupplierRawMaterialRequestDTO dto,
+                                            HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse");
+        try{
+            LocalDate parsedDate = LocalDate.parse(date);
+            SupplierRawMaterialResponseDTO updated = supplierRawMaterialService.updateCQuantity(inventoryId, supplierId, parsedDate, dto.getCurrentQuantity());
+            return ResponseEntity.ok(updated);
+        }
+        catch(Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to update: " + e.getMessage());
+        }
+
     }
 
     @DeleteMapping("/{inventoryId}/{supplierId}/{date}")

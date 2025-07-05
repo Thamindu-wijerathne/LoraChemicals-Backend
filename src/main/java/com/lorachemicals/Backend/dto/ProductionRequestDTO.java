@@ -16,4 +16,5 @@ public class ProductionRequestDTO {
     private Date date;
     private Double volume;
     private Double currentvolume;
+    private String status;
 }

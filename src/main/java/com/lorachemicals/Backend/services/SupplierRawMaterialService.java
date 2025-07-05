@@ -50,6 +50,7 @@ public class SupplierRawMaterialService {
             srm.setExpDate(dto.getExpDate());
             srm.setQuantity(dto.getQuantity());
             srm.setUnitPrice(dto.getUnitPrice());
+            srm.setCurrentQuantity(dto.getQuantity());
             srm.setTotalPrice(dto.getUnitPrice() * dto.getQuantity());
 
             supplierRawMaterialRepository.save(srm);
@@ -66,6 +67,19 @@ public class SupplierRawMaterialService {
                     .stream()
                     .map(this::convertToDTO)
                     .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to retrieve SupplierRawMaterials: " + e.getMessage());
+        }
+    }
+
+    //get all by arranged latest exp date first
+    public List<SupplierRawMaterialResponseDTO> getAllByexp() {
+        try {
+            return supplierRawMaterialRepository.findAllByOrderByExpDateDesc()
+                    .stream()
+                    .map(this::convertToDTO)
+                    .collect(Collectors.toList());
+
         } catch (Exception e) {
             throw new RuntimeException("Failed to retrieve SupplierRawMaterials: " + e.getMessage());
         }
@@ -108,10 +122,26 @@ public class SupplierRawMaterialService {
             srm.setQuantity(dto.getQuantity());
             srm.setUnitPrice(dto.getUnitPrice());
             srm.setTotalPrice(dto.getQuantity() * dto.getUnitPrice());
+            srm.setCurrentQuantity(dto.getCurrentQuantity());
 
             supplierRawMaterialRepository.save(srm);
             return convertToDTO(srm);
         } catch (Exception e) {
+            throw new RuntimeException("Failed to update record: " + e.getMessage());
+        }
+    }
+
+    //update c.quantity
+    public SupplierRawMaterialResponseDTO updateCQuantity(Long inventoryId, Long supplierId, LocalDate date, Integer quantity) {
+        try{
+            SupplierRawMaterialId id = new SupplierRawMaterialId(inventoryId, supplierId, date);
+            SupplierRawMaterial srm = supplierRawMaterialRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Record not found"));
+
+            srm.setCurrentQuantity(quantity);
+            supplierRawMaterialRepository.save(srm);
+            return convertToDTO(srm);
+        } catch (Exception e){
             throw new RuntimeException("Failed to update record: " + e.getMessage());
         }
     }
@@ -131,6 +161,7 @@ public class SupplierRawMaterialService {
         dto.setWarehouseManagerName(entity.getWarehouseManager().getUser().getName());
         dto.setUnitPrice(entity.getUnitPrice());
         dto.setTotalPrice(entity.getTotalPrice());
+        dto.setCurrentQuantity(entity.getCurrentQuantity());
         return dto;
     }
 

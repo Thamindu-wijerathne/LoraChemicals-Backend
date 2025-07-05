@@ -16,6 +16,7 @@ public class ProductionResponseDTO {
     private Long mixerid;
     private Date date;
     private Double volume;
+    private String status;
     private Double currentvolume;
 
 }

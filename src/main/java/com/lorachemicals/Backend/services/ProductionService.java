@@ -69,6 +69,7 @@ public class ProductionService {
             production.setDate(new Date()); // current date should be added
             production.setVolume(dto.getVolume());
             production.setCurrentvolume(dto.getCurrentvolume());
+            production.setStatus("pending");
 
             return productionRepository.save(production);
 
@@ -97,6 +98,7 @@ public class ProductionService {
             production.setDate(new Date());// current date should be added
             production.setVolume(dto.getVolume());
             production.setCurrentvolume(dto.getCurrentvolume());
+            production.setStatus(dto.getStatus());
 
             return productionRepository.save(production);
 
@@ -113,6 +115,7 @@ public class ProductionService {
                     .orElseThrow(()-> new RuntimeException("Production not found with id:" + id));
 
             production.setCurrentvolume(dto.getCurrentvolume());
+            production.setStatus(dto.getStatus());
             return productionRepository.save(production);
         } catch (Exception e) {
             throw new RuntimeException("Failed to update production with id:" + id, e);
