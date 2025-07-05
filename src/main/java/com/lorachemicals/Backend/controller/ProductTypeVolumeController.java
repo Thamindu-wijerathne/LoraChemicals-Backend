@@ -40,9 +40,11 @@ public class ProductTypeVolumeController {
     // CREATE
     @PostMapping("/add")
     public ResponseEntity<?> addproduct(
+            HttpServletRequest request ,
             @RequestPart("dto") ProductTypeVolumeRequestDTO dto,
             @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
         try {
+            AccessControlUtil.checkAccess(request,  "admin");
             // Validate image file if provided
             if (imageFile != null && !imageFile.isEmpty()) {
                 validateImageFile(imageFile);
@@ -92,10 +94,13 @@ public class ProductTypeVolumeController {
     // UPDATE
     @PutMapping("/update/{id}")
     public ResponseEntity<?> update(
+            HttpServletRequest request,
             @PathVariable Long id,
             @RequestPart("dto") ProductTypeVolumeRequestDTO dto,
             @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
         try {
+            AccessControlUtil.checkAccess(request,  "admin");
+
             // Validate image file if provided
             if (imageFile != null && !imageFile.isEmpty()) {
                 validateImageFile(imageFile);
@@ -120,8 +125,9 @@ public class ProductTypeVolumeController {
 
     // DELETE
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(@PathVariable Long id,HttpServletRequest request) {
         try {
+            AccessControlUtil.checkAccess(request, "admin");
             boolean deleted = service.delete(id);
             if (deleted) {
                 return ResponseEntity.ok().body("Product deleted successfully");
