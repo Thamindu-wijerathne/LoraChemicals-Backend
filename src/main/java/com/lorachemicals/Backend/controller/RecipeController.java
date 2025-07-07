@@ -44,6 +44,20 @@ public class RecipeController {
         }
     }
 
+    //Get by mixer id
+    @GetMapping("/mixer/{id}")
+    public ResponseEntity<?> getMixerById(@PathVariable("id") Long id, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "admin", "warehouse");
+
+        try{
+            Recipe recipe = recipeService.getRecipeByMixerId(id);
+            return new ResponseEntity<>(recipe, HttpStatus.OK);
+
+        } catch(Exception e){
+            return ResponseEntity.internalServerError().body("Failed to fetch recipe with ID: " + id);
+        }
+    }
+
     // CREATE
     @PostMapping("/add")
     public ResponseEntity<?> createRecipe(@RequestBody RecipeRequestDTO dto, HttpServletRequest request) {

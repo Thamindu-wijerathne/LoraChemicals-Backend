@@ -44,7 +44,7 @@ public class RecipeItemController {
 
     @GetMapping("/recipe/{id}")
     public ResponseEntity<?> getAllByRecipeId(@PathVariable("id") Long id, HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "admin");
+        AccessControlUtil.checkAccess(request, "admin", "warehouse");
         try {
             List<RecipeItem> recipeItems = recipeItemService.getRecipeItemsByRecipeId(id);
             return new ResponseEntity<>(recipeItems, HttpStatus.OK);

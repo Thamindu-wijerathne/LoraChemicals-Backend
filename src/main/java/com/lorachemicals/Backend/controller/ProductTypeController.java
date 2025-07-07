@@ -76,7 +76,7 @@ public class ProductTypeController {
     public ResponseEntity<?> getAll(HttpServletRequest request) {
         try {
             logger.info("GET /Get All ProductTypes API called");
-            AccessControlUtil.checkAccess(request, "admin");
+            AccessControlUtil.checkAccess(request, "admin", "warehouse");
             List<ProductTypeResponseDto> all = service.getAll();
             return ResponseEntity.ok(all);
         } catch (Exception e) {

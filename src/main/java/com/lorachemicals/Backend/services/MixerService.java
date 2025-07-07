@@ -28,6 +28,18 @@ public class MixerService {
         }
     }
 
+    //get all by product type
+    public List<Mixer> getMixerByProductType(Long productTypeId) {
+        if (productTypeId == null) {
+            throw new IllegalArgumentException("ProductTypeId cannot be null");
+        }
+        try {
+            return mixerRepository.findAllByProductTypeId(productTypeId);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to retrieve mixers: " + e.getMessage(), e);
+        }
+    }
+
     // Get mixer by ID
     public Mixer getMixerById(Long id) {
         try {
