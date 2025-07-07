@@ -30,6 +30,8 @@ public class User {
 
     private String role;
 
+    private String status;
+
     // Default constructor
     public User() {}
 
@@ -60,6 +62,8 @@ public class User {
     public void setPassword(String password) { this.password = password; }
 
     public void setRole(String role) { this.role = role; }
+
+    public void setStatus(String status) { this.status = status; }
 
     @Override
     public String toString() {
