@@ -44,10 +44,15 @@ public class ProductionController {
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody ProductionRequestDTO dto, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
-        try{
+        try {
             Production production = productionService.createProduction(dto);
             return new ResponseEntity<>(production, HttpStatus.CREATED);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("Insufficient") || e.getMessage().contains("Not enough")) {
+                // Business validation failure, return 400
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+            // Other errors -> 500
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }

@@ -41,7 +41,7 @@ public class RecipeService {
     //get by mixerid
     public Recipe getRecipeByMixerId(Long mixerid) {
         try {
-            return recipeRepository.findAllByMixer_Mixerid(mixerid)
+            return recipeRepository.findByMixer_Mixerid(mixerid)
                     .orElseThrow(() -> new RuntimeException("Recipe not found with mixer ID: " + mixerid));
         } catch (Exception e) {
             throw new RuntimeException("Failed to retrieve recipe with mixer ID: " + mixerid, e);

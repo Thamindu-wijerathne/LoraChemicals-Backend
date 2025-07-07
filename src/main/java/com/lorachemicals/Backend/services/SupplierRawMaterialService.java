@@ -75,11 +75,23 @@ public class SupplierRawMaterialService {
     //get all by arranged latest exp date first
     public List<SupplierRawMaterialResponseDTO> getAllByexp() {
         try {
-            return supplierRawMaterialRepository.findAllByOrderByExpDateDesc()
+            return supplierRawMaterialRepository.findAllByOrderByExpDateAsc()
                     .stream()
                     .map(this::convertToDTO)
                     .collect(Collectors.toList());
 
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to retrieve SupplierRawMaterials: " + e.getMessage());
+        }
+    }
+
+    //get all by exp and chemid
+    public List<SupplierRawMaterialResponseDTO> getByChemIdOrderByExp(Long chemid) {
+        try {
+            return supplierRawMaterialRepository.findByChemicalIdOrderByExpAsc(chemid)
+                    .stream()
+                    .map(this::convertToDTO)
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             throw new RuntimeException("Failed to retrieve SupplierRawMaterials: " + e.getMessage());
         }

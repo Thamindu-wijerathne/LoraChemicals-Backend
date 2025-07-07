@@ -74,6 +74,19 @@ public class SupplierRawMaterialController {
         }
     }
 
+    @GetMapping("/chem/{id}")
+    public ResponseEntity<?> getChem(@PathVariable Long id, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse");
+        try {
+            List<SupplierRawMaterialResponseDTO> list = supplierRawMaterialService.getByChemIdOrderByExp(id);
+            return ResponseEntity.ok(list);
+        }
+        catch(Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to fetch records: " + e.getMessage());
+        }
+    }
+
     @PutMapping("/{inventoryId}/{supplierId}/{date}")
     public ResponseEntity<?> updateById(@PathVariable Long inventoryId,
                                         @PathVariable Long supplierId,
