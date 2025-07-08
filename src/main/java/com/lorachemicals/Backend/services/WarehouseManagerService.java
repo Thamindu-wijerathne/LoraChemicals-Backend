@@ -1,5 +1,6 @@
 package com.lorachemicals.Backend.services;
 
+import com.lorachemicals.Backend.model.SalesRep;
 import com.lorachemicals.Backend.model.WarehouseManager;
 import com.lorachemicals.Backend.repository.WarehouseManagerRepository;
 import org.springframework.stereotype.Service;
@@ -22,5 +23,9 @@ public class WarehouseManagerService {
             warehouseManagerRepo.delete(wm);
         }
     }
+    public WarehouseManager getWarehouseManagerById(Long Id) {
+        return warehouseManagerRepo.findByUserId(Id);
+    }
+
 
 }

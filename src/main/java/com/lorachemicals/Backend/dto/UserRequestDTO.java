@@ -9,6 +9,7 @@ public class UserRequestDTO {
     public String email;
     public String password;
     public String role;
+    public String status;
 
     // Customer-specific fields
     public String shop_name;
@@ -105,5 +106,12 @@ public class UserRequestDTO {
 
     public void setRouteid(Long routeid) {
         this.routeid = routeid;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
