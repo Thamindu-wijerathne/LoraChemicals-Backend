@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -175,7 +176,7 @@ public class SupplierRawMaterialService {
     }
 
     // GET BY ID
-    public SupplierRawMaterialResponseDTO getById(Long inventoryId, Long supplierId, LocalDate date) {
+    public SupplierRawMaterialResponseDTO getById(Long inventoryId, Long supplierId, LocalDateTime date) {
         try {
             SupplierRawMaterialId id = new SupplierRawMaterialId(inventoryId, supplierId, date);
             SupplierRawMaterial srm = supplierRawMaterialRepository.findById(id)
@@ -188,7 +189,7 @@ public class SupplierRawMaterialService {
 
 
     // DELETE BY ID
-    public void deleteById(Long inventoryId, Long supplierId, LocalDate date) {
+    public void deleteById(Long inventoryId, Long supplierId, LocalDateTime date) {
         try {
             SupplierRawMaterialId id = new SupplierRawMaterialId(inventoryId, supplierId, date);
             if (!supplierRawMaterialRepository.existsById(id)) {
@@ -201,7 +202,7 @@ public class SupplierRawMaterialService {
     }
 
     // UPDATE BY ID
-    public SupplierRawMaterialResponseDTO updateById(Long inventoryId, Long supplierId, LocalDate date, SupplierRawMaterialRequestDTO dto) {
+    public SupplierRawMaterialResponseDTO updateById(Long inventoryId, Long supplierId, LocalDateTime date, SupplierRawMaterialRequestDTO dto) {
         try {
             SupplierRawMaterialId id = new SupplierRawMaterialId(inventoryId, supplierId, date);
             SupplierRawMaterial srm = supplierRawMaterialRepository.findById(id)
@@ -221,7 +222,7 @@ public class SupplierRawMaterialService {
     }
 
     //update c.quantity
-    public SupplierRawMaterialResponseDTO updateCQuantity(Long inventoryId, Long supplierId, LocalDate date, Integer quantity) {
+    public SupplierRawMaterialResponseDTO updateCQuantity(Long inventoryId, Long supplierId, LocalDateTime date, Integer quantity) {
         try{
             SupplierRawMaterialId id = new SupplierRawMaterialId(inventoryId, supplierId, date);
             SupplierRawMaterial srm = supplierRawMaterialRepository.findById(id)

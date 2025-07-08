@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -15,7 +16,7 @@ public class PurchaseWithInventoryUpdateDTO {
     private Long supplierId;
     private Long inventoryId;
     private Long warehouseManagerId;
-    private LocalDate date;
+    private LocalDateTime date;
     private LocalDate expDate;
     private Integer quantity;
     private double unitPrice;
