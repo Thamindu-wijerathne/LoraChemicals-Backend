@@ -133,7 +133,8 @@ public class UserController {
                     user.getRole(),
                     user.getPhone(),
                     user.getAddress(),
-                    user.getNic()
+                    user.getNic(),
+                    user.getStatus()
             );
 
             // Generate JWT

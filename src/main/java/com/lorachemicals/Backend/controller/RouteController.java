@@ -19,7 +19,7 @@ public class RouteController {
 
     @GetMapping("/all")
     public ResponseEntity<List<Route>> getAllRoutes(HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "salesrep");
+        AccessControlUtil.checkAccess(request, "salesrep", "admin");
         // You can add role checks if needed, e.g.
         // AccessControlUtil.checkAccess(request, "admin", "salesrep");
         return ResponseEntity.ok(routeService.getAllRoutes());

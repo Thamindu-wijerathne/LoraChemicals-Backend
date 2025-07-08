@@ -15,7 +15,7 @@ public class BoxType {
     private String name;
 
     @Column(name = "quantity_in_box")
-    private int quantityInBox;
+    private Integer quantityInBox;
 
     public BoxType() {}
 }

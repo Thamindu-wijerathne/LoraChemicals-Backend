@@ -1,3 +1,4 @@
+
 package com.lorachemicals.Backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,7 +10,7 @@ import lombok.Setter;
 public class BoxTypeRequestDTO {
 
     @JsonProperty("quantity_in_box")
-    private int quantityInBox;
+    private Integer quantityInBox;
 
     private String name;
 
