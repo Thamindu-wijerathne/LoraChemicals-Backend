@@ -118,8 +118,12 @@ public class ProductionService {
             production.setCurrentvolume(dto.getCurrentvolume());
             production.setStatus("pending");
 
-            return productionRepository.save(production);
+            Production saved = productionRepository.save(production);
 
+            mixer.setAvailability(0); // <- This line is newly added
+            mixerRepository.save(mixer); // <- This line is newly added
+
+            return saved;
         } catch (Exception e) {
             throw new RuntimeException("Failed to create production: " + e.getMessage(), e);
         }

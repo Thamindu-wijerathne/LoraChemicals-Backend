@@ -67,6 +67,20 @@ public class BottleController {
         }
     }
 
+    @PutMapping("/{inventoryId}/location")
+    public ResponseEntity<?> updatelocation(@PathVariable Long inventoryId,
+                                            @RequestBody BottleQuantityUpdateDTO dto,
+                                            HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse");
+        try {
+            Bottle updated = bottleService.updatelocation(inventoryId, dto.getLocation());
+            return new ResponseEntity<>(updated, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to update volume: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     // POST create new bottle
     @PostMapping("/add")
     public ResponseEntity<?> createBottle(@RequestBody BottleRequestDTO dto, HttpServletRequest request) {

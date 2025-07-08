@@ -69,6 +69,18 @@ public class LabelService {
         }
     }
 
+    public Label updatelocation(Long inventoryId, String location) {
+        try {
+            Label raw = labelRepository.findById(inventoryId)
+                    .orElseThrow(() -> new RuntimeException("Bottle not found"));
+
+            raw.setLocation(location);
+            return labelRepository.save(raw);
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating volume: " + e.getMessage());
+        }
+    }
+
     // Update existing label
     public Label updateLabel(Long inventoryId, LabelRequestDTO dto) {
         try {

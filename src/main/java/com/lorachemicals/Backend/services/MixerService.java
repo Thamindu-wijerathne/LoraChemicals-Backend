@@ -69,23 +69,21 @@ public class MixerService {
     }
 
     // Update mixer
-    public Mixer updateMixer(Long mixerid, MixerRequestDTO dto) {
-        try {
-            Mixer mixer = mixerRepository.findById(mixerid)
-                    .orElseThrow(() -> new RuntimeException("Mixer not found with ID: " + mixerid));
+    public Mixer updateMixer(Long id, MixerRequestDTO dto) {
+        Mixer mixer = mixerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Mixer not found with id: " + id));
 
-            ProductType productType = productTypeRepository.findById(dto.getProductTypeId())
-                    .orElseThrow(() -> new RuntimeException("ProductType not found with ID: " + dto.getProductTypeId()));
+        ProductType productType = productTypeRepository.findById(dto.getProductTypeId())
+                .orElseThrow(() -> new RuntimeException("ProductType not found with id: " + dto.getProductTypeId()));
 
-            mixer.setName(dto.getName());
-            mixer.setCapacity(dto.getCapacity());
-            mixer.setProductType(productType);
+        mixer.setName(dto.getName());
+        mixer.setCapacity(dto.getCapacity());
+        mixer.setProductType(productType);
+        mixer.setAvailability(dto.getAvailability());
 
-            return mixerRepository.save(mixer);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to update mixer: " + e.getMessage(), e);
-        }
+        return mixerRepository.save(mixer);
     }
+
 
     // Update availability
     public Mixer updateAvailability(Long mixerid, int availability) {
