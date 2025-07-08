@@ -4,10 +4,7 @@ import com.lorachemicals.Backend.dto.CustomerOrderItemRequestDTO;
 import com.lorachemicals.Backend.dto.CustomerOrderItemResponseDTO;
 import com.lorachemicals.Backend.dto.CustomerOrderRequestDTO;
 import com.lorachemicals.Backend.dto.CustomerOrderResponseDTO;
-import com.lorachemicals.Backend.model.CustomerOrder;
-import com.lorachemicals.Backend.model.CustomerOrderItem;
-import com.lorachemicals.Backend.model.ProductTypeVolume;
-import com.lorachemicals.Backend.model.User;
+import com.lorachemicals.Backend.model.*;
 import com.lorachemicals.Backend.repository.CustomerOrderItemRepository;
 import com.lorachemicals.Backend.repository.CustomerOrderRepository;
 import com.lorachemicals.Backend.repository.ProductTypeVolumeRepository;
@@ -95,11 +92,20 @@ public class CustomerOrderService {
             // Map items (ptvid, quantity, productTotal only)
             List<CustomerOrderItemResponseDTO> itemDTOs = order.getOrderItems().stream().map(item -> {
                 CustomerOrderItemResponseDTO itemDTO = new CustomerOrderItemResponseDTO();
-                itemDTO.setPtvid(item.getProductTypeVolume().getPtvid());
+
+                ProductTypeVolume ptv = item.getProductTypeVolume();
+                ProductType productType = ptv.getProductType();
+
+                itemDTO.setPtvid(ptv.getPtvid());
                 itemDTO.setQuantity(item.getQuantity().intValue());
                 itemDTO.setProductTotal(item.getProductTotal());
+
+                itemDTO.setImage(ptv.getImage());
+                itemDTO.setProductTypeName(productType != null ? productType.getName() : null);
+
                 return itemDTO;
             }).collect(Collectors.toList());
+
 
             dto.setItems(itemDTOs);
             return dto;
