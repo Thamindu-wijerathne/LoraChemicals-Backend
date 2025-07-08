@@ -20,18 +20,6 @@ public class SupplierRawMaterialController {
     @Autowired
     private SupplierRawMaterialService supplierRawMaterialService;
 
-    @PostMapping("/add")
-    public ResponseEntity<?> create(@RequestBody SupplierRawMaterialRequestDTO dto, HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse");
-        try {
-            SupplierRawMaterialResponseDTO created = supplierRawMaterialService.create(dto);
-            return ResponseEntity.ok(created);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to create: " + e.getMessage());
-        }
-    }
-
     @GetMapping("/all")
     public ResponseEntity<?> getAll(HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
@@ -41,6 +29,20 @@ public class SupplierRawMaterialController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to fetch records: " + e.getMessage());
+        }
+    }
+
+    // NEW: Combined purchase + inventory update
+    @PostMapping("/add")
+    public ResponseEntity<?> create(@RequestBody PurchaseWithInventoryUpdateDTO dto, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse");
+        try {
+            supplierRawMaterialService.createPurchaseAndUpdateInventory(dto);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Purchase and inventory update successful.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error: " + e.getMessage());
         }
     }
 
@@ -138,4 +140,16 @@ public class SupplierRawMaterialController {
                     .body("Failed to delete: " + e.getMessage());
         }
     }
+
+//    @PostMapping("/add")
+//    public ResponseEntity<?> create(@RequestBody SupplierRawMaterialRequestDTO dto, HttpServletRequest request) {
+//        AccessControlUtil.checkAccess(request, "warehouse");
+//        try {
+//            SupplierRawMaterialResponseDTO created = supplierRawMaterialService.create(dto);
+//            return ResponseEntity.ok(created);
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body("Failed to create: " + e.getMessage());
+//        }
+//    }
 }
