@@ -19,6 +19,7 @@ public class SupplierRawMaterialResponseDTO {
     private LocalDate date;
     private LocalDate expDate;
     private Integer quantity;
+    private Integer currentQuantity;
 
     private Long warehouseManagerId;
     private String warehouseManagerName;
