@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/customer-order")
 public class CustomerOrderController {
@@ -34,6 +36,19 @@ public class CustomerOrderController {
         } catch (Exception e) {
             logger.error("Order creation failed", e);
             return ResponseEntity.internalServerError().body("Order creation failed: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/get-customer-all-orders/{id}")
+    public ResponseEntity<?> getAllOrders(@PathVariable Long id, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "customer");
+
+        try {
+            List<CustomerOrderResponseDTO> orders = customerOrderService.getOrdersByCustomerId(id);
+            return ResponseEntity.ok(orders);
+        } catch (Exception e) {
+            logger.error("Order detail get failed", e);
+            return ResponseEntity.internalServerError().body("Order detail get failed: " + e.getMessage());
         }
     }
 }

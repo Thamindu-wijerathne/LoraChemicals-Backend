@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Setter
 @Getter
@@ -30,4 +31,8 @@ public class CustomerOrder {
             foreignKey = @ForeignKey(name = "fk_user_order", foreignKeyDefinition = "FOREIGN KEY (customerid) REFERENCES users(id) ON DELETE SET NULL ON UPDATE SET NULL")
     )
     private User user;
+
+    @OneToMany(mappedBy = "customerOrder", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<CustomerOrderItem> orderItems;
+
 }
