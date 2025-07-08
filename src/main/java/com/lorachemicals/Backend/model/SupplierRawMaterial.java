@@ -32,6 +32,8 @@ public class SupplierRawMaterial {
 
     private Integer quantity;
 
+    private Integer currentQuantity;
+
     @ManyToOne
     @JoinColumn(name = "wmid", referencedColumnName = "wmid")
     private WarehouseManager warehouseManager;
