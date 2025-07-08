@@ -73,16 +73,15 @@ public class MixerController {
 
     // Update mixer
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateMixer(@PathVariable Long id, @RequestBody MixerRequestDTO dto, HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "admin");
+    public ResponseEntity<?> updateMixer(@PathVariable Long id, @RequestBody MixerRequestDTO dto) {
         try {
             Mixer mixer = mixerService.updateMixer(id, dto);
             return new ResponseEntity<>(mixer, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>("Failed to update mixer: " + e.getMessage(),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Failed to update mixer: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     // Update availability
     @PatchMapping("/availability/{id}")
