@@ -7,4 +7,5 @@ import lombok.Setter;
 @Setter
 public class BoxQuantityUpdateDTO {
     private int quantity;
+    private String location;
 }

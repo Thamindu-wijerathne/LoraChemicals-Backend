@@ -88,6 +88,18 @@ public class BottleService {
         }
     }
 
+    public Bottle updatelocation(Long inventoryId, String location) {
+        try {
+            Bottle raw = bottleRepository.findById(inventoryId)
+                    .orElseThrow(() -> new RuntimeException("Bottle not found"));
+
+            raw.setLocation(location);
+            return bottleRepository.save(raw);
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating volume: " + e.getMessage());
+        }
+    }
+
     // Delete bottle by inventory ID
     public void deleteBottle(Long inventoryId) {
         try {

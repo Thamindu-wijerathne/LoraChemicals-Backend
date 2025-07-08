@@ -7,4 +7,5 @@ import lombok.Setter;
 @Setter
 public class LabelQuantityUpdateDTO {
     private int quantity;
+    private String location;
 }

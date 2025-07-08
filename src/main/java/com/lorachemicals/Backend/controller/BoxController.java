@@ -95,6 +95,20 @@ public class BoxController {
         }
     }
 
+    @PutMapping("/{inventoryId}/location")
+    public ResponseEntity<?> updateLocation(@PathVariable Long inventoryId,
+                                            @RequestBody BoxQuantityUpdateDTO dto,
+                                            HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse");
+        try {
+            Box updated = boxService.updateLocation(inventoryId, dto.getLocation());
+            return new ResponseEntity<>(updated, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to update quantity: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     // DELETE box by inventory ID
     @DeleteMapping("/{inventoryId}")
     public ResponseEntity<?> deleteBox(@PathVariable Long inventoryId, HttpServletRequest request) {
