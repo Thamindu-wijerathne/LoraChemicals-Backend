@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
@@ -111,4 +112,49 @@ public class CustomerOrderService {
             return dto;
         }).collect(Collectors.toList());
     }
+
+    public List<CustomerOrderResponseDTO> getOrders() {
+        List<CustomerOrder> orders = orderRepository.findAll();
+
+        return orders.stream().map(order -> {
+            CustomerOrderResponseDTO dto = new CustomerOrderResponseDTO();
+            dto.setOrderid(order.getOrderid());
+            dto.setDeliveredDate(order.getDelivered_date());
+            dto.setStatus(order.getStatus());
+            dto.setTotal(order.getTotal());
+            dto.setCustomerId(order.getUser().getId());
+            dto.setCustomerName(order.getUser().getName());
+
+            // Map items (ptvid, quantity, productTotal only)
+            List<CustomerOrderItemResponseDTO> itemDTOs = order.getOrderItems().stream().map(item -> {
+                CustomerOrderItemResponseDTO itemDTO = new CustomerOrderItemResponseDTO();
+
+                ProductTypeVolume ptv = item.getProductTypeVolume();
+                ProductType productType = ptv.getProductType();
+
+                itemDTO.setPtvid(ptv.getPtvid());
+                itemDTO.setQuantity(item.getQuantity().intValue());
+                itemDTO.setProductTotal(item.getProductTotal());
+
+                itemDTO.setImage(ptv.getImage());
+                itemDTO.setProductTypeName(productType != null ? productType.getName() : null);
+
+                return itemDTO;
+            }).collect(Collectors.toList());
+
+            dto.setItems(itemDTOs);
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    public void acceptOrder(Long id) {
+        CustomerOrder order = orderRepository.findByOrderid(id);
+        if (order == null) {
+            throw new RuntimeException("Order not found with id " + id);
+        }
+        order.setStatus("accepted");  // Update status to accepted
+        orderRepository.save(order);
+    }
+
+
 }
