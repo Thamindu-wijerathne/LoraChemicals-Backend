@@ -69,17 +69,6 @@ public class ProductionController {
         }
     }
 
-    @PutMapping("/cvolume/{id}")
-    public ResponseEntity<?> cvolume(@PathVariable Long id, @RequestBody ProductionRequestDTO dto, HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse");
-        try{
-            Production production = productionService.updatecvolume(id, dto);
-            return new ResponseEntity<>(production, HttpStatus.OK);
-        } catch(Exception e){
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");

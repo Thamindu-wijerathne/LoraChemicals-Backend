@@ -117,6 +117,7 @@ public class ProductionService {
             production.setVolume(dto.getVolume());
             production.setCurrentvolume(dto.getCurrentvolume());
             production.setStatus("pending");
+            production.setExpiredate(dto.getExpiredate());
 
             Production saved = productionRepository.save(production);
 
@@ -192,26 +193,13 @@ public class ProductionService {
             production.setMixer(mixer);
             production.setDate(new Date());// current date should be added
             production.setVolume(dto.getVolume());
-            production.setCurrentvolume(dto.getCurrentvolume());
+            production.setCurrentvolume(dto.getVolume());
             production.setStatus(dto.getStatus());
+            production.setExpiredate(dto.getExpiredate());
 
             return productionRepository.save(production);
 
 
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to update production with id:" + id, e);
-        }
-    }
-
-    //update current volume
-    public Production updatecvolume(Long id, ProductionRequestDTO dto) {
-        try{
-            Production production = productionRepository.findById(id)
-                    .orElseThrow(()-> new RuntimeException("Production not found with id:" + id));
-
-            production.setCurrentvolume(dto.getCurrentvolume());
-            production.setStatus(dto.getStatus());
-            return productionRepository.save(production);
         } catch (Exception e) {
             throw new RuntimeException("Failed to update production with id:" + id, e);
         }
