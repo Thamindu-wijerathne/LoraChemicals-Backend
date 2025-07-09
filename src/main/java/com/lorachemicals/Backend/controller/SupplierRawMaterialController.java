@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,7 +68,7 @@ public class SupplierRawMaterialController {
                                      HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
         try {
-            LocalDate parsedDate = LocalDate.parse(date);
+            LocalDateTime parsedDate = LocalDateTime.parse(date);
             SupplierRawMaterialResponseDTO dto = supplierRawMaterialService.getById(inventoryId, supplierId, parsedDate);
             return ResponseEntity.ok(dto);
         } catch (Exception e) {
@@ -97,7 +98,7 @@ public class SupplierRawMaterialController {
                                         HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
         try {
-            LocalDate parsedDate = LocalDate.parse(date);
+            LocalDateTime parsedDate = LocalDateTime.parse(date);
             SupplierRawMaterialResponseDTO updated = supplierRawMaterialService.updateById(inventoryId, supplierId, parsedDate, dto);
             return ResponseEntity.ok(updated);
         } catch (Exception e) {
@@ -114,7 +115,7 @@ public class SupplierRawMaterialController {
                                             HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
         try{
-            LocalDate parsedDate = LocalDate.parse(date);
+            LocalDateTime parsedDate = LocalDateTime.parse(date);
             SupplierRawMaterialResponseDTO updated = supplierRawMaterialService.updateCQuantity(inventoryId, supplierId, parsedDate, dto.getCurrentQuantity());
             return ResponseEntity.ok(updated);
         }
@@ -132,7 +133,7 @@ public class SupplierRawMaterialController {
                                         HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
         try {
-            LocalDate parsedDate = LocalDate.parse(date);
+            LocalDateTime parsedDate = LocalDateTime.parse(date);
             supplierRawMaterialService.deleteById(inventoryId, supplierId, parsedDate);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {

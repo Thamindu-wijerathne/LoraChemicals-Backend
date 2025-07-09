@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @Entity
-@Table(name = "CustomerOrderItem")
+@Table(name = "customer_order_item")  // changed to lowercase snake_case
 public class CustomerOrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,7 +23,10 @@ public class CustomerOrderItem {
     @JoinColumn(
             name = "orderid",
             referencedColumnName = "orderid",
-            foreignKey = @ForeignKey(name = "fk_orderItem_order", foreignKeyDefinition = "FOREIGN KEY (orderid) REFERENCES CustomerOrder(orderid) ON DELETE SET NULL ON UPDATE SET NULL")
+            foreignKey = @ForeignKey(
+                    name = "fk_orderItem_order",
+                    foreignKeyDefinition = "FOREIGN KEY (orderid) REFERENCES customer_order(orderid) ON DELETE SET NULL ON UPDATE SET NULL"
+            )
     )
     private CustomerOrder customerOrder;
 
@@ -31,7 +34,10 @@ public class CustomerOrderItem {
     @JoinColumn(
             name = "ptvid",
             referencedColumnName = "ptvid",
-            foreignKey = @ForeignKey(name = "fk_orderItem_ptvid", foreignKeyDefinition = "FOREIGN KEY (ptvid) REFERENCES product_type_volume(ptvid) ON DELETE SET NULL ON UPDATE SET NULL")
+            foreignKey = @ForeignKey(
+                    name = "fk_orderItem_ptvid",
+                    foreignKeyDefinition = "FOREIGN KEY (ptvid) REFERENCES product_type_volume(ptvid) ON DELETE SET NULL ON UPDATE SET NULL"
+            )
     )
     private ProductTypeVolume productTypeVolume;
 }
