@@ -9,7 +9,7 @@ import lombok.Setter;
 @PrimaryKeyJoinColumn(name = "inventoryid")
 @Getter
 @Setter
-public class Label extends RawMaterial{
+public class Label extends RawMaterial {
 
     @ManyToOne
     @JoinColumn(name = "labelid", nullable = false)

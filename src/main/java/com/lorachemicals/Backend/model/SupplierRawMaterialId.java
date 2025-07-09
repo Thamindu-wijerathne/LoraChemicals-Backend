@@ -4,7 +4,7 @@ import jakarta.persistence.Embeddable;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Data
@@ -13,11 +13,11 @@ public class SupplierRawMaterialId implements Serializable {
 
     private Long inventoryid;
     private Long supplierid;
-    private LocalDate date;
+    private LocalDateTime date;
 
     public SupplierRawMaterialId() {}
 
-    public SupplierRawMaterialId(Long inventoryid, Long supplierid, LocalDate date) {
+    public SupplierRawMaterialId(Long inventoryid, Long supplierid, LocalDateTime date) {
         this.inventoryid = inventoryid;
         this.supplierid = supplierid;
         this.date = date;

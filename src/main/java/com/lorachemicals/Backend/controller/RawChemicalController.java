@@ -1,7 +1,9 @@
 package com.lorachemicals.Backend.controller;
 
+import com.lorachemicals.Backend.dto.BoxQuantityUpdateDTO;
 import com.lorachemicals.Backend.dto.ChemicalVolumeUpdateDTO;
 import com.lorachemicals.Backend.dto.RawChemicalRequestDTO;
+import com.lorachemicals.Backend.model.Box;
 import com.lorachemicals.Backend.model.RawChemical;
 import com.lorachemicals.Backend.services.RawChemicalService;
 import com.lorachemicals.Backend.util.AccessControlUtil;
@@ -90,6 +92,20 @@ public class RawChemicalController { // ✅ You missed this line
             return new ResponseEntity<>(updated, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to update volume: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/{inventoryId}/location")
+    public ResponseEntity<?> updateLocation(@PathVariable Long inventoryId,
+                                            @RequestBody ChemicalVolumeUpdateDTO dto,
+                                            HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse");
+        try {
+            RawChemical updated = rawChemicalService.updateLocation(inventoryId, dto.getLocation());
+            return new ResponseEntity<>(updated, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to update quantity: " + e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

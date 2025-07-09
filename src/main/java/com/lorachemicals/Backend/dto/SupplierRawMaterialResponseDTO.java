@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
@@ -16,9 +17,10 @@ public class SupplierRawMaterialResponseDTO {
     private Long supplierId;
     private String supplierName;
 
-    private LocalDate date;
+    private LocalDateTime date;
     private LocalDate expDate;
     private Integer quantity;
+    private Integer currentQuantity;
 
     private Long warehouseManagerId;
     private String warehouseManagerName;

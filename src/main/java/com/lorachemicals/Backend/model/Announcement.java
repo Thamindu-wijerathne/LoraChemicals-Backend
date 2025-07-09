@@ -1,18 +1,24 @@
 package com.lorachemicals.Backend.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "announcement")
 public class Announcement {
 
+    // Getters and Setters
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long announcementID;
 
     @Column(nullable = false)
-    private String message;
+    private String message; // cannot exceed more than 255 letters (this should be fixed)
 
     @Column(nullable = false)
     private LocalDateTime dateTime;
@@ -28,28 +34,4 @@ public class Announcement {
         this.dateTime = dateTime;
     }
 
-    // Getters and Setters
-    public Long getAnnouncementID() {
-        return announcementID;
-    }
-
-    public void setAnnouncementID(Long announcementID) {
-        this.announcementID = announcementID;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public LocalDateTime getDateTime() {
-        return dateTime;
-    }
-
-    public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
-    }
 }

@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 @Getter
 @Entity
-@Table(name = "CustomerOrder")
+@Table(name = "customer_order")  // changed to lowercase snake_case
 public class CustomerOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +28,10 @@ public class CustomerOrder {
     @JoinColumn(
             name = "customerid",
             referencedColumnName = "id",
-            foreignKey = @ForeignKey(name = "fk_user_order", foreignKeyDefinition = "FOREIGN KEY (customerid) REFERENCES users(id) ON DELETE SET NULL ON UPDATE SET NULL")
+            foreignKey = @ForeignKey(
+                    name = "fk_user_order",
+                    foreignKeyDefinition = "FOREIGN KEY (customerid) REFERENCES users(id) ON DELETE SET NULL ON UPDATE SET NULL"
+            )
     )
     private User user;
 
