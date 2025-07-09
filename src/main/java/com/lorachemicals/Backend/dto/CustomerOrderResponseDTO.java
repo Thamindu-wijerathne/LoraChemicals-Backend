@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,4 +16,7 @@ public class CustomerOrderResponseDTO {
     private BigDecimal total;
     private Long customerId;
     private String customerName;  // optional extra for UI display
+
+    private List<CustomerOrderItemResponseDTO> items; // ✅ new
+
 }
