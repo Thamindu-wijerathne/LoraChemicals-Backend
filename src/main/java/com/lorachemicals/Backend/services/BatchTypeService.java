@@ -50,6 +50,7 @@ public class BatchTypeService {
         BatchType batchType = new BatchType();
       batchType.setProductTypeVolume(ptv);
         batchType.setBoxType(box);
+        batchType.setBatchtypename(dto.getBatchtypename());
 
         return convertToResponseDTO(batchTypeRepository.save(batchType));
     }
@@ -66,6 +67,7 @@ public class BatchTypeService {
 
         batchType.setProductTypeVolume(ptv);
         batchType.setBoxType(box);
+        batchType.setBatchtypename(dto.getBatchtypename());
 
         return convertToResponseDTO(batchTypeRepository.save(batchType));
     }
@@ -88,6 +90,8 @@ public class BatchTypeService {
         dto.setBoxid(bt.getBoxType().getBoxid());
         dto.setName(bt.getBoxType().getName());
         dto.setQuantityInBox(bt.getBoxType().getQuantityInBox());
+
+        dto.setBatchtypename(bt.getBatchtypename());
 
         return dto;
     }

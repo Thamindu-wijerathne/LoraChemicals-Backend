@@ -17,5 +17,7 @@ public class BatchTypeResponseDTO {
     private String name;
     private Integer quantityInBox;
 
+    private String batchtypename;
+
     public BatchTypeResponseDTO() {}
 }
