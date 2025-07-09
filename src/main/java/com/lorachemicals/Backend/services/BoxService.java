@@ -69,6 +69,18 @@ public class BoxService {
         }
     }
 
+    public Box updateLocation(Long inventoryId, String location) {
+        try {
+            Box raw = boxRepository.findById(inventoryId)
+                    .orElseThrow(() -> new RuntimeException("Bottle not found"));
+
+            raw.setLocation(location);
+            return boxRepository.save(raw);
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating volume: " + e.getMessage());
+        }
+    }
+
     // Update existing box
     public Box updateBox(Long boxid, BoxRequestDTO dto) {
         try {

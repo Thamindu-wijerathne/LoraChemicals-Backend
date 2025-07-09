@@ -66,6 +66,20 @@ public class LabelController {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @PutMapping("/{inventoryId}/location")
+    public ResponseEntity<?> updatelocation(@PathVariable Long inventoryId,
+                                            @RequestBody LabelQuantityUpdateDTO dto,
+                                            HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse");
+        try {
+            Label updated = labelService.updatelocation(inventoryId, dto.getLocation());
+            return new ResponseEntity<>(updated, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to update quantity: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
     // POST create new label
     @PostMapping("/add")

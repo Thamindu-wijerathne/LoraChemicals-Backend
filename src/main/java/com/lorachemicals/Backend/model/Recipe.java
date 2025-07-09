@@ -16,7 +16,7 @@ public class Recipe {
 
     private String recipeName;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "mixerid", unique = true, nullable = false)
     private Mixer mixer;
 }

@@ -52,6 +52,18 @@ public class RawChemicalService {
         }
     }
 
+    public RawChemical updateLocation(Long inventoryId, String location) {
+        try {
+            RawChemical raw = rawChemicalRepository.findById(inventoryId)
+                    .orElseThrow(() -> new RuntimeException("Raw chemical not found"));
+
+            raw.setLocation(location);
+            return rawChemicalRepository.save(raw);
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating volume: " + e.getMessage());
+        }
+    }
+
     // Create new raw chemical
     public RawChemical createRawChemical(RawChemicalRequestDTO dto) {
         try {
