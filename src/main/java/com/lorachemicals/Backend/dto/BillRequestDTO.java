@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,4 +18,7 @@ public class BillRequestDTO {
     private String shop_name;
     private String address;
     private String phone;
+
+    private List<BillItemRequestDTO> items; // New field
+
 }
