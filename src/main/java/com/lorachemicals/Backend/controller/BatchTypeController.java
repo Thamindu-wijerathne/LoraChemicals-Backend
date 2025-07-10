@@ -20,7 +20,7 @@ public class BatchTypeController {
 
     @GetMapping("/all")
     public ResponseEntity<List<BatchTypeResponseDTO>> getAllBatchTypes(HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "admin"); // ✅ Access check
+        AccessControlUtil.checkAccess(request, "admin", "warehouse"); // ✅ Access check
         return ResponseEntity.ok(batchTypeService.getAllBatchTypes(request));
     }
 
