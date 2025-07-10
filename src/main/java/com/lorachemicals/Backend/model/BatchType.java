@@ -22,6 +22,8 @@ public class BatchType {
     @JoinColumn(name = "boxid", nullable = false)
     private BoxType boxType;
 
+    private String batchtypename;
+
 
     public BatchType() {}
 }

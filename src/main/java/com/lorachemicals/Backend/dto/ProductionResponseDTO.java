@@ -18,5 +18,5 @@ public class ProductionResponseDTO {
     private Double volume;
     private String status;
     private Double currentvolume;
-
+    private Date expiredate;
 }

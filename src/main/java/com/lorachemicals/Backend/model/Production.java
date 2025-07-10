@@ -39,4 +39,6 @@ public class Production {
 
     private String status;
 
+    private Date expiredate;
+
 }

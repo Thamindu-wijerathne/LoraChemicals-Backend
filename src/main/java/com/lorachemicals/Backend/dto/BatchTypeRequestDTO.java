@@ -8,6 +8,6 @@ import lombok.Setter;
 public class BatchTypeRequestDTO {
     private Long ptvid;
     private Long boxid;
-
+    private String batchtypename;
     public BatchTypeRequestDTO() {}
 }
