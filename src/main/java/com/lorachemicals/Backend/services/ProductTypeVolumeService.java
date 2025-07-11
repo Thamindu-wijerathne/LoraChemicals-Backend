@@ -115,6 +115,19 @@ public class ProductTypeVolumeService {
         return toDto(repository.save(entity));
     }
 
+    //get all by ptid
+    public List<ProductTypeVolumeResponseDTO> getallbyproducttypeid(Long id) {
+        try {
+            return repository.findByProductType_ProductTypeId(id)
+                    .stream()
+                    .map(this::toDto)
+                    .collect(Collectors.toList());
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Failed to get byproducttypeid", e);
+        }
+    }
+
+
     public boolean delete(Long id) {
         if (!repository.existsById(id)) return false;
 

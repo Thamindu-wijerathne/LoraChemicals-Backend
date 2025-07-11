@@ -10,4 +10,6 @@ public interface ProductionRepository extends JpaRepository<Production, Long> {
     Optional<Production> findTopByProductype_ProductTypeIdOrderByExpiredateAsc(Long ptid);
 
     Optional<Production> findTopByStatusIgnoreCaseOrderByExpiredateAsc(String confirmed);
+
+    Optional<Production> getByProdid(Long prodid);
 }
