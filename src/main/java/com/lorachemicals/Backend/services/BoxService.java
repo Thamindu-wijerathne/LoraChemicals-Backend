@@ -1,5 +1,6 @@
 package com.lorachemicals.Backend.services;
 
+import com.lorachemicals.Backend.dto.BoxResponseDTO;
 import com.lorachemicals.Backend.model.Bottle;
 import com.lorachemicals.Backend.model.Box;
 import com.lorachemicals.Backend.model.BoxType;
@@ -37,6 +38,14 @@ public class BoxService {
             return boxRepository.findById(inventoryId);
         } catch (Exception e) {
             throw new RuntimeException("Failed to fetch box by ID: " + e.getMessage(), e);
+        }
+    }
+
+    public BoxResponseDTO getByBoxid(Long boxid) {
+        try{
+            return boxRepository.findByBoxType_Boxid(boxid);
+        } catch (RuntimeException e) {
+            throw new RuntimeException("FAILED to fetch box by ID: " + e.getMessage(), e);
         }
     }
 

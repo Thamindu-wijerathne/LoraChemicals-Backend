@@ -40,4 +40,19 @@ public class ProductTypeVolume {
     private Labeltype labeltype;
 
 
+    public ProductType getProducttype() {
+        return productType;
+    }
+
+    public Bottletype getBottle() {
+        return bottletype;
+    }
+
+    public Labeltype getLabel() {
+        return labeltype;
+    }
+
+    public ProductType getProductType() {
+        return productType;
+    }
 }

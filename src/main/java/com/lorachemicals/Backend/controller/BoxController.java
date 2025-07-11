@@ -1,9 +1,8 @@
 package com.lorachemicals.Backend.controller;
 
-import com.lorachemicals.Backend.dto.BottleQuantityUpdateDTO;
 import com.lorachemicals.Backend.dto.BoxQuantityUpdateDTO;
 import com.lorachemicals.Backend.dto.BoxRequestDTO;
-import com.lorachemicals.Backend.model.Bottle;
+import com.lorachemicals.Backend.dto.BoxResponseDTO;
 import com.lorachemicals.Backend.model.Box;
 import com.lorachemicals.Backend.services.BoxService;
 import com.lorachemicals.Backend.util.AccessControlUtil;
@@ -50,6 +49,17 @@ public class BoxController {
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to get box: " + e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/bt/{boxid}")
+    public ResponseEntity<?> getBoxByBoxId(@PathVariable Long boxid, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse");
+        try {
+            BoxResponseDTO box = boxService.getByBoxid(boxid);
+            return new ResponseEntity<>(box, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>("Failed to get box: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

@@ -40,6 +40,21 @@ public class BatchTypeService {
         return convertToResponseDTO(batchType);
     }
 
+    //get by ptv
+    public List<BatchTypeResponseDTO> getAllByPtv(Long id, HttpServletRequest request) {
+        try {
+            ProductTypeVolume ptv = productTypeVolumeRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("ProductTypeVolume not found with id: " + id));
+
+            return batchTypeRepository.findByProductTypeVolume(ptv)
+                    .stream()
+                    .map(this::convertToResponseDTO)
+                    .collect(Collectors.toList());
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Failed to find BatchType by id: " + id);
+        }
+    }
+
     public BatchTypeResponseDTO createBatchType(BatchTypeRequestDTO dto, HttpServletRequest request) {
         ProductTypeVolume ptv = productTypeVolumeRepository.findById(dto.getPtvid())
                 .orElseThrow(() -> new RuntimeException("ProductTypeVolume not found"));

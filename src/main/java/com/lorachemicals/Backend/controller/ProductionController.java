@@ -1,6 +1,8 @@
 package com.lorachemicals.Backend.controller;
 
+import com.lorachemicals.Backend.dto.ProductionDetailedResponseDTO;
 import com.lorachemicals.Backend.dto.ProductionRequestDTO;
+import com.lorachemicals.Backend.dto.ProductionResponseDTO;
 import com.lorachemicals.Backend.model.Production;
 import com.lorachemicals.Backend.services.ProductionService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,6 +40,17 @@ public class ProductionController {
             return new ResponseEntity<>(production, HttpStatus.OK);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
+
+    @GetMapping("/exp")
+    public ResponseEntity<ProductionDetailedResponseDTO> getSoonestExpireProduction( HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse");
+        try {
+            ProductionDetailedResponseDTO dto = productionService.getSoonestExpireProduction();
+            return ResponseEntity.ok(dto);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
         }
     }
 
