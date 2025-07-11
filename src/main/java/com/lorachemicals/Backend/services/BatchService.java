@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BatchService {
@@ -33,6 +34,9 @@ public class BatchService {
 
     @Autowired
     LabelRepository labelRepository;
+
+    @Autowired
+    BatchInventoryRepository batchInventoryRepository;
 
 
     //get all
@@ -71,44 +75,25 @@ public class BatchService {
                     .orElseThrow(() -> new RuntimeException("Warehouse Manager not found"));
 
             BoxType boxType = box.getBoxType();
-
             int quantityToProduce = dto.getQuantity();
 
             ProductTypeVolume ptv = batchType.getProductTypeVolume();
             ProductType productType = ptv.getProducttype();
 
-            // Calculate total volume required
             long volumePerUnit = ptv.getVolume() != null ? ptv.getVolume() : 0L;
             int quantityInBox = boxType.getQuantityInBox() != null ? boxType.getQuantityInBox() : 0;
             int packsNeeded = quantityToProduce * quantityInBox;
             Long requiredVolume = volumePerUnit * packsNeeded;
 
-            // Get FIFO production for product type
-            Production production = productionRepository
-                    .findTopByProductype_ProductTypeIdOrderByExpiredateAsc(productType.getProductTypeId())
-                    .orElseThrow(() -> new RuntimeException("No production found for product type"));
-
-            if (!"confirmed".equalsIgnoreCase(production.getStatus())) {
-                throw new RuntimeException("Production is not confirmed");
-            }
-
-            if (production.getCurrentvolume() < requiredVolume) {
-                throw new RuntimeException("Not enough production volume available");
-            }
-
-            // Check inventories
             Bottletype bottletype = ptv.getBottle();
             Labeltype labeltype = ptv.getLabel();
 
-            // Fetch actual inventory entities for bottle and label by type IDs
             Bottle bottle = bottleRepository.findByBottleType_Bottleid(bottletype.getBottleid())
-                    .orElseThrow(() -> new RuntimeException("Bottle inventory not found for given type"));
-
-
+                    .orElseThrow(() -> new RuntimeException("Bottle inventory not found"));
             Label label = labelRepository.findByLabeltype_LabelId(labeltype.getLabelid())
                     .orElseThrow(() -> new RuntimeException("Label inventory not found"));
 
-            int boxesRequired = dto.getQuantity();
+            int boxesRequired = quantityToProduce;
 
             if (box.getQuantity() < boxesRequired) {
                 throw new RuntimeException("Not enough boxes");
@@ -120,7 +105,7 @@ public class BatchService {
                 throw new RuntimeException("Not enough labels");
             }
 
-            // Deduct inventory quantities
+            // Deduct inventories
             box.setQuantity(box.getQuantity() - boxesRequired);
             bottle.setQuantity(bottle.getQuantity() - packsNeeded);
             label.setQuantity(label.getQuantity() - packsNeeded);
@@ -129,18 +114,46 @@ public class BatchService {
             bottleRepository.save(bottle);
             labelRepository.save(label);
 
-            // Deduct production volume
-            production.setCurrentvolume(production.getCurrentvolume() - requiredVolume);
-            productionRepository.save(production);
+            // Handle FIFO production deduction
+            List<Production> productions = productionRepository
+                    .findByProductype_ProductTypeIdAndStatusOrderByExpiredateAsc(
+                            productType.getProductTypeId(), "confirmed");
 
-            // Create batch entity
+            long volumeRemaining = requiredVolume;
+            Production usedProduction = null;
+
+            for (Production prod : productions) {
+                if (volumeRemaining <= 0) break;
+
+                Double available = prod.getCurrentvolume();
+
+                if (available >= volumeRemaining) {
+                    prod.setCurrentvolume(available - volumeRemaining);
+                    productionRepository.save(prod);
+                    usedProduction = prod;
+                    volumeRemaining = 0;
+                } else {
+                    volumeRemaining -= available;
+                    prod.setCurrentvolume(0.0);
+                    productionRepository.save(prod);
+                    if (usedProduction == null) {
+                        usedProduction = prod; // Assign first partial production
+                    }
+                }
+            }
+
+            if (volumeRemaining > 0) {
+                throw new RuntimeException("Not enough total production volume available");
+            }
+
+            // Create Batch
             Batch batch = new Batch();
             batch.setBatchtype(batchType);
             batch.setBatchdate(dto.getBatchdate() != null ? dto.getBatchdate() : LocalDateTime.now());
             batch.setBox(box);
             batch.setWarehousemanager(wm);
             batch.setQuantity(quantityToProduce);
-            batch.setProduction(production);
+            batch.setProduction(usedProduction); // assign earliest used production
             batch.setStatus("pending");
 
             return batchRepository.save(batch);
