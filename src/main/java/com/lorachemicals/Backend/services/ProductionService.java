@@ -1,6 +1,7 @@
 package com.lorachemicals.Backend.services;
 
 
+import com.lorachemicals.Backend.dto.ProductionDetailedResponseDTO;
 import com.lorachemicals.Backend.dto.ProductionRequestDTO;
 import com.lorachemicals.Backend.model.*;
 import com.lorachemicals.Backend.repository.*;
@@ -46,6 +47,34 @@ public class ProductionService {
             throw new RuntimeException("Failed to find all productions: " + e.getMessage(), e);
         }
     }
+
+    //get the production that has the latest exp.date
+    public ProductionDetailedResponseDTO getSoonestExpireProduction() {
+        try {
+            // Find earliest production with status confirmed
+            Production production = productionRepository.findTopByStatusIgnoreCaseOrderByExpiredateAsc("confirmed")
+                    .orElseThrow(() -> new RuntimeException("No confirmed production found"));
+
+            return convertToDetailedDTO(production);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get soonest expire production: " + e.getMessage(), e);
+        }
+    }
+
+    public ProductionDetailedResponseDTO convertToDetailedDTO(Production entity) {
+        ProductionDetailedResponseDTO dto = new ProductionDetailedResponseDTO();
+        dto.setProdid(entity.getProdid());
+        dto.setProducttype(entity.getProductype());
+        dto.setWarehousemanager(entity.getWarehousemanager());
+        dto.setMixer(entity.getMixer());
+        dto.setDate(entity.getDate());
+        dto.setVolume(entity.getVolume());
+        dto.setCurrentvolume(entity.getCurrentvolume());
+        dto.setStatus(entity.getStatus());
+        dto.setExpiredate(entity.getExpiredate());
+        return dto;
+    }
+
 
     //get by id
     public Production findById(Long id) {
@@ -217,32 +246,5 @@ public class ProductionService {
             throw new RuntimeException("Failed to delete production with id:" + id, e);
         }
     }
-
-    //create a production
-//    public Production createProduction(ProductionRequestDTO dto) {
-//        try{
-//            ProductType producttype = productTypeRepository.findById(dto.getPtid())
-//                    .orElseThrow(()-> new RuntimeException("Product type not found with id:" + dto.getPtid()));
-//
-//            WarehouseManager wm = warehouseManagerRepository.findById(dto.getWmid())
-//                    .orElseThrow(()-> new RuntimeException("Warehouse not found with id:" + dto.getWmid()));
-//
-//            Mixer mixer = mixerRepository.findById(dto.getMixerid())
-//                    .orElseThrow(()-> new RuntimeException("Mixer not found with id:" + dto.getMixerid()));
-//
-//            Production production = new Production();
-//            production.setProductype(producttype);
-//            production.setWarehousemanager(wm);
-//            production.setMixer(mixer);
-//            production.setDate(new Date()); // current date should be added
-//            production.setVolume(dto.getVolume());
-//            production.setCurrentvolume(dto.getCurrentvolume());
-//            production.setStatus("pending");
-//
-//            return productionRepository.save(production);
-//
-//        } catch (Exception e) {
-//            throw new RuntimeException("Failed to create production: " + e.getMessage(), e);
-//        }
-//    }
+    
 }
