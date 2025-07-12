@@ -189,6 +189,7 @@ public class ProductTypeVolumeService {
                 ptv.getName(),
                 ptv.getProductType() != null ? ptv.getProductType().getProductTypeId() : null,
                 ptv.getProductType() != null ? ptv.getProductType().getName() : null,
+                ptv.getProductType() != null ? ptv.getProductType().getDetails() : null,
                 ptv.getVolume(),
                 ptv.getUnitPrice(),
                 imageUrl,
