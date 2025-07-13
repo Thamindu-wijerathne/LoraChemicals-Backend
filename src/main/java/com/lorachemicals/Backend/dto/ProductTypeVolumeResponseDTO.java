@@ -25,6 +25,7 @@ public class ProductTypeVolumeResponseDTO {
     private String bottleTypeName;
     private Long labelid;
     private String labelTypeName;
+    private String productdetails;
 
     public ProductTypeVolumeResponseDTO(
             Long ptvid,
@@ -50,6 +51,7 @@ public class ProductTypeVolumeResponseDTO {
             String name,
             Long ptid,
             String details,
+            String productdetails,
             Long volume,
             BigDecimal unitprice,
             String imageUrl,
@@ -71,6 +73,7 @@ public class ProductTypeVolumeResponseDTO {
         this.bottleTypeName = bottleTypeName;
         this.labelid = labelid;
         this.labelTypeName = labelTypeName;
+        this.productdetails = productdetails;
     }
 
 
