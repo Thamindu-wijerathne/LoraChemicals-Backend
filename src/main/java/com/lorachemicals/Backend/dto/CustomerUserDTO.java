@@ -1,5 +1,10 @@
 package com.lorachemicals.Backend.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class CustomerUserDTO {
     private Long customerId;
     private String shop_name;
@@ -14,11 +19,12 @@ public class CustomerUserDTO {
     private String address;
     private String phone;
     private String nic;
+    private String status;
 
     // Constructor
     public CustomerUserDTO(Long customerId, String shopName, Long salesRepId, Long routeId,
                            Long userId, String fname, String lname, String email, String role,
-                           String address, String phone, String nic) {
+                           String address, String phone, String nic, String status) {
         this.customerId = customerId;
         this.shop_name = shopName;
         this.srepid = salesRepId;
@@ -31,55 +37,7 @@ public class CustomerUserDTO {
         this.address = address;
         this.phone = phone;
         this.nic = nic;
-    }
-
-    // Getters
-    public Long getCustomerId() {
-        return customerId;
-    }
-
-    public String getShop_name() {
-        return shop_name;
-    }
-
-    public Long getSrepid() {
-        return srepid;
-    }
-
-    public Long getRouteid() {
-        return routeid;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public String getFname() {
-        return fname;
-    }
-
-    public String getLname() {
-        return lname;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public String getNic() {
-        return nic;
+        this.status = status;
     }
 
     @Override
