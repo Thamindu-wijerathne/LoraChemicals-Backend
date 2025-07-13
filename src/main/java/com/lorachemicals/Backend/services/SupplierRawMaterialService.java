@@ -68,7 +68,7 @@ public class SupplierRawMaterialService {
             srm.setQuantity(dto.getQuantity());
             srm.setCurrentQuantity(dto.getQuantity());
             srm.setUnitPrice(dto.getUnitPrice());
-            srm.setTotalPrice(dto.getUnitPrice() * dto.getQuantity());
+            srm.setTotalPrice(dto.getTotalPrice());
 
             supplierRawMaterialRepository.save(srm);
 

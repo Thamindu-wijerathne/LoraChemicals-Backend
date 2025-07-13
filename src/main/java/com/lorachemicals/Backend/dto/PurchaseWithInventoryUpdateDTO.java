@@ -20,5 +20,6 @@ public class PurchaseWithInventoryUpdateDTO {
     private LocalDate expDate;
     private Integer quantity;
     private double unitPrice;
+    private double totalPrice;
 
 }
