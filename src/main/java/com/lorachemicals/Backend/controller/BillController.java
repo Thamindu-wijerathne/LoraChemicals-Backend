@@ -50,11 +50,15 @@ public class BillController {
         AccessControlUtil.checkAccess(request, "salesrep");
         try {
             List<Bill> bills = billService.getSalesrepBill(id);
-            logger.info("bills {}", bills);
-            return ResponseEntity.ok(bills);
+            List<BillResponseDTO> response = bills.stream()
+                    .map(billService::convertToDTO)
+                    .toList();
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            logger.error("Error get bill", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Unexpected error: " + e.getMessage());
         }
     }
+
+
 }

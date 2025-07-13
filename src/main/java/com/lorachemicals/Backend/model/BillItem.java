@@ -29,11 +29,11 @@ public class BillItem {
     )
     private ProductTypeVolume productTypeVolume;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-            name = "cbillid",
+            name = "cbillid", // Use cbillid as the foreign key column name
             nullable = false,
-            foreignKey = @ForeignKey(name = "fk_billitem_customerbill")
+            foreignKey = @ForeignKey(name = "fk_billitem_bill")
     )
-    private CustomerBill customerBill;
+    private Bill bill;
 }
