@@ -7,6 +7,8 @@ import com.lorachemicals.Backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class BillService {
 
@@ -62,4 +64,9 @@ public class BillService {
 
         return bill;
     }
+
+    public List<Bill> getSalesrepBill(Long srepId) {
+        return billRepository.findBySalesRep_Srepid(srepId);
+    }
+
 }

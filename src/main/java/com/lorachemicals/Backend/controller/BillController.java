@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/bill")
 public class BillController {
@@ -39,6 +41,19 @@ public class BillController {
 
         } catch (Exception e) {
             logger.error("Error creating bill", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/salesrep-created-orders/{id}")
+    public ResponseEntity<?> getSalesrepCreatedOrders(@PathVariable Long id, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "salesrep");
+        try {
+            List<Bill> bills = billService.getSalesrepBill(id);
+            logger.info("bills {}", bills);
+            return ResponseEntity.ok(bills);
+        } catch (Exception e) {
+            logger.error("Error get bill", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error: " + e.getMessage());
         }
     }

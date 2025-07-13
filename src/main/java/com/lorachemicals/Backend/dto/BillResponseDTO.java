@@ -1,5 +1,6 @@
 package com.lorachemicals.Backend.dto;
 
+import com.lorachemicals.Backend.model.Bill;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,4 +15,7 @@ public class BillResponseDTO {
     private Date datetime;
     private Long salesRepId;
     private String salesRepName; // Optional: from linked User object
+
 }
+
+
