@@ -59,6 +59,8 @@ public class BillService {
                 item.setQuantity((long) itemDto.getQuantity());
                 item.setTotal(itemDto.getTotal());
 
+                item.setBill(bill);
+
                 billItemRepository.save(item);
             }
         }
