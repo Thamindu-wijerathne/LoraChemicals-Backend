@@ -24,6 +24,7 @@ public class BillController {
     @PostMapping("/create/{id}")
     public ResponseEntity<?> createBill(@PathVariable Long id, @RequestBody BillRequestDTO data, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "salesrep");
+        logger.error("Error creating bill {}", data);
 
         try {
 
@@ -31,7 +32,7 @@ public class BillController {
 
             // Convert to ResponseDTO
             BillResponseDTO response = new BillResponseDTO();
-            response.setBillid(Long.valueOf(bill.getBillid()));
+            response.setBillid(bill.getBillid());
             response.setTotal(bill.getTotal());
             response.setDatetime(bill.getDatetime());
             response.setSalesRepId(bill.getSalesRep().getSrepid());
