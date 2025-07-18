@@ -12,26 +12,25 @@ import java.time.LocalDateTime;
 @Table(name = "announcement")
 public class Announcement {
 
-    // Getters and Setters
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long announcementID;
 
-    @Column(nullable = false)
-    private String message; // cannot exceed more than 255 letters (this should be fixed)
+    @Column(nullable = false, length = 255)
+    private String message;
 
     @Column(nullable = false)
     private LocalDateTime dateTime;
 
-    // No-arg constructor
-    public Announcement() {
-    }
+    @Column(name = "target_roles") // comma-separated values
+    private String targetRoles;
 
-    // All-args constructor (optional, if you need it)
-    public Announcement(Long announcementID, String message, LocalDateTime dateTime) {
+    public Announcement() {}
+
+    public Announcement(Long announcementID, String message, LocalDateTime dateTime, String targetRoles) {
         this.announcementID = announcementID;
         this.message = message;
         this.dateTime = dateTime;
+        this.targetRoles = targetRoles;
     }
-
 }
