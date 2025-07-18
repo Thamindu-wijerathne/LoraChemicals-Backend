@@ -16,7 +16,7 @@ public class Announcement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long announcementID;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false, length = 255, columnDefinition = "TEXT")
     private String message;
 
     @Column(nullable = false)
