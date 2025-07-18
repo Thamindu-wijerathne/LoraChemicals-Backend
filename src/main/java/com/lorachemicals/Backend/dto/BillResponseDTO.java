@@ -1,10 +1,12 @@
 package com.lorachemicals.Backend.dto;
 
+import com.lorachemicals.Backend.model.Bill;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -14,4 +16,9 @@ public class BillResponseDTO {
     private Date datetime;
     private Long salesRepId;
     private String salesRepName; // Optional: from linked User object
+    private List<BillItemResponseDTO> billItems;
+
+
 }
+
+

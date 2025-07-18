@@ -14,4 +14,5 @@ public interface ProductionRepository extends JpaRepository<Production, Long> {
 
     List<Production> findByProductype_ProductTypeIdAndStatusOrderByExpiredateAsc(Long ptid, String status);
 
+    Optional<Production> getByProdid(Long prodid);
 }

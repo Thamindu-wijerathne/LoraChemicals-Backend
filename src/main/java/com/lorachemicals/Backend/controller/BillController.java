@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/bill")
 public class BillController {
@@ -22,6 +24,7 @@ public class BillController {
     @PostMapping("/create/{id}")
     public ResponseEntity<?> createBill(@PathVariable Long id, @RequestBody BillRequestDTO data, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "salesrep");
+        logger.error("Error creating bill {}", data);
 
         try {
 
@@ -29,7 +32,7 @@ public class BillController {
 
             // Convert to ResponseDTO
             BillResponseDTO response = new BillResponseDTO();
-            response.setBillid(Long.valueOf(bill.getBillid()));
+            response.setBillid(bill.getBillid());
             response.setTotal(bill.getTotal());
             response.setDatetime(bill.getDatetime());
             response.setSalesRepId(bill.getSalesRep().getSrepid());
@@ -42,4 +45,21 @@ public class BillController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error: " + e.getMessage());
         }
     }
+
+    @GetMapping("/salesrep-created-orders/{id}")
+    public ResponseEntity<?> getSalesrepCreatedOrders(@PathVariable Long id, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "salesrep");
+        try {
+            List<Bill> bills = billService.getSalesrepBill(id);
+            List<BillResponseDTO> response = bills.stream()
+                    .map(billService::convertToDTO)
+                    .toList();
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Unexpected error: " + e.getMessage());
+        }
+    }
+
+
 }

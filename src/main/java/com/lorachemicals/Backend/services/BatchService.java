@@ -163,5 +163,103 @@ public class BatchService {
         }
     }
 
+    //create by prodid
+    @Transactional
+    public Batch createByProdid(Long prodid, BatchRequestDTO dto) {
+        try {
+            BatchType batchType = batchTypeRepository.findById(dto.getBatchtypeid())
+                    .orElseThrow(() -> new RuntimeException("BatchType not found"));
+
+            Box box = boxRepository.findById(dto.getInventoryid())
+                    .orElseThrow(() -> new RuntimeException("Box not found"));
+
+            WarehouseManager wm = warehouseManagerRepository.findById(dto.getWmid())
+                    .orElseThrow(() -> new RuntimeException("Warehouse Manager not found"));
+
+            BoxType boxType = box.getBoxType();
+            int quantityToProduce = dto.getQuantity();
+
+            ProductTypeVolume ptv = batchType.getProductTypeVolume();
+            ProductType productType = ptv.getProducttype();
+
+            long volumePerUnit = ptv.getVolume() != null ? ptv.getVolume() : 0L;
+            int quantityInBox = boxType.getQuantityInBox() != null ? boxType.getQuantityInBox() : 0;
+            int packsNeeded = quantityToProduce * quantityInBox;
+            Long requiredVolume = volumePerUnit * packsNeeded;
+
+            // ✅ Fixed this line
+            Production production = productionRepository.getByProdid(prodid)
+                    .orElseThrow(() -> new RuntimeException("No production found for prodid: " + prodid));
+
+            if (!"confirmed".equalsIgnoreCase(production.getStatus())) {
+                throw new RuntimeException("Production is not confirmed");
+            }
+
+            if (production.getCurrentvolume() < requiredVolume) {
+                throw new RuntimeException("Not enough production volume available");
+            }
+
+            Bottletype bottletype = ptv.getBottle();
+            Labeltype labeltype = ptv.getLabel();
+
+            Bottle bottle = bottleRepository.findByBottleType_Bottleid(bottletype.getBottleid())
+                    .orElseThrow(() -> new RuntimeException("Bottle inventory not found for given type"));
+
+            Label label = labelRepository.findByLabeltype_LabelId(labeltype.getLabelid())
+                    .orElseThrow(() -> new RuntimeException("Label inventory not found"));
+
+            int boxesRequired = dto.getQuantity();
+
+            if (box.getQuantity() < boxesRequired) {
+                throw new RuntimeException("Not enough boxes");
+            }
+            if (bottle.getQuantity() < packsNeeded) {
+                throw new RuntimeException("Not enough bottles");
+            }
+            if (label.getQuantity() < packsNeeded) {
+                throw new RuntimeException("Not enough labels");
+            }
+
+            box.setQuantity(box.getQuantity() - boxesRequired);
+            bottle.setQuantity(bottle.getQuantity() - packsNeeded);
+            label.setQuantity(label.getQuantity() - packsNeeded);
+
+            boxRepository.save(box);
+            bottleRepository.save(bottle);
+            labelRepository.save(label);
+
+            production.setCurrentvolume(production.getCurrentvolume() - requiredVolume);
+            productionRepository.save(production);
+
+            Batch batch = new Batch();
+            batch.setBatchtype(batchType);
+            batch.setBatchdate(dto.getBatchdate() != null ? dto.getBatchdate() : LocalDateTime.now());
+            batch.setBox(box);
+            batch.setWarehousemanager(wm);
+            batch.setQuantity(quantityToProduce);
+            batch.setProduction(production);
+            batch.setStatus("pending");
+
+            return batchRepository.save(batch);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create batch: " + e.getMessage(), e);
+        }
+    }
+
+    //update status
+    public Batch updatebatch(Long batchid, BatchRequestDTO batchRequestDTO) {
+        try {
+            Batch batch = batchRepository.findById(batchid)
+                    .orElseThrow(() -> new RuntimeException("Batch not found"));
+
+            batch.setStatus(batchRequestDTO.getStatus());
+            return batchRepository.save(batch);
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating batch: " + e.getMessage());
+        }
+    }
+
+
 
 }

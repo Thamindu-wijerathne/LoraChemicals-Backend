@@ -91,6 +91,19 @@ public class ProductTypeVolumeController {
         }
     }
 
+    @GetMapping("/pt/{ptid}")
+    public ResponseEntity<?> getByPid(@PathVariable Long ptid, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request,  "admin", "warehouse");
+
+        try{
+            List<ProductTypeVolumeResponseDTO> list = service.getallbyproducttypeid(ptid);
+            return ResponseEntity.ok(list);
+        }
+        catch (Exception e) {
+            throw new RuntimeException("Error fetching product with id " + ptid, e);
+        }
+    }
+
     // UPDATE
     @PutMapping("/update/{id}")
     public ResponseEntity<?> update(
