@@ -18,7 +18,22 @@ public class BillRequestDTO {
     private String shop_name;
     private String address;
     private String phone;
-
+    private String district;
     private List<BillItemRequestDTO> items; // New field
+
+
+    @Override
+    public String toString() {
+        return "BillRequestDTO{" +
+                "total=" + total +
+                ", datetime=" + datetime +
+                ", salesRepId=" + salesRepId +
+                ", shop_name='" + shop_name + '\'' +
+                ", address='" + address + '\'' +
+                ", phone='" + phone + '\'' +
+                ", district='" + district + '\'' +
+                ", items=" + items +
+                '}';
+    }
 
 }

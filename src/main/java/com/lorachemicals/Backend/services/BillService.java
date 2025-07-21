@@ -45,6 +45,7 @@ public class BillService {
         customerBill.setShop_name(data.getShop_name());
         customerBill.setAddress(data.getAddress());
         customerBill.setPhone(data.getPhone());
+        customerBill.setDistrict(data.getDistrict());
         customerBill.setBill(bill);
         customerBill = customerBillRepository.save(customerBill);
 
