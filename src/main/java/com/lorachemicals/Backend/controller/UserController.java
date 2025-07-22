@@ -102,7 +102,8 @@ public class UserController {
                 c.getUser().getRole(),
                 c.getUser().getAddress(),
                 c.getUser().getPhone(),
-                c.getUser().getNic()
+                c.getUser().getNic(),
+                c.getUser().getStatus()
         )).toList();
     }
 

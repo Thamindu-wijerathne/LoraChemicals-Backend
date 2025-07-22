@@ -234,6 +234,19 @@ public class BatchService {
         }
     }
 
+    //update status
+    public Batch updatebatch(Long batchid, BatchRequestDTO batchRequestDTO) {
+        try {
+            Batch batch = batchRepository.findById(batchid)
+                    .orElseThrow(() -> new RuntimeException("Batch not found"));
+
+            batch.setStatus(batchRequestDTO.getStatus());
+            return batchRepository.save(batch);
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating batch: " + e.getMessage());
+        }
+    }
+
 
 
 }
