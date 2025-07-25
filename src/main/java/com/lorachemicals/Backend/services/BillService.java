@@ -73,6 +73,10 @@ public class BillService {
         return billRepository.findBySalesRep_Srepid(srepId);
     }
 
+    public List<Bill> getAllBills() {
+        return billRepository.findAll();
+    }
+
     public BillResponseDTO convertToDTO(Bill bill) {
         BillResponseDTO dto = new BillResponseDTO();
         dto.setBillid(bill.getBillid());
