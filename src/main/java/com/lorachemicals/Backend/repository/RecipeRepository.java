@@ -7,6 +7,4 @@ import java.util.Optional;
 
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     Optional<Recipe> findByProductType_ProductTypeId(Long productTypeId);
-//    Optional<Recipe> findByMixer_Mixerid(Long mixerid);
-
 }
