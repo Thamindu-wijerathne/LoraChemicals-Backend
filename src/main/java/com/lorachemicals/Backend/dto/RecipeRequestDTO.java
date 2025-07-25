@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RecipeRequestDTO {
     private String recipeName;
-    private Long mixerid;
+    private Long productTypeId;
 }
