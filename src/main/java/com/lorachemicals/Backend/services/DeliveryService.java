@@ -49,49 +49,49 @@ public class DeliveryService {
 
     //create
     @Transactional
-    public void createDeliveryWithItems(CreateDeliveryRequestDTO request) {
-        Delivery delivery = new Delivery();
-        delivery.setDeliveryid(request.getDeliveryId());
-        delivery.setDeliverydate(request.getDeliveryDate());
-        deliveryRepository.save(delivery);
-
-        for (DeliveryInventoryRequestDTO itemRequest : request.getItems()) {
-            int remainingQty = itemRequest.getQuantity();
-            List<BatchInventory> batches = batchInventoryRepository
-                    .findByInventoryidOrderByExpiredateAsc(itemRequest.getInventoryId());
-
-            for (BatchInventory batch : batches) {
-                if (remainingQty <= 0) break;
-
-                int available = batch.getQuantity();
-                if (available <= 0) continue;
-
-                int deduct = Math.min(available, remainingQty);
-
-                // Update batch
-                batch.setQuantity(available - deduct);
-                batchInventoryRepository.save(batch);
-
-                // Save DeliveryInventory
-                DeliveryInventoryId id = new DeliveryInventoryId(
-                        request.getDeliveryId(),
-                        itemRequest.getInventoryId(),
-                        request.getDeliveryDate()
-                );
-
-                DeliveryInventory deliveryInventory = new DeliveryInventory();
-                deliveryInventory.setId(id);
-                deliveryInventory.setQuantity(deduct);
-                deliveryInventoryRepository.save(deliveryInventory);
-
-                remainingQty -= deduct;
-            }
-
-            if (remainingQty > 0) {
-                throw new RuntimeException("Not enough stock for inventoryId: " + itemRequest.getInventoryId());
-            }
-        }
-    }
+//    public void createDeliveryWithItems(CreateDeliveryRequestDTO request) {
+//        Delivery delivery = new Delivery();
+//        delivery.setDeliveryid(request.getDeliveryId());
+//        delivery.setDeliverydate(request.getDeliveryDate());
+//        deliveryRepository.save(delivery);
+//
+//        for (DeliveryInventoryRequestDTO itemRequest : request.getItems()) {
+//            int remainingQty = itemRequest.getQuantity();
+//            List<BatchInventory> batches = batchInventoryRepository
+//                    .findByInventoryidOrderByExpiredateAsc(itemRequest.getInventoryId());
+//
+//            for (BatchInventory batch : batches) {
+//                if (remainingQty <= 0) break;
+//
+//                int available = batch.getQuantity();
+//                if (available <= 0) continue;
+//
+//                int deduct = Math.min(available, remainingQty);
+//
+//                // Update batch
+//                batch.setQuantity(available - deduct);
+//                batchInventoryRepository.save(batch);
+//
+//                // Save DeliveryInventory
+//                DeliveryInventoryId id = new DeliveryInventoryId(
+//                        request.getDeliveryId(),
+//                        itemRequest.getInventoryId(),
+//                        request.getDeliveryDate()
+//                );
+//
+//                DeliveryInventory deliveryInventory = new DeliveryInventory();
+//                deliveryInventory.setId(id);
+//                deliveryInventory.setQuantity(deduct);
+//                deliveryInventoryRepository.save(deliveryInventory);
+//
+//                remainingQty -= deduct;
+//            }
+//
+//            if (remainingQty > 0) {
+//                throw new RuntimeException("Not enough stock for inventoryId: " + itemRequest.getInventoryId());
+//            }
+//        }
+//    }
 
 
 
