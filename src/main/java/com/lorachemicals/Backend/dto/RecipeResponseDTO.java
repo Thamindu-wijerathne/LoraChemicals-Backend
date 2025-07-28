@@ -12,5 +12,5 @@ import lombok.Setter;
 public class RecipeResponseDTO {
     private Long recipeid;
     private String recipeName;
-    private Long mixerid;
+    private Long productTypeId;
 }

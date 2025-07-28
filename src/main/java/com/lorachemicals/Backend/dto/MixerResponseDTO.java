@@ -9,16 +9,14 @@ public class MixerResponseDTO {
     private Long mixerid;
     private String name;
     private long capacity;
-    private Long productTypeId;
     private int availability;
 
     public MixerResponseDTO() {}
 
-    public MixerResponseDTO(Long mixerid, String name, long capacity, Long productTypeId, int availability) {
+    public MixerResponseDTO(Long mixerid, String name, long capacity,int availability) {
         this.mixerid = mixerid;
         this.name = name;
         this.capacity = capacity;
-        this.productTypeId = productTypeId;
         this.availability = availability;
     }
 

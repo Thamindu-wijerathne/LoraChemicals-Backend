@@ -2,8 +2,10 @@ package com.lorachemicals.Backend.services;
 
 import com.lorachemicals.Backend.dto.RecipeRequestDTO;
 import com.lorachemicals.Backend.model.Mixer;
+import com.lorachemicals.Backend.model.ProductType;
 import com.lorachemicals.Backend.model.Recipe;
 import com.lorachemicals.Backend.repository.MixerRepository;
+import com.lorachemicals.Backend.repository.ProductTypeRepository;
 import com.lorachemicals.Backend.repository.RecipeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +19,7 @@ public class RecipeService {
     private RecipeRepository recipeRepository;
 
     @Autowired
-    private MixerRepository mixerRepository;
+    private ProductTypeRepository productTypeRepository;
 
     // Get all recipes
     public List<Recipe> getAllRecipes() {
@@ -38,25 +40,25 @@ public class RecipeService {
         }
     }
 
-    //get by mixerid
-    public Recipe getRecipeByMixerId(Long mixerid) {
+    //get by productType
+    public Recipe getRecipeByproductTypeid(Long productTypeid) {
         try {
-            return recipeRepository.findByMixer_Mixerid(mixerid)
-                    .orElseThrow(() -> new RuntimeException("Recipe not found with mixer ID: " + mixerid));
+            return recipeRepository.findByProductType_ProductTypeId(productTypeid)
+                    .orElseThrow(() -> new RuntimeException("Recipe not found with productType: " + productTypeid));
         } catch (Exception e) {
-            throw new RuntimeException("Failed to retrieve recipe with mixer ID: " + mixerid, e);
+            throw new RuntimeException("Failed to retrieve recipe with productType: " + productTypeid, e);
         }
     }
 
     // Create recipe
     public Recipe addRecipe(RecipeRequestDTO dto) {
         try {
-            Mixer mixer = mixerRepository.findById(dto.getMixerid())
-                    .orElseThrow(() -> new RuntimeException("Mixer not found with ID: " + dto.getMixerid()));
+            ProductType productType = productTypeRepository.findById(dto.getProductTypeId())
+                    .orElseThrow(() -> new RuntimeException("ProductType not found with ID: " + dto.getProductTypeId()));
 
             Recipe recipe = new Recipe();
             recipe.setRecipeName(dto.getRecipeName());
-            recipe.setMixer(mixer);
+            recipe.setProductType(productType);
 
             return recipeRepository.save(recipe);
         } catch (Exception e) {
@@ -70,11 +72,12 @@ public class RecipeService {
             Recipe recipe = recipeRepository.findById(recipeid)
                     .orElseThrow(() -> new RuntimeException("Recipe not found with ID: " + recipeid));
 
-            Mixer mixer = mixerRepository.findById(dto.getMixerid())
-                    .orElseThrow(() -> new RuntimeException("Mixer not found with ID: " + dto.getMixerid()));
+            ProductType productType = productTypeRepository.findById(dto.getProductTypeId())
+                    .orElseThrow(() -> new RuntimeException("ProductType not found with ID: " + dto.getProductTypeId()));
+
 
             recipe.setRecipeName(dto.getRecipeName());
-            recipe.setMixer(mixer);
+            recipe.setProductType(productType);
 
             return recipeRepository.save(recipe);
         } catch (Exception e) {
