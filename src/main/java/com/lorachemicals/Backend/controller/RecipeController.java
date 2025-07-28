@@ -23,7 +23,7 @@ public class RecipeController {
     // GET all
     @GetMapping("/all")
     public ResponseEntity<?> getAllRecipes(HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "admin");
+        AccessControlUtil.checkAccess(request, "admin","warehouse");
         try {
             List<Recipe> recipes = recipeService.getAllRecipes();
             return new ResponseEntity<>(recipes, HttpStatus.OK);
@@ -45,12 +45,12 @@ public class RecipeController {
     }
 
     //Get by mixer id
-    @GetMapping("/mixer/{id}")
+    @GetMapping("/productType/{id}")
     public ResponseEntity<?> getMixerById(@PathVariable("id") Long id, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "admin", "warehouse");
 
         try{
-            Recipe recipe = recipeService.getRecipeByMixerId(id);
+            Recipe recipe = recipeService.getRecipeByproductTypeid(id);
             return new ResponseEntity<>(recipe, HttpStatus.OK);
 
         } catch(Exception e){

@@ -174,7 +174,6 @@ public class BatchService {
             int packsNeeded = quantityToProduce * quantityInBox;
             Long requiredVolume = volumePerUnit * packsNeeded;
 
-            // ✅ Fixed this line
             Production production = productionRepository.getByProdid(prodid)
                     .orElseThrow(() -> new RuntimeException("No production found for prodid: " + prodid));
 

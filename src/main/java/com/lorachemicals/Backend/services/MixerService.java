@@ -29,16 +29,6 @@ public class MixerService {
     }
 
     //get all by product type
-    public List<Mixer> getMixerByProductType(Long productTypeId) {
-        if (productTypeId == null) {
-            throw new IllegalArgumentException("ProductTypeId cannot be null");
-        }
-        try {
-            return mixerRepository.findAllByProductTypeId(productTypeId);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to retrieve mixers: " + e.getMessage(), e);
-        }
-    }
 
     // Get mixer by ID
     public Mixer getMixerById(Long id) {
@@ -53,13 +43,9 @@ public class MixerService {
     // Create mixer
     public Mixer createMixer(MixerRequestDTO dto) {
         try {
-            ProductType productType = productTypeRepository.findById(dto.getProductTypeId())
-                    .orElseThrow(() -> new RuntimeException("ProductType not found with ID: " + dto.getProductTypeId()));
-
             Mixer mixer = new Mixer();
             mixer.setName(dto.getName());
             mixer.setCapacity(dto.getCapacity());
-            mixer.setProductType(productType);
             mixer.setAvailability(1); // default available
 
             return mixerRepository.save(mixer);
@@ -73,12 +59,8 @@ public class MixerService {
         Mixer mixer = mixerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Mixer not found with id: " + id));
 
-        ProductType productType = productTypeRepository.findById(dto.getProductTypeId())
-                .orElseThrow(() -> new RuntimeException("ProductType not found with id: " + dto.getProductTypeId()));
-
         mixer.setName(dto.getName());
         mixer.setCapacity(dto.getCapacity());
-        mixer.setProductType(productType);
         mixer.setAvailability(dto.getAvailability());
 
         return mixerRepository.save(mixer);
