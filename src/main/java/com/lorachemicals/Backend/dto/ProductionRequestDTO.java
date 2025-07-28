@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -18,4 +19,17 @@ public class ProductionRequestDTO {
     private Double currentvolume;
     private String status;
     private Date expiredate;
+    private Long recipeid;
+
+    private List<RecipeItemDTO> recipeItems;
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class RecipeItemDTO {
+        private Long recipeItemId;
+        private Double quantity;  // or Integer if always integer values
+        private String unit;
+        private Long chemicalId;
+    }
 }

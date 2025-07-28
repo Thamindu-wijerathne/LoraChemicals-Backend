@@ -9,7 +9,4 @@ import java.util.List;
 
 public interface MixerRepository extends JpaRepository<Mixer, Long> {
 
-    @Query("SELECT m FROM Mixer m WHERE m.productType.productTypeId = :productTypeId AND m.availability = 1")
-    List<Mixer> findAllByProductTypeId(@Param("productTypeId") Long productTypeId);
-
 }
