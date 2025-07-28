@@ -59,16 +59,23 @@ public class SupplierRawMaterialService {
             SupplierRawMaterialId id = new SupplierRawMaterialId(
                     dto.getInventoryId(), dto.getSupplierId(), dto.getDate());
 
+            String ischem = getRawMaterialType(rawMaterial);
+
             SupplierRawMaterial srm = new SupplierRawMaterial();
             srm.setId(id);
             srm.setSupplier(supplier);
             srm.setRawMaterial(rawMaterial);
             srm.setWarehouseManager(wm);
             srm.setExpDate(dto.getExpDate());
-            srm.setQuantity(dto.getQuantity());
-            srm.setCurrentQuantity(dto.getQuantity());
+            if(ischem.equals("chemical") && dto.getQuantity() != null){
+                srm.setQuantity(dto.getQuantity() * 1000);
+                srm.setCurrentQuantity(dto.getQuantity() * 1000);
+            }else{
+                srm.setQuantity(dto.getQuantity());
+                srm.setCurrentQuantity(dto.getQuantity());
+            }
             srm.setUnitPrice(dto.getUnitPrice());
-            srm.setTotalPrice(dto.getUnitPrice() * dto.getQuantity());
+            srm.setTotalPrice(dto.getTotalPrice());
 
             supplierRawMaterialRepository.save(srm);
 
@@ -90,7 +97,7 @@ public class SupplierRawMaterialService {
                     try {
                         RawChemical chemical = rawChemicalRepository.findById(dto.getInventoryId())
                                 .orElseThrow(() -> new RuntimeException("Chemical not found with ID: " + dto.getInventoryId()));
-                        chemical.setVolume(chemical.getVolume() + dto.getQuantity());
+                        chemical.setVolume(chemical.getVolume() + dto.getQuantity() * 1000);
                         rawChemicalRepository.save(chemical);
                     } catch (Exception e) {
                         throw new RuntimeException("Failed to update chemical inventory: " + e.getMessage(), e);

@@ -14,4 +14,5 @@ public class ProductTypeVolumeRequestDTO {
     private String category;
     private Long bottleid;
     private Long labelid;
+
 }

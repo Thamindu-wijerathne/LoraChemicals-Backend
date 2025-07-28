@@ -69,5 +69,17 @@ public class BatchController {
         }
     }
 
+    @PutMapping("/{batchid}")
+    public ResponseEntity<?> updatebatch(@PathVariable Long batchid, @RequestBody BatchRequestDTO batchRequestDTO, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse");
+        try{
+            Batch batch = batchService.updatebatch(batchid, batchRequestDTO);
+            return new ResponseEntity<>(batch, HttpStatus.CREATED);
+        }
+        catch(Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
 }

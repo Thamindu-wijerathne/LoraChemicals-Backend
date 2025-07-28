@@ -112,7 +112,12 @@ public class ProductionService {
                 // Find all RawChemical inventory entities for this chemical type
                 List<RawChemical> rawChemicals = rawChemicalRepository.findByChemicalType(rawChemicalType);
 
+                // Convert units
                 double requiredQty = item.getQuantity();
+                String unit = item.getUnit().toLowerCase(); // E.g., "g", "ml", "kg", "l"
+                if (unit.equals("l") || unit.equals("kg")) {
+                    requiredQty *= 1000;
+                }
 
                 // Sum all volumes from RawChemical entities
                 double totalAvailable = rawChemicals.stream().mapToDouble(RawChemical::getVolume).sum();

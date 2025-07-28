@@ -1,49 +1,55 @@
 package com.lorachemicals.Backend.controller;
 
-import com.lorachemicals.Backend.dto.AnnouncementDTO;
-import com.lorachemicals.Backend.model.Announcement;
+import com.lorachemicals.Backend.dto.AnnouncementRequestDTO;
+import com.lorachemicals.Backend.dto.AnnouncementResponseDTO;
 import com.lorachemicals.Backend.services.AnnouncementService;
-import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-        import java.util.List;
+import java.util.List;
 
-@AllArgsConstructor
 @RestController
 @RequestMapping("/announcements")
+@CrossOrigin(origins = "**")
 public class AnnouncementController {
 
     private final AnnouncementService announcementService;
 
-    // ✅ POST: Create new announcement using DTO
+    public AnnouncementController(AnnouncementService announcementService) {
+        this.announcementService = announcementService;
+    }
+
+    // Create a new announcement
     @PostMapping
-    public ResponseEntity<AnnouncementDTO> createAnnouncement(@RequestBody AnnouncementDTO announcementDTO) {
-        AnnouncementDTO savedAnnouncement = announcementService.createAnnouncement(announcementDTO);
-        return new ResponseEntity<>(savedAnnouncement, HttpStatus.CREATED);
+    public ResponseEntity<AnnouncementResponseDTO> createAnnouncement(@RequestBody AnnouncementRequestDTO requestDTO) {
+        AnnouncementResponseDTO created = announcementService.createAnnouncement(requestDTO);
+        return ResponseEntity.ok(created);
     }
 
-    // ✅ GET: Retrieve all announcements
+    // Get all announcements (for admin only)
     @GetMapping
-    public ResponseEntity<List<Announcement>> getAllAnnouncements() {
-        List<Announcement> announcements = announcementService.getAllAnnouncement();
-        return new ResponseEntity<>(announcements, HttpStatus.OK);
+    public ResponseEntity<List<AnnouncementResponseDTO>> getAllAnnouncements() {
+        return ResponseEntity.ok(announcementService.getAllAnnouncements());
     }
 
-    // ✅ PUT: Update existing announcement by ID
+    // Get a specific announcement by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<AnnouncementResponseDTO> getAnnouncementById(@PathVariable Long id) {
+        return ResponseEntity.ok(announcementService.getAnnouncement(id));
+    }
+
+    // Update an announcement
     @PutMapping("/{id}")
-    public ResponseEntity<AnnouncementDTO> updateAnnouncement(
-            @PathVariable("id") Long announcementId,
-            @RequestBody AnnouncementDTO announcementDTO) {
-        AnnouncementDTO updatedAnnouncement = announcementService.updateAnnouncement(announcementId, announcementDTO);
-        return new ResponseEntity<>(updatedAnnouncement, HttpStatus.OK);
+    public ResponseEntity<AnnouncementResponseDTO> updateAnnouncement(
+            @PathVariable Long id,
+            @RequestBody AnnouncementRequestDTO requestDTO) {
+        return ResponseEntity.ok(announcementService.updateAnnouncement(id, requestDTO));
     }
 
-    // ✅ DELETE: Delete announcement by ID
+    // Delete an announcement
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAnnouncement(@PathVariable("id") Long announcementId) {
-        announcementService.deleteAnnouncement(announcementId);
+    public ResponseEntity<Void> deleteAnnouncement(@PathVariable Long id) {
+        announcementService.deleteAnnouncement(id);
         return ResponseEntity.noContent().build();
     }
 }
