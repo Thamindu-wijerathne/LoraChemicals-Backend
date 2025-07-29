@@ -1,6 +1,7 @@
 package com.lorachemicals.Backend.services;
 
 import com.lorachemicals.Backend.dto.BatchRequestDTO;
+import com.lorachemicals.Backend.dto.BatchResponseDTO;
 import com.lorachemicals.Backend.model.*;
 import com.lorachemicals.Backend.repository.*;
 import jakarta.transaction.Transactional;
@@ -20,6 +21,9 @@ public class BatchService {
     BatchTypeRepository batchTypeRepository;
 
     @Autowired
+    ParentBatchTypeRepository parentBatchTypeRepository;
+
+    @Autowired
     BoxRepository boxRepository;
 
     @Autowired
@@ -34,25 +38,25 @@ public class BatchService {
     @Autowired
     LabelRepository labelRepository;
 
-
     //get all
-    public List<Batch> getAllBatches() {
-        try{
-            return batchRepository.findAll();
-        }
-        catch(Exception e){
+    public List<BatchResponseDTO> getAllBatches() {
+        try {
+            return batchRepository.findAll()
+                    .stream()
+                    .map(this::convertToResponseDTO)
+                    .collect(java.util.stream.Collectors.toList());
+        } catch (Exception e) {
             throw new RuntimeException("Failed to find all batches: " + e.getMessage(), e);
         }
     }
 
     //get by id
-    public Batch getBatchById(Long id) {
-        try{
-            return batchRepository.findById(id)
+    public BatchResponseDTO getBatchById(Long id) {
+        try {
+            Batch batch = batchRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Failed to find batch by id: " + id));
-
-        }
-        catch(Exception e){
+            return convertToResponseDTO(batch);
+        } catch (Exception e) {
             throw new RuntimeException("Failed to find batch by id: " + id, e);
         }
     }
@@ -61,8 +65,9 @@ public class BatchService {
     @Transactional
     public Batch createBatch(BatchRequestDTO dto) {
         try {
-            BatchType batchType = batchTypeRepository.findById(dto.getBatchtypeid())
-                    .orElseThrow(() -> new RuntimeException("BatchType not found"));
+            // Get the parent batch type (either BatchType or BatchTypeWithoutBox)
+            ParentBatchType parentBatchType = parentBatchTypeRepository.findById(dto.getEffectiveBatchTypeId())
+                    .orElseThrow(() -> new RuntimeException("ParentBatchType not found"));
 
             Box box = boxRepository.findById(dto.getInventoryid())
                     .orElseThrow(() -> new RuntimeException("Box not found"));
@@ -74,7 +79,7 @@ public class BatchService {
 
             int quantityToProduce = dto.getQuantity();
 
-            ProductTypeVolume ptv = batchType.getProductTypeVolume();
+            ProductTypeVolume ptv = parentBatchType.getProductTypeVolume();
             ProductType productType = ptv.getProducttype();
 
             // Calculate total volume required
@@ -103,7 +108,6 @@ public class BatchService {
             // Fetch actual inventory entities for bottle and label by type IDs
             Bottle bottle = bottleRepository.findByBottleType_Bottleid(bottletype.getBottleid())
                     .orElseThrow(() -> new RuntimeException("Bottle inventory not found for given type"));
-
 
             Label label = labelRepository.findByLabeltype_LabelId(labeltype.getLabelid())
                     .orElseThrow(() -> new RuntimeException("Label inventory not found"));
@@ -135,7 +139,7 @@ public class BatchService {
 
             // Create batch entity
             Batch batch = new Batch();
-            batch.setBatchtype(batchType);
+            batch.setParentBatchType(parentBatchType);
             batch.setBatchdate(dto.getBatchdate() != null ? dto.getBatchdate() : LocalDateTime.now());
             batch.setBox(box);
             batch.setWarehousemanager(wm);
@@ -154,8 +158,8 @@ public class BatchService {
     @Transactional
     public Batch createByProdid(Long prodid, BatchRequestDTO dto) {
         try {
-            BatchType batchType = batchTypeRepository.findById(dto.getBatchtypeid())
-                    .orElseThrow(() -> new RuntimeException("BatchType not found"));
+            ParentBatchType parentBatchType = parentBatchTypeRepository.findById(dto.getEffectiveBatchTypeId())
+                    .orElseThrow(() -> new RuntimeException("ParentBatchType not found"));
 
             Box box = boxRepository.findById(dto.getInventoryid())
                     .orElseThrow(() -> new RuntimeException("Box not found"));
@@ -166,7 +170,7 @@ public class BatchService {
             BoxType boxType = box.getBoxType();
             int quantityToProduce = dto.getQuantity();
 
-            ProductTypeVolume ptv = batchType.getProductTypeVolume();
+            ProductTypeVolume ptv = parentBatchType.getProductTypeVolume();
             ProductType productType = ptv.getProducttype();
 
             long volumePerUnit = ptv.getVolume() != null ? ptv.getVolume() : 0L;
@@ -218,7 +222,7 @@ public class BatchService {
             productionRepository.save(production);
 
             Batch batch = new Batch();
-            batch.setBatchtype(batchType);
+            batch.setParentBatchType(parentBatchType);
             batch.setBatchdate(dto.getBatchdate() != null ? dto.getBatchdate() : LocalDateTime.now());
             batch.setBox(box);
             batch.setWarehousemanager(wm);
@@ -246,6 +250,48 @@ public class BatchService {
         }
     }
 
+    // Conversion method to DTO
+    private BatchResponseDTO convertToResponseDTO(Batch batch) {
+        BatchResponseDTO dto = new BatchResponseDTO();
 
+        dto.setBatchid(batch.getBatchid());
+        dto.setParentBatchTypeId(batch.getParentBatchType().getId());
+        dto.setUniqueBatchCode(batch.getParentBatchType().getUniqueBatchCode());
+        dto.setBatchtypename(batch.getParentBatchType().getBatchtypename());
+        dto.setBatchdate(batch.getBatchdate());
 
+        // For backward compatibility
+        if (batch.getBatchtype() != null) {
+            dto.setBatchtypeid(batch.getBatchtype().getBatchtypeid());
+        }
+
+        if (batch.getBox() != null) {
+            dto.setInventoryid(batch.getBox().getInventoryid());
+            if (batch.getBox().getBoxType() != null) {
+                dto.setBoxTypeName(batch.getBox().getBoxType().getName());
+            }
+        }
+
+        if (batch.getWarehousemanager() != null) {
+            dto.setWmid(batch.getWarehousemanager().getWmid());
+            if (batch.getWarehousemanager().getUser() != null) {
+                String fullName = batch.getWarehousemanager().getUser().getFname();
+                if (batch.getWarehousemanager().getUser().getLname() != null) {
+                    fullName += " " + batch.getWarehousemanager().getUser().getLname();
+                }
+                dto.setWarehouseManagerName(fullName);
+            }
+        }
+
+        dto.setQuantity(batch.getQuantity());
+
+        if (batch.getProduction() != null) {
+            dto.setProdid(batch.getProduction().getProdid());
+            dto.setProductionStatus(batch.getProduction().getStatus());
+        }
+
+        dto.setStatus(batch.getStatus());
+
+        return dto;
+    }
 }

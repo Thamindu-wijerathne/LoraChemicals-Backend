@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.lorachemicals.Backend.dto.BatchInventoryWithoutBoxRequestDTO;
 import com.lorachemicals.Backend.model.BatchInventoryWithoutBox;
 import com.lorachemicals.Backend.model.BatchTypeWithoutBox;
+import com.lorachemicals.Backend.model.ParentBatchType;
 import com.lorachemicals.Backend.model.ProductTypeVolume;
 import com.lorachemicals.Backend.repository.BatchInventoryWithoutBoxRepository;
 import com.lorachemicals.Backend.repository.BatchTypeWithoutBoxRepository;
@@ -52,7 +53,12 @@ public class BatchInventoryWithoutBoxService {
 
             List<BatchTypeWithoutBox> batchTypes = batchTypeWithoutBoxRepository.findByProductTypeVolume(ptv);
 
-            return batchInventoryWithoutBoxRepository.findByBatchTypeWithoutBoxIn(batchTypes);
+            // Convert BatchTypeWithoutBox to ParentBatchType for the query
+            List<ParentBatchType> parentBatchTypes = batchTypes.stream()
+                    .map(bt -> (ParentBatchType) bt)
+                    .collect(java.util.stream.Collectors.toList());
+
+            return batchInventoryWithoutBoxRepository.findByParentBatchTypeIn(parentBatchTypes);
         } catch (Exception e) {
             throw new RuntimeException("Failed to fetch batch inventories without box by PTV ID: " + e.getMessage(), e);
         }

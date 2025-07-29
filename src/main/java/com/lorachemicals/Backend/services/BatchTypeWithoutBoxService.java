@@ -21,7 +21,6 @@ public class BatchTypeWithoutBoxService {
     @Autowired
     private BatchTypeWithoutBoxRepository batchTypeWithoutBoxRepository;
 
-
     @Autowired
     private ProductTypeVolumeRepository productTypeVolumeRepository;
 
@@ -88,6 +87,7 @@ public class BatchTypeWithoutBoxService {
         BatchTypeWithoutBoxResponseDTO dto = new BatchTypeWithoutBoxResponseDTO();
 
         dto.setBatchtypewithoutboxid(bt.getBatchtypewithoutboxid());
+        dto.setUniqueBatchCode(bt.getUniqueBatchCode());
         dto.setPtvid(bt.getProductTypeVolume().getPtvid());
         dto.setProducttypename(bt.getProductTypeVolume().getName());
         dto.setBatchtypename(bt.getBatchtypename());

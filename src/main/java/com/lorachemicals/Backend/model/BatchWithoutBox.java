@@ -27,8 +27,8 @@ public class BatchWithoutBox {
     private Long batchwithoutboxid;
 
     @ManyToOne
-    @JoinColumn(name = "batchtypewithoutboxid", nullable = false)
-    private BatchTypeWithoutBox batchtypewithoutbox;
+    @JoinColumn(name = "parent_batch_type_id", nullable = false)
+    private ParentBatchType parentBatchType;
 
     private LocalDateTime batchdate;
 
@@ -43,4 +43,16 @@ public class BatchWithoutBox {
     private String status;
 
     private int quantity;
+
+    // Backward compatibility methods
+    public BatchTypeWithoutBox getBatchtypewithoutbox() {
+        if (parentBatchType instanceof BatchTypeWithoutBox) {
+            return (BatchTypeWithoutBox) parentBatchType;
+        }
+        return null;
+    }
+
+    public void setBatchtypewithoutbox(BatchTypeWithoutBox batchTypeWithoutBox) {
+        this.parentBatchType = batchTypeWithoutBox;
+    }
 }

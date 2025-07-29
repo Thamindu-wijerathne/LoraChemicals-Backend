@@ -2,8 +2,10 @@ package com.lorachemicals.Backend.services;
 
 import com.lorachemicals.Backend.model.BatchInventory;
 import com.lorachemicals.Backend.model.BatchType;
+import com.lorachemicals.Backend.model.ParentBatchType;
 import com.lorachemicals.Backend.repository.BatchInventoryRepository;
 import com.lorachemicals.Backend.repository.BatchTypeRepository;
+import com.lorachemicals.Backend.repository.ParentBatchTypeRepository;
 import com.lorachemicals.Backend.dto.BatchInventoryRequestDTO;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,9 @@ public class BatchInventoryService {
 
     @Autowired
     private BatchTypeRepository batchTypeRepository;
+
+    @Autowired
+    private ParentBatchTypeRepository parentBatchTypeRepository;
 
     // Get all batch inventories
     public List<BatchInventory> getAllBatchInventories() {
@@ -42,11 +47,11 @@ public class BatchInventoryService {
     // Create new batch inventory
     public BatchInventory createBatchInventory(BatchInventoryRequestDTO dto) {
         try {
-            BatchType batchType = batchTypeRepository.findById(dto.getBatchtypeid())
-                    .orElseThrow(() -> new RuntimeException("Batch type not found"));
+            ParentBatchType parentBatchType = parentBatchTypeRepository.findById(dto.getEffectiveBatchTypeId())
+                    .orElseThrow(() -> new RuntimeException("Parent batch type not found"));
 
             BatchInventory batchInventory = new BatchInventory();
-            batchInventory.setBatchType(batchType);
+            batchInventory.setParentBatchType(parentBatchType);
             batchInventory.setBatch_quantity(dto.getBatch_quantity());
             batchInventory.setLocation(dto.getLocation());
 

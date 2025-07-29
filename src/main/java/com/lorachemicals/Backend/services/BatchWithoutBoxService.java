@@ -7,12 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.lorachemicals.Backend.dto.BatchWithoutBoxRequestDTO;
+import com.lorachemicals.Backend.dto.BatchWithoutBoxResponseDTO;
 import com.lorachemicals.Backend.model.BatchTypeWithoutBox;
 import com.lorachemicals.Backend.model.BatchWithoutBox;
 import com.lorachemicals.Backend.model.Bottle;
 import com.lorachemicals.Backend.model.Bottletype;
 import com.lorachemicals.Backend.model.Label;
 import com.lorachemicals.Backend.model.Labeltype;
+import com.lorachemicals.Backend.model.ParentBatchType;
 import com.lorachemicals.Backend.model.ProductType;
 import com.lorachemicals.Backend.model.ProductTypeVolume;
 import com.lorachemicals.Backend.model.Production;
@@ -21,6 +23,7 @@ import com.lorachemicals.Backend.repository.BatchTypeWithoutBoxRepository;
 import com.lorachemicals.Backend.repository.BatchWithoutBoxRepository;
 import com.lorachemicals.Backend.repository.BottleRepository;
 import com.lorachemicals.Backend.repository.LabelRepository;
+import com.lorachemicals.Backend.repository.ParentBatchTypeRepository;
 import com.lorachemicals.Backend.repository.ProductionRepository;
 import com.lorachemicals.Backend.repository.WarehouseManagerRepository;
 
@@ -36,6 +39,9 @@ public class BatchWithoutBoxService {
     BatchTypeWithoutBoxRepository batchTypeWithoutBoxRepository;
 
     @Autowired
+    ParentBatchTypeRepository parentBatchTypeRepository;
+
+    @Autowired
     WarehouseManagerRepository warehouseManagerRepository;
 
     @Autowired
@@ -48,20 +54,23 @@ public class BatchWithoutBoxService {
     LabelRepository labelRepository;
 
     //get all
-    public List<BatchWithoutBox> getAllBatchesWithoutBox() {
+    public List<BatchWithoutBoxResponseDTO> getAllBatchesWithoutBox() {
         try {
-            return batchWithoutBoxRepository.findAll();
+            return batchWithoutBoxRepository.findAll()
+                    .stream()
+                    .map(this::convertToResponseDTO)
+                    .collect(java.util.stream.Collectors.toList());
         } catch (Exception e) {
             throw new RuntimeException("Failed to find all batches without box: " + e.getMessage(), e);
         }
     }
 
     //get by id
-    public BatchWithoutBox getBatchWithoutBoxById(Long id) {
+    public BatchWithoutBoxResponseDTO getBatchWithoutBoxById(Long id) {
         try {
-            return batchWithoutBoxRepository.findById(id)
+            BatchWithoutBox batch = batchWithoutBoxRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Failed to find batch without box by id: " + id));
-
+            return convertToResponseDTO(batch);
         } catch (Exception e) {
             throw new RuntimeException("Failed to find batch without box by id: " + id, e);
         }
@@ -71,8 +80,8 @@ public class BatchWithoutBoxService {
     @Transactional
     public BatchWithoutBox createBatchWithoutBox(BatchWithoutBoxRequestDTO dto) {
         try {
-            BatchTypeWithoutBox batchTypeWithoutBox = batchTypeWithoutBoxRepository.findById(dto.getBatchtypewithoutboxid())
-                    .orElseThrow(() -> new RuntimeException("BatchTypeWithoutBox not found"));
+            ParentBatchType parentBatchType = parentBatchTypeRepository.findById(dto.getEffectiveBatchTypeId())
+                    .orElseThrow(() -> new RuntimeException("ParentBatchType not found"));
 
             WarehouseManager wm = warehouseManagerRepository.findById(dto.getWmid())
                     .orElseThrow(() -> new RuntimeException("Warehouse Manager not found"));
@@ -82,7 +91,7 @@ public class BatchWithoutBoxService {
 
             int quantityToProduce = dto.getQuantity();
 
-            ProductTypeVolume ptv = batchTypeWithoutBox.getProductTypeVolume();
+            ProductTypeVolume ptv = parentBatchType.getProductTypeVolume();
             ProductType productType = ptv.getProducttype();
 
             // Calculate total volume required (without box calculations)
@@ -135,7 +144,7 @@ public class BatchWithoutBoxService {
 
             // Create batch without box
             BatchWithoutBox batchWithoutBox = new BatchWithoutBox();
-            batchWithoutBox.setBatchtypewithoutbox(batchTypeWithoutBox);
+            batchWithoutBox.setParentBatchType(parentBatchType);
             batchWithoutBox.setBatchdate(dto.getBatchdate() != null ? dto.getBatchdate() : LocalDateTime.now());
             batchWithoutBox.setWarehousemanager(wm);
             batchWithoutBox.setProduction(production);
@@ -215,5 +224,43 @@ public class BatchWithoutBoxService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to delete batch without box: " + e.getMessage(), e);
         }
+    }
+
+    // Conversion method to DTO
+    private BatchWithoutBoxResponseDTO convertToResponseDTO(BatchWithoutBox batch) {
+        BatchWithoutBoxResponseDTO dto = new BatchWithoutBoxResponseDTO();
+
+        dto.setBatchwithoutboxid(batch.getBatchwithoutboxid());
+        dto.setParentBatchTypeId(batch.getParentBatchType().getId());
+        dto.setUniqueBatchCode(batch.getParentBatchType().getUniqueBatchCode());
+        dto.setBatchtypename(batch.getParentBatchType().getBatchtypename());
+        dto.setBatchdate(batch.getBatchdate());
+
+        // For backward compatibility
+        if (batch.getBatchtypewithoutbox() != null) {
+            dto.setBatchtypewithoutboxid(batch.getBatchtypewithoutbox().getBatchtypewithoutboxid());
+        }
+
+        if (batch.getWarehousemanager() != null) {
+            dto.setWmid(batch.getWarehousemanager().getWmid());
+            if (batch.getWarehousemanager().getUser() != null) {
+                String fullName = batch.getWarehousemanager().getUser().getFname();
+                if (batch.getWarehousemanager().getUser().getLname() != null) {
+                    fullName += " " + batch.getWarehousemanager().getUser().getLname();
+                }
+                dto.setWarehouseManagerName(fullName);
+            }
+        }
+
+        dto.setQuantity(batch.getQuantity());
+
+        if (batch.getProduction() != null) {
+            dto.setProdid(batch.getProduction().getProdid());
+            dto.setProductionStatus(batch.getProduction().getStatus());
+        }
+
+        dto.setStatus(batch.getStatus());
+
+        return dto;
     }
 }

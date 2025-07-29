@@ -8,6 +8,7 @@ import lombok.Setter;
 public class BatchTypeWithoutBoxResponseDTO {
 
     private Long batchtypewithoutboxid;
+    private String uniqueBatchCode;
     private Long ptvid;
     private String producttypename;
     private String batchtypename;

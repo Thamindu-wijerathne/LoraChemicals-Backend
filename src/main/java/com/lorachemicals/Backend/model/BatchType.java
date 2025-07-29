@@ -8,21 +8,23 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "batch_type")
-public class BatchType {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long batchtypeid;
-
-    @ManyToOne
-    @JoinColumn(name = "ptvid", nullable = false)
-    private ProductTypeVolume productTypeVolume;
+@PrimaryKeyJoinColumn(name = "id")
+public class BatchType extends ParentBatchType {
 
     @ManyToOne
     @JoinColumn(name = "boxid", nullable = false)
     private BoxType boxType;
 
-    private String batchtypename;
+    public BatchType() {
+    }
 
+    // Override getId to return the parent's id
+    public Long getBatchtypeid() {
+        return super.getId();
+    }
 
-    public BatchType() {}
+    // Setter for compatibility
+    public void setBatchtypeid(Long id) {
+        super.setId(id);
+    }
 }

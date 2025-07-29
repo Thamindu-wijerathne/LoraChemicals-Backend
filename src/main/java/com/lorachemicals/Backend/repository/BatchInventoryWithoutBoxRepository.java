@@ -5,9 +5,9 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.lorachemicals.Backend.model.BatchInventoryWithoutBox;
-import com.lorachemicals.Backend.model.BatchTypeWithoutBox;
+import com.lorachemicals.Backend.model.ParentBatchType;
 
 public interface BatchInventoryWithoutBoxRepository extends JpaRepository<BatchInventoryWithoutBox, Long> {
 
-    List<BatchInventoryWithoutBox> findByBatchTypeWithoutBoxIn(List<BatchTypeWithoutBox> batchTypes);
+    List<BatchInventoryWithoutBox> findByParentBatchTypeIn(List<ParentBatchType> batchTypes);
 }

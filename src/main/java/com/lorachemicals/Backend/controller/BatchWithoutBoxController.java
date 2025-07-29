@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lorachemicals.Backend.dto.BatchWithoutBoxRequestDTO;
+import com.lorachemicals.Backend.dto.BatchWithoutBoxResponseDTO;
 import com.lorachemicals.Backend.model.BatchWithoutBox;
 import com.lorachemicals.Backend.services.BatchWithoutBoxService;
 import com.lorachemicals.Backend.util.AccessControlUtil;
@@ -33,7 +34,7 @@ public class BatchWithoutBoxController {
         AccessControlUtil.checkAccess(request, "warehouse");
 
         try {
-            List<BatchWithoutBox> batches = batchWithoutBoxService.getAllBatchesWithoutBox();
+            List<BatchWithoutBoxResponseDTO> batches = batchWithoutBoxService.getAllBatchesWithoutBox();
             return new ResponseEntity<>(batches, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -44,7 +45,7 @@ public class BatchWithoutBoxController {
     public ResponseEntity<?> getBatchWithoutBoxById(HttpServletRequest request, @PathVariable long id) {
         AccessControlUtil.checkAccess(request, "warehouse");
         try {
-            BatchWithoutBox batch = batchWithoutBoxService.getBatchWithoutBoxById(id);
+            BatchWithoutBoxResponseDTO batch = batchWithoutBoxService.getBatchWithoutBoxById(id);
             return new ResponseEntity<>(batch, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
