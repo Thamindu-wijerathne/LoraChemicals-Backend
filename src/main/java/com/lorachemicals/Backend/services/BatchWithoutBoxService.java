@@ -1,7 +1,9 @@
 package com.lorachemicals.Backend.services;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -145,11 +147,13 @@ public class BatchWithoutBoxService {
             // Create batch without box
             BatchWithoutBox batchWithoutBox = new BatchWithoutBox();
             batchWithoutBox.setParentBatchType(parentBatchType);
-            batchWithoutBox.setBatchdate(dto.getBatchdate() != null ? dto.getBatchdate() : LocalDateTime.now());
+            LocalDateTime batchDate = dto.getBatchdate() != null ? dto.getBatchdate() : LocalDateTime.now();
+            batchWithoutBox.setBatchdate(batchDate);
             batchWithoutBox.setWarehousemanager(wm);
             batchWithoutBox.setProduction(production);
             batchWithoutBox.setStatus(dto.getStatus() != null ? dto.getStatus() : "pending");
             batchWithoutBox.setQuantity(quantityToProduce);
+            batchWithoutBox.setBatchcode(generateBatchCodeWithoutBox(batchDate));
 
             return batchWithoutBoxRepository.save(batchWithoutBox);
 
@@ -231,6 +235,7 @@ public class BatchWithoutBoxService {
         BatchWithoutBoxResponseDTO dto = new BatchWithoutBoxResponseDTO();
 
         dto.setBatchwithoutboxid(batch.getBatchwithoutboxid());
+        dto.setBatchcode(batch.getBatchcode());
         dto.setParentBatchTypeId(batch.getParentBatchType().getId());
         dto.setUniqueBatchCode(batch.getParentBatchType().getUniqueBatchCode());
         dto.setBatchtypename(batch.getParentBatchType().getBatchtypename());
@@ -257,10 +262,20 @@ public class BatchWithoutBoxService {
         if (batch.getProduction() != null) {
             dto.setProdid(batch.getProduction().getProdid());
             dto.setProductionStatus(batch.getProduction().getStatus());
+            dto.setExpiredate(batch.getProduction().getExpiredate());
         }
 
         dto.setStatus(batch.getStatus());
 
         return dto;
+    }
+
+    // Generate unique batch code for BatchWithoutBox
+    private String generateBatchCodeWithoutBox(LocalDateTime batchDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
+        String dateStr = batchDate.format(formatter);
+        Random random = new Random();
+        int randomNum = 1000 + random.nextInt(9000); // 4-digit random number
+        return "BTW" + dateStr + randomNum;
     }
 }

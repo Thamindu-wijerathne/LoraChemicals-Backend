@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Random;
 
 @Service
 public class BatchService {
@@ -140,12 +142,14 @@ public class BatchService {
             // Create batch entity
             Batch batch = new Batch();
             batch.setParentBatchType(parentBatchType);
-            batch.setBatchdate(dto.getBatchdate() != null ? dto.getBatchdate() : LocalDateTime.now());
+            LocalDateTime batchDate = dto.getBatchdate() != null ? dto.getBatchdate() : LocalDateTime.now();
+            batch.setBatchdate(batchDate);
             batch.setBox(box);
             batch.setWarehousemanager(wm);
             batch.setQuantity(quantityToProduce);
             batch.setProduction(production);
             batch.setStatus("pending");
+            batch.setBatchcode(generateBatchCode(batchDate));
 
             return batchRepository.save(batch);
 
@@ -223,12 +227,14 @@ public class BatchService {
 
             Batch batch = new Batch();
             batch.setParentBatchType(parentBatchType);
-            batch.setBatchdate(dto.getBatchdate() != null ? dto.getBatchdate() : LocalDateTime.now());
+            LocalDateTime batchDate = dto.getBatchdate() != null ? dto.getBatchdate() : LocalDateTime.now();
+            batch.setBatchdate(batchDate);
             batch.setBox(box);
             batch.setWarehousemanager(wm);
             batch.setQuantity(quantityToProduce);
             batch.setProduction(production);
             batch.setStatus("pending");
+            batch.setBatchcode(generateBatchCode(batchDate));
 
             return batchRepository.save(batch);
 
@@ -250,11 +256,21 @@ public class BatchService {
         }
     }
 
+    // Generate unique batch code for Batch (with box)
+    private String generateBatchCode(LocalDateTime batchDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
+        String dateStr = batchDate.format(formatter);
+        Random random = new Random();
+        int randomNum = 1000 + random.nextInt(9000); // 4-digit random number
+        return "BT" + dateStr + randomNum;
+    }
+
     // Conversion method to DTO
     private BatchResponseDTO convertToResponseDTO(Batch batch) {
         BatchResponseDTO dto = new BatchResponseDTO();
 
         dto.setBatchid(batch.getBatchid());
+        dto.setBatchcode(batch.getBatchcode());
         dto.setParentBatchTypeId(batch.getParentBatchType().getId());
         dto.setUniqueBatchCode(batch.getParentBatchType().getUniqueBatchCode());
         dto.setBatchtypename(batch.getParentBatchType().getBatchtypename());
@@ -288,6 +304,7 @@ public class BatchService {
         if (batch.getProduction() != null) {
             dto.setProdid(batch.getProduction().getProdid());
             dto.setProductionStatus(batch.getProduction().getStatus());
+            dto.setExpiredate(batch.getProduction().getExpiredate());
         }
 
         dto.setStatus(batch.getStatus());

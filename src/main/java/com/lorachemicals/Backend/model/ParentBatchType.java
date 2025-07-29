@@ -39,7 +39,7 @@ public class ParentBatchType {
     private void generateUniqueBatchCode() {
         // Generate unique batch code: BATCH + 5 random numbers
         int randomNumber = (int) (Math.random() * 100000); // 0 to 99999
-        this.uniqueBatchCode = "BATCH" + String.format("%05d", randomNumber);
+        this.uniqueBatchCode = "BATCHTYPE" + String.format("%05d", randomNumber);
     }
 
     public ParentBatchType() {

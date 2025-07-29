@@ -42,6 +42,9 @@ public class Batch {
 
     private int quantity;
 
+    @Column(unique = true, nullable = false)
+    private String batchcode;
+
     // Backward compatibility methods
     public BatchType getBatchtype() {
         if (parentBatchType instanceof BatchType) {

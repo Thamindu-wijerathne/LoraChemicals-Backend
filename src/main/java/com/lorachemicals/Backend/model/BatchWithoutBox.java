@@ -2,6 +2,7 @@ package com.lorachemicals.Backend.model;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -43,6 +44,9 @@ public class BatchWithoutBox {
     private String status;
 
     private int quantity;
+
+    @Column(unique = true, nullable = false)
+    private String batchcode;
 
     // Backward compatibility methods
     public BatchTypeWithoutBox getBatchtypewithoutbox() {
