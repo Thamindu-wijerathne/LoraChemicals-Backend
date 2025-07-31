@@ -27,8 +27,9 @@ public class Vehicle {
     private String image;
     private Long seats;
     private String date;
+    private String status;
 
-    public Vehicle(String vehicleNo, String vehicleType, String capacity, String description, String image, Long seats, String date) {
+    public Vehicle(String vehicleNo, String vehicleType, String capacity, String description, String image, Long seats, String date, String status) {
         this.vehicleNo = vehicleNo;
         this.vehicleType = vehicleType;
         this.capacity = capacity;
@@ -36,6 +37,7 @@ public class Vehicle {
         this.image = image;
         this.seats = seats;
         this.date = date;
+        this.status = status;
     }
 
 

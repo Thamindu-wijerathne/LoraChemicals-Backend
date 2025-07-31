@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/vehicles")
@@ -65,6 +66,20 @@ public class VehicleController {
         } catch (Exception e) {
             logger.error("Internal error: {}", e.getMessage(), e);
             return new ResponseEntity<>("Internal server error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/status/{id}")
+    public ResponseEntity<?> updateVehicleStatus(@PathVariable Long id, HttpServletRequest request, @RequestBody VehicleRequestDTO vehicleRequestDTO) {
+        AccessControlUtil.checkAccess(request, "admin");
+        logger.info("PUT /Update Vehicle status Api Called {}", vehicleRequestDTO);
+        try {
+            logger.info("PUT /Update Vehicle status Api Called");
+            vehicleService.updateVehicleStatus(id, vehicleRequestDTO.getStatus());
+            return ResponseEntity.ok("Vehicle status updated successfully for id: " + id);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Vehicle cannot update with id: " + id);
         }
     }
 
