@@ -6,6 +6,7 @@ import com.lorachemicals.Backend.model.Bill;
 import com.lorachemicals.Backend.services.BillService;
 import com.lorachemicals.Backend.util.AccessControlUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.aot.generate.AccessControl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -58,6 +59,20 @@ public class BillController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Unexpected error: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/get-total-orders")
+    public ResponseEntity<?> getOrderDistrictCount(HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "admin");
+        try {
+            List<Bill> bills = billService.getAllBills();
+            List<BillResponseDTO> response = bills.stream()
+                    .map(billService::convertToDTO)
+                    .toList();
+            return ResponseEntity.ok(bills);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error: " + e.getMessage());
         }
     }
 

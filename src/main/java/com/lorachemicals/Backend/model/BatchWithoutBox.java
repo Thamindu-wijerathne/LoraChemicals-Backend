@@ -1,34 +1,37 @@
 package com.lorachemicals.Backend.model;
 
-import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "batch")
-public class Batch {
+@Table(name = "batch_without_box")
+public class BatchWithoutBox {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long batchid;
+    private Long batchwithoutboxid;
 
     @ManyToOne
     @JoinColumn(name = "parent_batch_type_id", nullable = false)
     private ParentBatchType parentBatchType;
 
     private LocalDateTime batchdate;
-
-    @ManyToOne
-    @JoinColumn(name = "inventoryid", nullable = false)
-    private Box box;
 
     @ManyToOne
     @JoinColumn(name = "wmid", nullable = false)
@@ -46,25 +49,14 @@ public class Batch {
     private String batchcode;
 
     // Backward compatibility methods
-    public BatchType getBatchtype() {
-        if (parentBatchType instanceof BatchType) {
-            return (BatchType) parentBatchType;
-        }
-        return null;
-    }
-
-    public void setBatchtype(BatchType batchType) {
-        this.parentBatchType = batchType;
-    }
-
-    public BatchTypeWithoutBox getBatchtypeWithoutBox() {
+    public BatchTypeWithoutBox getBatchtypewithoutbox() {
         if (parentBatchType instanceof BatchTypeWithoutBox) {
             return (BatchTypeWithoutBox) parentBatchType;
         }
         return null;
     }
 
-    public void setBatchtypeWithoutBox(BatchTypeWithoutBox batchTypeWithoutBox) {
+    public void setBatchtypewithoutbox(BatchTypeWithoutBox batchTypeWithoutBox) {
         this.parentBatchType = batchTypeWithoutBox;
     }
 }

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-
 @RestController
 @RequestMapping("/batch")
 public class BatchController {
@@ -25,11 +24,10 @@ public class BatchController {
     public ResponseEntity<?> getAllBatches(HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
 
-        try{
-            List<Batch> batches = batchService.getAllBatches();
+        try {
+            List<BatchResponseDTO> batches = batchService.getAllBatches();
             return new ResponseEntity<>(batches, HttpStatus.OK);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -37,11 +35,10 @@ public class BatchController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getBatchById(HttpServletRequest request, @PathVariable long id) {
         AccessControlUtil.checkAccess(request, "warehouse");
-        try{
-            Batch batch = batchService.getBatchById(id);
+        try {
+            BatchResponseDTO batch = batchService.getBatchById(id);
             return new ResponseEntity<>(batch, HttpStatus.OK);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -60,11 +57,10 @@ public class BatchController {
     @PostMapping("/add/{prodid}")
     public ResponseEntity<?> addBatchByProduction(@PathVariable Long prodid, @RequestBody BatchRequestDTO batchRequestDTO, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
-        try{
+        try {
             Batch batch = batchService.createByProdid(prodid, batchRequestDTO);
             return new ResponseEntity<>(batch, HttpStatus.CREATED);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -72,14 +68,12 @@ public class BatchController {
     @PutMapping("/{batchid}")
     public ResponseEntity<?> updatebatch(@PathVariable Long batchid, @RequestBody BatchRequestDTO batchRequestDTO, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
-        try{
+        try {
             Batch batch = batchService.updatebatch(batchid, batchRequestDTO);
             return new ResponseEntity<>(batch, HttpStatus.CREATED);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
 }

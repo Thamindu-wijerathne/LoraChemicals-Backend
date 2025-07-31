@@ -45,6 +45,7 @@ public class BillService {
         customerBill.setShop_name(data.getShop_name());
         customerBill.setAddress(data.getAddress());
         customerBill.setPhone(data.getPhone());
+        customerBill.setDistrict(data.getDistrict());
         customerBill.setBill(bill);
         customerBill = customerBillRepository.save(customerBill);
 
@@ -70,6 +71,10 @@ public class BillService {
 
     public List<Bill> getSalesrepBill(Long srepId) {
         return billRepository.findBySalesRep_Srepid(srepId);
+    }
+
+    public List<Bill> getAllBills() {
+        return billRepository.findAll();
     }
 
     public BillResponseDTO convertToDTO(Bill bill) {

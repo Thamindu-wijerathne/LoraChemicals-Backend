@@ -10,6 +10,7 @@ public class CustomerBillResponseDTO {
     private String shop_name;
     private String address;
     private String phone;
+    private String district;
     private Long billid;
     private Long salesRepId;
     private String salesRepName;

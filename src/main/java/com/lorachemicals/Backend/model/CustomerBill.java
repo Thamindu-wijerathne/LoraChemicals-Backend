@@ -19,6 +19,8 @@ public class CustomerBill {
 
     private String phone;
 
+    private String district;
+
     @OneToOne
     @JoinColumn(name = "billid", nullable = false, foreignKey = @ForeignKey(name = "fk_customerbill_bill"))
     private Bill bill;

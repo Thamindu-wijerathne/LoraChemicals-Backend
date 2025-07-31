@@ -1,12 +1,17 @@
 package com.lorachemicals.Backend.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Table(
-        name = "batch_inventory",
+        name = "batch_inventory_without_box",
         uniqueConstraints = {
             @UniqueConstraint(columnNames = "parent_batch_type_id")
         }
@@ -15,7 +20,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class BatchInventory extends Inventory {
+public class BatchInventoryWithoutBox extends Inventory {
 
     @ManyToOne
     @JoinColumn(name = "parent_batch_type_id", nullable = false)
@@ -28,17 +33,6 @@ public class BatchInventory extends Inventory {
     }
 
     // Backward compatibility methods
-    public BatchType getBatchType() {
-        if (parentBatchType instanceof BatchType) {
-            return (BatchType) parentBatchType;
-        }
-        return null;
-    }
-
-    public void setBatchType(BatchType batchType) {
-        this.parentBatchType = batchType;
-    }
-
     public BatchTypeWithoutBox getBatchTypeWithoutBox() {
         if (parentBatchType instanceof BatchTypeWithoutBox) {
             return (BatchTypeWithoutBox) parentBatchType;
