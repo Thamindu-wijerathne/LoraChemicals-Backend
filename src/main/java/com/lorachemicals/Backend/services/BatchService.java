@@ -1,14 +1,37 @@
 package com.lorachemicals.Backend.services;
 
-import com.lorachemicals.Backend.dto.BatchRequestDTO;
-import com.lorachemicals.Backend.model.*;
-import com.lorachemicals.Backend.repository.*;
-import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Random;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import com.lorachemicals.Backend.dto.BatchRequestDTO;
+import com.lorachemicals.Backend.dto.BatchResponseDTO;
+import com.lorachemicals.Backend.model.Batch;
+import com.lorachemicals.Backend.model.Bottle;
+import com.lorachemicals.Backend.model.Bottletype;
+import com.lorachemicals.Backend.model.Box;
+import com.lorachemicals.Backend.model.BoxType;
+import com.lorachemicals.Backend.model.Label;
+import com.lorachemicals.Backend.model.Labeltype;
+import com.lorachemicals.Backend.model.ParentBatchType;
+import com.lorachemicals.Backend.model.ProductType;
+import com.lorachemicals.Backend.model.ProductTypeVolume;
+import com.lorachemicals.Backend.model.Production;
+import com.lorachemicals.Backend.model.WarehouseManager;
+import com.lorachemicals.Backend.repository.BatchRepository;
+import com.lorachemicals.Backend.repository.BatchTypeRepository;
+import com.lorachemicals.Backend.repository.BottleRepository;
+import com.lorachemicals.Backend.repository.BoxRepository;
+import com.lorachemicals.Backend.repository.LabelRepository;
+import com.lorachemicals.Backend.repository.ParentBatchTypeRepository;
+import com.lorachemicals.Backend.repository.ProductionRepository;
+import com.lorachemicals.Backend.repository.WarehouseManagerRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class BatchService {
@@ -18,6 +41,9 @@ public class BatchService {
 
     @Autowired
     BatchTypeRepository batchTypeRepository;
+
+    @Autowired
+    ParentBatchTypeRepository parentBatchTypeRepository;
 
     @Autowired
     BoxRepository boxRepository;
@@ -34,25 +60,25 @@ public class BatchService {
     @Autowired
     LabelRepository labelRepository;
 
-
     //get all
-    public List<Batch> getAllBatches() {
-        try{
-            return batchRepository.findAll();
-        }
-        catch(Exception e){
+    public List<BatchResponseDTO> getAllBatches() {
+        try {
+            return batchRepository.findAll()
+                    .stream()
+                    .map(this::convertToResponseDTO)
+                    .collect(java.util.stream.Collectors.toList());
+        } catch (Exception e) {
             throw new RuntimeException("Failed to find all batches: " + e.getMessage(), e);
         }
     }
 
     //get by id
-    public Batch getBatchById(Long id) {
-        try{
-            return batchRepository.findById(id)
+    public BatchResponseDTO getBatchById(Long id) {
+        try {
+            Batch batch = batchRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Failed to find batch by id: " + id));
-
-        }
-        catch(Exception e){
+            return convertToResponseDTO(batch);
+        } catch (Exception e) {
             throw new RuntimeException("Failed to find batch by id: " + id, e);
         }
     }
@@ -61,8 +87,9 @@ public class BatchService {
     @Transactional
     public Batch createBatch(BatchRequestDTO dto) {
         try {
-            BatchType batchType = batchTypeRepository.findById(dto.getBatchtypeid())
-                    .orElseThrow(() -> new RuntimeException("BatchType not found"));
+            // Get the parent batch type (either BatchType or BatchTypeWithoutBox)
+            ParentBatchType parentBatchType = parentBatchTypeRepository.findById(dto.getEffectiveBatchTypeId())
+                    .orElseThrow(() -> new RuntimeException("ParentBatchType not found"));
 
             Box box = boxRepository.findById(dto.getInventoryid())
                     .orElseThrow(() -> new RuntimeException("Box not found"));
@@ -74,7 +101,7 @@ public class BatchService {
 
             int quantityToProduce = dto.getQuantity();
 
-            ProductTypeVolume ptv = batchType.getProductTypeVolume();
+            ProductTypeVolume ptv = parentBatchType.getProductTypeVolume();
             ProductType productType = ptv.getProducttype();
 
             // Calculate total volume required
@@ -103,7 +130,6 @@ public class BatchService {
             // Fetch actual inventory entities for bottle and label by type IDs
             Bottle bottle = bottleRepository.findByBottleType_Bottleid(bottletype.getBottleid())
                     .orElseThrow(() -> new RuntimeException("Bottle inventory not found for given type"));
-
 
             Label label = labelRepository.findByLabeltype_LabelId(labeltype.getLabelid())
                     .orElseThrow(() -> new RuntimeException("Label inventory not found"));
@@ -135,13 +161,15 @@ public class BatchService {
 
             // Create batch entity
             Batch batch = new Batch();
-            batch.setBatchtype(batchType);
-            batch.setBatchdate(dto.getBatchdate() != null ? dto.getBatchdate() : LocalDateTime.now());
+            batch.setParentBatchType(parentBatchType);
+            LocalDateTime batchDate = dto.getBatchdate() != null ? dto.getBatchdate() : LocalDateTime.now();
+            batch.setBatchdate(batchDate);
             batch.setBox(box);
             batch.setWarehousemanager(wm);
             batch.setQuantity(quantityToProduce);
             batch.setProduction(production);
             batch.setStatus("pending");
+            batch.setBatchcode(generateBatchCode(batchDate));
 
             return batchRepository.save(batch);
 
@@ -154,8 +182,8 @@ public class BatchService {
     @Transactional
     public Batch createByProdid(Long prodid, BatchRequestDTO dto) {
         try {
-            BatchType batchType = batchTypeRepository.findById(dto.getBatchtypeid())
-                    .orElseThrow(() -> new RuntimeException("BatchType not found"));
+            ParentBatchType parentBatchType = parentBatchTypeRepository.findById(dto.getEffectiveBatchTypeId())
+                    .orElseThrow(() -> new RuntimeException("ParentBatchType not found"));
 
             Box box = boxRepository.findById(dto.getInventoryid())
                     .orElseThrow(() -> new RuntimeException("Box not found"));
@@ -166,7 +194,7 @@ public class BatchService {
             BoxType boxType = box.getBoxType();
             int quantityToProduce = dto.getQuantity();
 
-            ProductTypeVolume ptv = batchType.getProductTypeVolume();
+            ProductTypeVolume ptv = parentBatchType.getProductTypeVolume();
             ProductType productType = ptv.getProducttype();
 
             long volumePerUnit = ptv.getVolume() != null ? ptv.getVolume() : 0L;
@@ -218,13 +246,15 @@ public class BatchService {
             productionRepository.save(production);
 
             Batch batch = new Batch();
-            batch.setBatchtype(batchType);
-            batch.setBatchdate(dto.getBatchdate() != null ? dto.getBatchdate() : LocalDateTime.now());
+            batch.setParentBatchType(parentBatchType);
+            LocalDateTime batchDate = dto.getBatchdate() != null ? dto.getBatchdate() : LocalDateTime.now();
+            batch.setBatchdate(batchDate);
             batch.setBox(box);
             batch.setWarehousemanager(wm);
             batch.setQuantity(quantityToProduce);
             batch.setProduction(production);
             batch.setStatus("pending");
+            batch.setBatchcode(generateBatchCode(batchDate));
 
             return batchRepository.save(batch);
 
@@ -246,6 +276,59 @@ public class BatchService {
         }
     }
 
+    // Generate unique batch code for Batch (with box)
+    private String generateBatchCode(LocalDateTime batchDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
+        String dateStr = batchDate.format(formatter);
+        Random random = new Random();
+        int randomNum = 1000 + random.nextInt(9000); // 4-digit random number
+        return "BT-" + dateStr + randomNum;
+    }
 
+    // Conversion method to DTO
+    private BatchResponseDTO convertToResponseDTO(Batch batch) {
+        BatchResponseDTO dto = new BatchResponseDTO();
 
+        dto.setBatchid(batch.getBatchid());
+        dto.setBatchcode(batch.getBatchcode());
+        dto.setParentBatchTypeId(batch.getParentBatchType().getId());
+        dto.setUniqueBatchCode(batch.getParentBatchType().getUniqueBatchCode());
+        dto.setBatchtypename(batch.getParentBatchType().getBatchtypename());
+        dto.setBatchdate(batch.getBatchdate());
+
+        // For backward compatibility
+        if (batch.getBatchtype() != null) {
+            dto.setBatchtypeid(batch.getBatchtype().getBatchtypeid());
+        }
+
+        if (batch.getBox() != null) {
+            dto.setInventoryid(batch.getBox().getInventoryid());
+            if (batch.getBox().getBoxType() != null) {
+                dto.setBoxTypeName(batch.getBox().getBoxType().getName());
+            }
+        }
+
+        if (batch.getWarehousemanager() != null) {
+            dto.setWmid(batch.getWarehousemanager().getWmid());
+            if (batch.getWarehousemanager().getUser() != null) {
+                String fullName = batch.getWarehousemanager().getUser().getFname();
+                if (batch.getWarehousemanager().getUser().getLname() != null) {
+                    fullName += " " + batch.getWarehousemanager().getUser().getLname();
+                }
+                dto.setWarehouseManagerName(fullName);
+            }
+        }
+
+        dto.setQuantity(batch.getQuantity());
+
+        if (batch.getProduction() != null) {
+            dto.setProdid(batch.getProduction().getProdid());
+            dto.setProductionStatus(batch.getProduction().getStatus());
+            dto.setExpiredate(batch.getProduction().getExpiredate());
+        }
+
+        dto.setStatus(batch.getStatus());
+
+        return dto;
+    }
 }

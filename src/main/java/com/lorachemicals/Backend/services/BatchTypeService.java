@@ -63,7 +63,7 @@ public class BatchTypeService {
                 .orElseThrow(() -> new RuntimeException("BoxType not found"));
 
         BatchType batchType = new BatchType();
-      batchType.setProductTypeVolume(ptv);
+        batchType.setProductTypeVolume(ptv);
         batchType.setBoxType(box);
         batchType.setBatchtypename(dto.getBatchtypename());
 
@@ -98,6 +98,7 @@ public class BatchTypeService {
         BatchTypeResponseDTO dto = new BatchTypeResponseDTO();
 
         dto.setBatchtypeid(bt.getBatchtypeid());
+        dto.setUniqueBatchCode(bt.getUniqueBatchCode());
 
         dto.setPtvid(bt.getProductTypeVolume().getPtvid());
         dto.setProducttypename(bt.getProductTypeVolume().getName());
