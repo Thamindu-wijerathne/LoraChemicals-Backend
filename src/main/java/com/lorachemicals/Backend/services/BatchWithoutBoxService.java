@@ -276,6 +276,6 @@ public class BatchWithoutBoxService {
         String dateStr = batchDate.format(formatter);
         Random random = new Random();
         int randomNum = 1000 + random.nextInt(9000); // 4-digit random number
-        return "BTW" + dateStr + randomNum;
+        return "BTW-" + dateStr + randomNum;
     }
 }

@@ -1,17 +1,37 @@
 package com.lorachemicals.Backend.services;
 
-import com.lorachemicals.Backend.dto.BatchRequestDTO;
-import com.lorachemicals.Backend.dto.BatchResponseDTO;
-import com.lorachemicals.Backend.model.*;
-import com.lorachemicals.Backend.repository.*;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Random;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.lorachemicals.Backend.dto.BatchRequestDTO;
+import com.lorachemicals.Backend.dto.BatchResponseDTO;
+import com.lorachemicals.Backend.model.Batch;
+import com.lorachemicals.Backend.model.Bottle;
+import com.lorachemicals.Backend.model.Bottletype;
+import com.lorachemicals.Backend.model.Box;
+import com.lorachemicals.Backend.model.BoxType;
+import com.lorachemicals.Backend.model.Label;
+import com.lorachemicals.Backend.model.Labeltype;
+import com.lorachemicals.Backend.model.ParentBatchType;
+import com.lorachemicals.Backend.model.ProductType;
+import com.lorachemicals.Backend.model.ProductTypeVolume;
+import com.lorachemicals.Backend.model.Production;
+import com.lorachemicals.Backend.model.WarehouseManager;
+import com.lorachemicals.Backend.repository.BatchRepository;
+import com.lorachemicals.Backend.repository.BatchTypeRepository;
+import com.lorachemicals.Backend.repository.BottleRepository;
+import com.lorachemicals.Backend.repository.BoxRepository;
+import com.lorachemicals.Backend.repository.LabelRepository;
+import com.lorachemicals.Backend.repository.ParentBatchTypeRepository;
+import com.lorachemicals.Backend.repository.ProductionRepository;
+import com.lorachemicals.Backend.repository.WarehouseManagerRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class BatchService {
@@ -262,7 +282,7 @@ public class BatchService {
         String dateStr = batchDate.format(formatter);
         Random random = new Random();
         int randomNum = 1000 + random.nextInt(9000); // 4-digit random number
-        return "BT" + dateStr + randomNum;
+        return "BT-" + dateStr + randomNum;
     }
 
     // Conversion method to DTO

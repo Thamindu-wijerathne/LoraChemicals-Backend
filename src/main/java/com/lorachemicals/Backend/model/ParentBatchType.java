@@ -1,10 +1,20 @@
 package com.lorachemicals.Backend.model;
 
-import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -39,7 +49,7 @@ public class ParentBatchType {
     private void generateUniqueBatchCode() {
         // Generate unique batch code: BATCH + 5 random numbers
         int randomNumber = (int) (Math.random() * 100000); // 0 to 99999
-        this.uniqueBatchCode = "BATCHTYPE" + String.format("%05d", randomNumber);
+        this.uniqueBatchCode = "BATCHTYPE-" + String.format("%05d", randomNumber);
     }
 
     public ParentBatchType() {
