@@ -123,7 +123,7 @@ public class VehicleController {
     public ResponseEntity<?> getAllVehicles(HttpServletRequest request) {
         try {
             logger.info("GET /Get All Vehicles Api Called");
-            AccessControlUtil.checkAccess(request, "admin");
+            AccessControlUtil.checkAccess(request, "admin", "warehouse");
             List<VehicleResponseDTO> vehicles = vehicleService.getAllVehicles();
             logger.info("GET vehicle data : {}", vehicles);
             return new ResponseEntity<>(vehicles, HttpStatus.OK);

@@ -5,10 +5,7 @@ import com.lorachemicals.Backend.dto.CustomerOrderItemResponseDTO;
 import com.lorachemicals.Backend.dto.CustomerOrderRequestDTO;
 import com.lorachemicals.Backend.dto.CustomerOrderResponseDTO;
 import com.lorachemicals.Backend.model.*;
-import com.lorachemicals.Backend.repository.CustomerOrderItemRepository;
-import com.lorachemicals.Backend.repository.CustomerOrderRepository;
-import com.lorachemicals.Backend.repository.ProductTypeVolumeRepository;
-import com.lorachemicals.Backend.repository.UserRepository;
+import com.lorachemicals.Backend.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +27,9 @@ public class CustomerOrderService {
 
     @Autowired
     private ProductTypeVolumeRepository productTypeVolumeRepository;
+
+    @Autowired
+    private CustomerRepository customerRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -98,11 +98,16 @@ public class CustomerOrderService {
                 ProductType productType = ptv.getProductType();
 
                 itemDTO.setPtvid(ptv.getPtvid());
+                itemDTO.setName(ptv.getName());
                 itemDTO.setQuantity(item.getQuantity().intValue());
+                itemDTO.setUnitPrice(ptv.getUnitPrice());
                 itemDTO.setProductTotal(item.getProductTotal());
-
                 itemDTO.setImage(ptv.getImage());
                 itemDTO.setProductTypeName(productType != null ? productType.getName() : null);
+                itemDTO.setBottleTypeName(ptv.getBottletype() != null ? ptv.getBottletype().getName() : null);
+                itemDTO.setLabelTypeName(ptv.getLabeltype() != null ? ptv.getLabeltype().getName() : null);
+                itemDTO.setVolume(ptv.getVolume());
+
 
                 return itemDTO;
             }).collect(Collectors.toList());
@@ -125,6 +130,15 @@ public class CustomerOrderService {
             dto.setCustomerId(order.getUser().getId());
             dto.setCustomerName(order.getUser().getName());
 
+            Customer customer = customerRepository.findByUserId(order.getUser().getId());
+
+            if (customer != null && customer.getRoute() != null) {
+                dto.setRoute(customer.getRoute().getDistrict()); // assuming 'route' in DTO is a String
+            } else {
+                dto.setRoute("N/A"); // or null, as fallback
+            }
+
+
             // Map items (ptvid, quantity, productTotal only)
             List<CustomerOrderItemResponseDTO> itemDTOs = order.getOrderItems().stream().map(item -> {
                 CustomerOrderItemResponseDTO itemDTO = new CustomerOrderItemResponseDTO();
@@ -133,11 +147,15 @@ public class CustomerOrderService {
                 ProductType productType = ptv.getProductType();
 
                 itemDTO.setPtvid(ptv.getPtvid());
+                itemDTO.setName(ptv.getName());
                 itemDTO.setQuantity(item.getQuantity().intValue());
+                itemDTO.setUnitPrice(ptv.getUnitPrice());
                 itemDTO.setProductTotal(item.getProductTotal());
-
                 itemDTO.setImage(ptv.getImage());
                 itemDTO.setProductTypeName(productType != null ? productType.getName() : null);
+                itemDTO.setBottleTypeName(ptv.getBottletype() != null ? ptv.getBottletype().getName() : null);
+                itemDTO.setLabelTypeName(ptv.getLabeltype() != null ? ptv.getLabeltype().getName() : null);
+                itemDTO.setVolume(ptv.getVolume());
 
                 return itemDTO;
             }).collect(Collectors.toList());

@@ -55,4 +55,6 @@ public class ProductTypeVolume {
     public ProductType getProductType() {
         return productType;
     }
+
+    public Long getVolume() { return this.volume; }
 }
