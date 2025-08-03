@@ -1,5 +1,10 @@
 package com.lorachemicals.Backend.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class UserResponseDTO {
     private final Long id;
     private final String fname;
@@ -10,9 +15,10 @@ public class UserResponseDTO {
     private final String phone;
     private final String nic;
     private String password;
+    private String status;
 
     // Constructor
-    public UserResponseDTO(Long id, String fname, String lname, String email, String role, String address, String phone,String nic) {
+    public UserResponseDTO(Long id, String fname, String lname, String email, String role, String address, String phone,String nic, String status) {
         this.id = id;
         this.fname = fname;
         this.lname = lname;
@@ -21,6 +27,7 @@ public class UserResponseDTO {
         this.address = address;
         this.phone = phone;
         this.nic = nic;
+        this.status = status;
     }
 
     // Getters
@@ -43,5 +50,7 @@ public class UserResponseDTO {
     public String getNic() { return nic; }
 
     public String getPassword() { return password; }
+
+    public String getStatus() { return status; }
 
 }

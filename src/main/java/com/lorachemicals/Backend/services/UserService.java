@@ -42,6 +42,7 @@ public class UserService {
             existingUser.setPhone(updatedUser.getPhone());
             existingUser.setAddress(updatedUser.getAddress());
             existingUser.setNic(updatedUser.getNic());
+            existingUser.setStatus(updatedUser.getStatus());
 
             // Only update password if it's not null or empty
             if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {

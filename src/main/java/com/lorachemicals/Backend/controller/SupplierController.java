@@ -1,4 +1,70 @@
-package com.lorachemicals.Backend.controller;
+//package com.lorachemicals.Backend.controller;
+//
+//import com.lorachemicals.Backend.model.Supplier;
+//import com.lorachemicals.Backend.services.SupplierService;
+//import com.lorachemicals.Backend.util.AccessControlUtil;
+//import jakarta.servlet.http.HttpServletRequest;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.http.ResponseEntity;
+//import org.springframework.http.HttpStatus;
+//import org.springframework.web.bind.annotation.*;
+//
+//import java.util.List;
+//
+//@RestController
+//@RequestMapping("/suppliers")
+//public class SupplierController {
+//
+//    private final SupplierService supplierService;
+//
+//    @Autowired
+//    public SupplierController(SupplierService supplierService) {
+//        this.supplierService = supplierService;
+//    }
+//
+//    // GET: Get all suppliers
+//    @GetMapping("/all")
+//    public ResponseEntity<List<Supplier>> getAllSuppliers(HttpServletRequest request) {
+//        AccessControlUtil.checkAccess(request, "warehouse");
+//        return ResponseEntity.ok(supplierService.getAllSuppliers());
+//    }
+//
+//    // POST: Add new supplier
+//    @PostMapping("/add")
+//    public ResponseEntity<Supplier> addSupplier(@RequestBody Supplier supplier, HttpServletRequest request) {
+//        AccessControlUtil.checkAccess(request, "warehouse");
+//        Supplier saved = supplierService.addSupplier(supplier);
+//        return ResponseEntity.ok(saved);
+//    }
+//
+//    // PUT: Update supplier by ID
+//    @PutMapping("/update/{id}")
+//    public ResponseEntity<?> updateSupplier(@PathVariable Long id, @RequestBody Supplier supplier, HttpServletRequest request) {
+//        AccessControlUtil.checkAccess(request, "warehouse");
+//
+//        Supplier updated = supplierService.updateSupplier(id, supplier);
+//        if (updated != null) {
+//            return ResponseEntity.ok(updated);
+//        } else {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Supplier not found");
+//        }
+//    }
+//
+//    // DELETE: Delete supplier by ID
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<?> deleteSupplier(@PathVariable Long id, HttpServletRequest request) {
+//        AccessControlUtil.checkAccess(request, "warehouse");
+//
+//        boolean deleted = supplierService.deleteSupplier(id);
+//        if (deleted) {
+//            return ResponseEntity.ok("Supplier deleted successfully");
+//        } else {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Supplier not found");
+//        }
+//    }
+//}
+
+        package com.lorachemicals.Backend.controller;
 
 import com.lorachemicals.Backend.dto.SupplierDTO;
 import com.lorachemicals.Backend.model.Supplier;
@@ -10,7 +76,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+        import java.util.List;
 
 @RestController
 @RequestMapping("/suppliers")
@@ -26,7 +92,7 @@ public class SupplierController {
     // GET: Get all suppliers
     @GetMapping("/all")
     public ResponseEntity<List<SupplierDTO>> getAllSuppliers(HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse");
+        AccessControlUtil.checkAccess(request, "warehouse", "admin");
 
         List<Supplier> suppliers = supplierService.getAllSuppliers();
 
@@ -41,7 +107,7 @@ public class SupplierController {
                     dto.setAddress(s.getAddress());
                     dto.setEmail(s.getEmail());
                     dto.setSupplierType(s.getSupplierType());
-
+                    dto.setStatus(s.getStatus());
                     return dto;
                 })
                 .toList();
@@ -52,7 +118,7 @@ public class SupplierController {
     // POST: Add new supplier
     @PostMapping("/add")
     public ResponseEntity<SupplierDTO> addSupplier(@RequestBody SupplierDTO supplierDto, HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse");
+        AccessControlUtil.checkAccess(request, "warehouse", "admin");
 
         Supplier supplier = new Supplier();
         supplier.setSupplierid(supplierDto.getSupplierid());
@@ -63,6 +129,7 @@ public class SupplierController {
         supplier.setAddress(supplierDto.getAddress());
         supplier.setEmail(supplierDto.getEmail());
         supplier.setSupplierType(supplierDto.getSupplierType());
+        supplier.setStatus(supplierDto.getStatus());
 
         Supplier saved = supplierService.addSupplier(supplier);
 
@@ -75,6 +142,7 @@ public class SupplierController {
         savedDto.setAddress(saved.getAddress());
         savedDto.setEmail(saved.getEmail());
         savedDto.setSupplierType(saved.getSupplierType());
+        savedDto.setStatus(saved.getStatus());
 
         return ResponseEntity.ok(savedDto);
     }
@@ -82,7 +150,7 @@ public class SupplierController {
     // PUT: Update supplier by ID
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateSupplier(@PathVariable Long id, @RequestBody SupplierDTO supplierDto, HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse");
+        AccessControlUtil.checkAccess(request, "warehouse", "admin");
 
         Supplier supplier = new Supplier();
         supplier.setSupplierid(supplierDto.getSupplierid());
@@ -93,7 +161,7 @@ public class SupplierController {
         supplier.setAddress(supplierDto.getAddress());
         supplier.setEmail(supplierDto.getEmail());
         supplier.setSupplierType(supplierDto.getSupplierType());
-
+        supplier.setStatus(supplierDto.getStatus());
 
         Supplier updated = supplierService.updateSupplier(id, supplier);
         if (updated != null) {
@@ -106,7 +174,7 @@ public class SupplierController {
             updatedDto.setAddress(updated.getAddress());
             updatedDto.setEmail(updated.getEmail());
             updatedDto.setSupplierType(updated.getSupplierType());
-
+            updatedDto.setStatus(updated.getStatus());
 
             return ResponseEntity.ok(updatedDto);
         } else {
@@ -117,7 +185,7 @@ public class SupplierController {
     // DELETE: Delete supplier by ID
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteSupplier(@PathVariable Long id, HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse");
+        AccessControlUtil.checkAccess(request, "warehouse", "admin");
 
         boolean deleted = supplierService.deleteSupplier(id);
         if (deleted) {
@@ -127,4 +195,3 @@ public class SupplierController {
         }
     }
 }
-

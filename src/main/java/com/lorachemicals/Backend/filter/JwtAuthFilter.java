@@ -37,7 +37,7 @@ public class JwtAuthFilter extends HttpFilter {
         }
 
         // Skip JWT check for login endpoint and OPTIONS requests
-        if (path.equals("/users/login") || path.equals("/forgot/forgot-password") || method.equals("OPTIONS")) {
+        if (path.equals("/users/login") || path.startsWith("/getid/") || path.equals("/forgot/forgot-password") || method.equals("OPTIONS")) {
             logger.info("Skipping JWT check for {} endpoint", path);
             chain.doFilter(request, response);
             return;

@@ -6,23 +6,17 @@ package com.lorachemicals.Backend.controller;
 import com.lorachemicals.Backend.dto.CustomerUserDTO;
 import com.lorachemicals.Backend.dto.UserRequestDTO;
 import com.lorachemicals.Backend.dto.UserResponseDTO;
-import com.lorachemicals.Backend.model.Customer;
-import com.lorachemicals.Backend.model.SalesRep;
-import com.lorachemicals.Backend.model.User;
-import com.lorachemicals.Backend.model.WarehouseManager;
-import com.lorachemicals.Backend.repository.SalesRepRepository;
+import com.lorachemicals.Backend.model.*;
+        import com.lorachemicals.Backend.repository.SalesRepRepository;
 import com.lorachemicals.Backend.repository.WarehouseManagerRepository;
-import com.lorachemicals.Backend.services.CustomerService;
-import com.lorachemicals.Backend.services.SalesrepService;
-import com.lorachemicals.Backend.services.UserService;
-import com.lorachemicals.Backend.services.WarehouseManagerService;
-import jakarta.servlet.http.HttpServletRequest;
+import com.lorachemicals.Backend.services.*;
+        import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.lorachemicals.Backend.util.JwtUtil;
+        import com.lorachemicals.Backend.util.JwtUtil;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -40,6 +34,7 @@ public class UserController {
     private final SalesRepRepository salesRepRepo;
     private final WarehouseManagerRepository warehouseManagerRepo;
     private final CustomerService customerService;
+    private final RouteService routeService;
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
@@ -49,13 +44,14 @@ public class UserController {
                           WarehouseManagerService warehouseManagerService,
                           SalesRepRepository salesRepRepo,
                           WarehouseManagerRepository warehouseManagerRepo,
-                          CustomerService customerService) {
+                          CustomerService customerService, RouteService routeService) {
         this.userService = userService;
         this.salesrepService = salesrepService;
         this.warehouseManagerService = warehouseManagerService;
         this.salesRepRepo = salesRepRepo;
         this.warehouseManagerRepo = warehouseManagerRepo;
         this.customerService = customerService; // ✅ FIXED
+        this.routeService = routeService;
     }
 
 
@@ -106,7 +102,8 @@ public class UserController {
                 c.getUser().getRole(),
                 c.getUser().getAddress(),
                 c.getUser().getPhone(),
-                c.getUser().getNic()
+                c.getUser().getNic(),
+                c.getUser().getStatus()
         )).toList();
     }
 
@@ -137,7 +134,8 @@ public class UserController {
                     user.getRole(),
                     user.getPhone(),
                     user.getAddress(),
-                    user.getNic()
+                    user.getNic(),
+                    user.getStatus()
             );
 
             // Generate JWT
@@ -179,10 +177,10 @@ public class UserController {
                 newCustomer.setShopName(userDTO.getShop_name());
 
                 SalesRep relatedRep = salesrepService.getSalesRepById(userDTO.getSrepid());
-//                Route relatedRoute = routeService.getRouteById(userDTO.getRouteid());
+                Route relatedRoute = routeService.getRouteById(userDTO.getRouteid());
 
                 newCustomer.setSalesRep(relatedRep);
-//                newCustomer.setRoute(relatedRoute);
+                newCustomer.setRoute(relatedRoute);
 
                 customerService.saveCustomer(newCustomer);
             }
@@ -271,10 +269,10 @@ public class UserController {
             logger.error("Updating Shop Name: {}", dto);
 
 
-            //        if (dto.getRouteId() != null) {
-    //            Route route = routeService.getRouteById(dto.getRouteId());
-    //            customer.setRoute(route);
-    //        }
+            if (dto.getRouteid() != null) {
+                Route route = routeService.getRouteById(dto.getRouteid());
+                customer.setRoute(route);
+            }
 
             if (dto.getSrepid() != null) {
                 SalesRep salesRep = salesrepService.getSalesRepById(dto.getSrepid());

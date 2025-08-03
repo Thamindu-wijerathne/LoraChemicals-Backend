@@ -1,0 +1,111 @@
+package com.lorachemicals.Backend.services;
+
+import com.lorachemicals.Backend.model.Box;
+import com.lorachemicals.Backend.model.Label;
+import com.lorachemicals.Backend.model.Labeltype;
+import com.lorachemicals.Backend.repository.LabelRepository;
+import com.lorachemicals.Backend.repository.LabeltypeRepository;
+import com.lorachemicals.Backend.dto.LabelRequestDTO;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class LabelService {
+
+    @Autowired
+    private LabelRepository labelRepository;
+
+    @Autowired
+    private LabeltypeRepository labeltypeRepository;
+
+    // Get all labels
+    public List<Label> getAllLabels() {
+        try {
+            return labelRepository.findAll();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch labels: " + e.getMessage(), e);
+        }
+    }
+
+    // Get label by inventory ID
+    public Optional<Label> getLabelById(Long inventoryId) {
+        try {
+            return labelRepository.findById(inventoryId);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch label by ID: " + e.getMessage(), e);
+        }
+    }
+
+    // Create new label
+    public Label createLabel(LabelRequestDTO dto) {
+        try {
+            Labeltype labelType = labeltypeRepository.findById(dto.getLabelTypeId())
+                    .orElseThrow(() -> new RuntimeException("Label type not found"));
+
+            Label label = new Label();
+            label.setLabelType(labelType);
+            label.setQuantity(dto.getQuantity());
+            label.setLocation(dto.getLocation());
+
+            return labelRepository.save(label);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create label: " + e.getMessage(), e);
+        }
+    }
+
+    public Label updateQuantity(Long inventoryId, int quantity) {
+        try {
+            Label raw = labelRepository.findById(inventoryId)
+                    .orElseThrow(() -> new RuntimeException("Bottle not found"));
+
+            raw.setQuantity(quantity);
+            return labelRepository.save(raw);
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating volume: " + e.getMessage());
+        }
+    }
+
+    public Label updatelocation(Long inventoryId, String location) {
+        try {
+            Label raw = labelRepository.findById(inventoryId)
+                    .orElseThrow(() -> new RuntimeException("Bottle not found"));
+
+            raw.setLocation(location);
+            return labelRepository.save(raw);
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating volume: " + e.getMessage());
+        }
+    }
+
+    // Update existing label
+    public Label updateLabel(Long inventoryId, LabelRequestDTO dto) {
+        try {
+            Label label = labelRepository.findById(inventoryId)
+                    .orElseThrow(() -> new RuntimeException("Label not found"));
+
+            Labeltype labelType = labeltypeRepository.findById(dto.getLabelTypeId())
+                    .orElseThrow(() -> new RuntimeException("Label type not found"));
+
+            label.setLabelType(labelType);
+            label.setQuantity(dto.getQuantity());
+            label.setLocation(dto.getLocation());
+
+            return labelRepository.save(label);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update label: " + e.getMessage(), e);
+        }
+    }
+
+    // Delete label by inventory ID
+    public void deleteLabel(Long inventoryId) {
+        try {
+            labelRepository.deleteById(inventoryId);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete label: " + e.getMessage(), e);
+        }
+    }
+}
