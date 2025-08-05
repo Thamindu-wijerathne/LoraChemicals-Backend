@@ -10,7 +10,6 @@ public class SupplierDTO {
     private String address;
     private String email;
     private String supplierType; // e.g., Chemical, Box, Label, Bottle
-    private String status;       // e.g., Active, Inactive
 
     // Constructors
     public SupplierDTO() {}
@@ -26,7 +25,6 @@ public class SupplierDTO {
         this.address = address;
         this.email = email;
         this.supplierType = supplierType;
-        this.status = status;
     }
 
     // Getters and Setters
@@ -94,11 +92,4 @@ public class SupplierDTO {
         this.supplierType = supplierType;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 }
