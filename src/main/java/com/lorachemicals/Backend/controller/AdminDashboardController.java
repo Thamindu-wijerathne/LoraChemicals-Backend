@@ -1,12 +1,15 @@
 package com.lorachemicals.Backend.controller;
 
 import com.lorachemicals.Backend.dto.AdminDashboardDTO;
+import com.lorachemicals.Backend.dto.DistrictSalesDTO;
 import com.lorachemicals.Backend.services.AdminDashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("admin-dashboard")
@@ -33,5 +36,10 @@ public class AdminDashboardController {
     @GetMapping("/active-staff")
     public long getActiveStaffCount() {
         return dashboardService.getActiveStaffCount();
+    }
+
+    @GetMapping("/sales-by-district")
+    public ResponseEntity<List<DistrictSalesDTO>> getSalesByDistrict() {
+        return ResponseEntity.ok(dashboardService.getTotalSalesByDistrict());
     }
 }
