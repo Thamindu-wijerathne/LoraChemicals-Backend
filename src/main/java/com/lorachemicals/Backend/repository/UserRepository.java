@@ -17,5 +17,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
   
     @Query("SELECT u FROM User u WHERE u.role = 'customer'")
     List<User> findAllCustomers();
+
+    // Count active staff (excluding customers)
+    @Query("SELECT COUNT(u) FROM User u WHERE u.role <> 'customer' AND u.status = 'active'")
+    long countActiveStaff();
 }
 
