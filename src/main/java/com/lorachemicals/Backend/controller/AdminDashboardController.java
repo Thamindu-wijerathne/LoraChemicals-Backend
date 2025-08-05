@@ -24,4 +24,14 @@ public class AdminDashboardController {
     public double getTotalSales(){
         return dashboardService.getTotalSales();
     }
+
+    @GetMapping("/active-districs")
+    public long getActiveDistricts() {
+        return dashboardService.getActiveDistricts();
+    }
+
+    @GetMapping("/active-staff")
+    public long getActiveStaffCount() {
+        return dashboardService.getActiveStaffCount();
+    }
 }
