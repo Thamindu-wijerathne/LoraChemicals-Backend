@@ -2,8 +2,10 @@ package com.lorachemicals.Backend.controller;
 
 import com.lorachemicals.Backend.dto.AdminDashboardDTO;
 import com.lorachemicals.Backend.dto.DistrictSalesDTO;
+import com.lorachemicals.Backend.dto.SalesEmployeeDTO;
 import com.lorachemicals.Backend.services.AdminDashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,4 +44,11 @@ public class AdminDashboardController {
     public ResponseEntity<List<DistrictSalesDTO>> getSalesByDistrict() {
         return ResponseEntity.ok(dashboardService.getTotalSalesByDistrict());
     }
+
+    @GetMapping("/sales-orders-by-employee")
+    public ResponseEntity<List<SalesEmployeeDTO>> getSalesAndOrdersByEmployee(Pageable pageable) {
+        return ResponseEntity.ok(dashboardService.getSalesAndOrdersByEmployee(pageable));
+    }
+
+
 }

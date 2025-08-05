@@ -1,6 +1,7 @@
 package com.lorachemicals.Backend.repository;
 
 import com.lorachemicals.Backend.dto.DistrictSalesDTO;
+import com.lorachemicals.Backend.dto.SalesEmployeeDTO;
 import com.lorachemicals.Backend.dto.TrendingProductsDTO;
 import com.lorachemicals.Backend.model.CustomerOrder;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,21 @@ public interface CustomerOrderRepository extends JpaRepository<CustomerOrder, Lo
 """)
     List<DistrictSalesDTO> getTotalSalesPerDistrict();
 
+
+    @Query("""
+    SELECT new com.lorachemicals.Backend.dto.SalesEmployeeDTO(
+        CONCAT(srUser.fname, ' ', srUser.lname),
+        CAST(SUM(o.total) AS double),
+        COUNT(o.orderid)
+    )
+    FROM CustomerOrder o
+    JOIN o.user u
+    JOIN Customer c ON c.user = u
+    JOIN c.salesRep sr
+    JOIN sr.user srUser
+    GROUP BY srUser.fname, srUser.lname
+""")
+    List<SalesEmployeeDTO> getSalesByEmployee(Pageable pageable);
 
 }
 
