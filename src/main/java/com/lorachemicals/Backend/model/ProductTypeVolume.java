@@ -24,7 +24,7 @@ public class ProductTypeVolume {
     private Long volume;
 
     @Column(name = "unitprice")
-    private BigDecimal UnitPrice;
+    private BigDecimal unitPrice;
 
     private String image;
 
@@ -57,4 +57,7 @@ public class ProductTypeVolume {
     }
 
     public Long getVolume() { return this.volume; }
+    public BigDecimal getUnitPrice() { return unitPrice; }
+
+
 }

@@ -2,6 +2,7 @@ package com.lorachemicals.Backend.controller;
 
 import com.lorachemicals.Backend.dto.CustomerOrderRequestDTO;
 import com.lorachemicals.Backend.dto.CustomerOrderResponseDTO;
+import com.lorachemicals.Backend.dto.TrendingProductsDTO;
 import com.lorachemicals.Backend.model.CustomerOrder;
 import com.lorachemicals.Backend.model.CustomerOrderItem;
 import com.lorachemicals.Backend.services.CustomerOrderService;
@@ -77,4 +78,15 @@ public class CustomerOrderController {
             return ResponseEntity.internalServerError().body("Order accepted failed: " + e.getMessage());
         }
     }
+
+    @GetMapping("/trending-products")
+    public ResponseEntity<?> getTrendingProducts(HttpServletRequest request) {
+        try {
+            List<TrendingProductsDTO> trending = customerOrderService.getTrendingProducts();
+            return ResponseEntity.ok(trending);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Failed to fetch trending products: " + e.getMessage());
+        }
+    }
+
 }

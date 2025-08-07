@@ -1,13 +1,11 @@
 package com.lorachemicals.Backend.services;
 
-import com.lorachemicals.Backend.dto.CustomerOrderItemRequestDTO;
-import com.lorachemicals.Backend.dto.CustomerOrderItemResponseDTO;
-import com.lorachemicals.Backend.dto.CustomerOrderRequestDTO;
-import com.lorachemicals.Backend.dto.CustomerOrderResponseDTO;
+import com.lorachemicals.Backend.dto.*;
 import com.lorachemicals.Backend.model.*;
 import com.lorachemicals.Backend.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -173,6 +171,11 @@ public class CustomerOrderService {
         order.setStatus("accepted");  // Update status to accepted
         orderRepository.save(order);
     }
+
+    public List<TrendingProductsDTO> getTrendingProducts() {
+        return customerOrderItemRepository.findTrendingProducts(PageRequest.of(0, 5)); // top 5
+    }
+
 
 
 }
