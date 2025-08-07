@@ -338,5 +338,15 @@ public class UserController {
         return ResponseEntity.ok(savedUser);
     }
 
+    @GetMapping("get-all-salesreps")
+    public ResponseEntity<?> getAllSalesrep(HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse");
+        try {
+            List<SalesRep> salesreps = salesrepService.getAllSalesreps();
+            return ResponseEntity.ok(salesreps);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Internal Server Error: " + e.getMessage());
+        }
+    }
 
 }

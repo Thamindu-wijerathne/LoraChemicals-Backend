@@ -4,6 +4,8 @@ import com.lorachemicals.Backend.model.SalesRep;
 import com.lorachemicals.Backend.repository.SalesRepRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class SalesrepService {
     private final SalesRepRepository salesrepRepo;
@@ -28,5 +30,9 @@ public class SalesrepService {
     }
     public SalesRep getSalesRepById(Long Id) {
         return salesrepRepo.findByUserId(Id);
+    }
+
+    public List<SalesRep> getAllSalesreps() {
+        return  salesrepRepo.findAll();
     }
 }
