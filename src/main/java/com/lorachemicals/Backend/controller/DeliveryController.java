@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -69,6 +70,39 @@ public class DeliveryController {
     public ResponseEntity<List<DeliveryResponseDTO>> getDeliveriesByStatus(@PathVariable int status) {
         List<DeliveryResponseDTO> deliveries = deliveryService.getDeliveriesByStatus(status);
         return new ResponseEntity<>(deliveries, HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateDeliveryStatus(@PathVariable Long id, @RequestBody StatusUpdateRequest statusRequest, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse", "admin", "salesrep");
+        try {
+            boolean updated = deliveryService.updateDeliveryStatus(id, statusRequest.getStatus());
+            if (updated) {
+                return ResponseEntity.ok().body("Delivery status updated successfully");
+            } else {
+                return ResponseEntity.badRequest().body("Failed to update delivery status");
+            }
+        } catch (RuntimeException e) {
+            System.err.println("❌ Runtime error updating delivery status: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("❌ Unexpected error updating delivery status: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
+    }
+
+    // Inner class for status update request
+    public static class StatusUpdateRequest {
+        private int status;
+        
+        public int getStatus() {
+            return status;
+        }
+        
+        public void setStatus(int status) {
+            this.status = status;
+        }
     }
 
 
