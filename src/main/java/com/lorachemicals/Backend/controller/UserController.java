@@ -3,27 +3,47 @@
 package com.lorachemicals.Backend.controller;
 
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.modelmapper.ModelMapper;
+        import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+        import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+        import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.lorachemicals.Backend.dto.CustomerUserDTO;
+import com.lorachemicals.Backend.dto.SalesRepResponseDTO;
+import com.lorachemicals.Backend.dto.SalesRepStatusUpdateDTO;
 import com.lorachemicals.Backend.dto.UserRequestDTO;
 import com.lorachemicals.Backend.dto.UserResponseDTO;
-import com.lorachemicals.Backend.model.*;
-        import com.lorachemicals.Backend.repository.SalesRepRepository;
+import com.lorachemicals.Backend.model.Customer;
+import com.lorachemicals.Backend.model.Route;
+import com.lorachemicals.Backend.model.SalesRep;
+import com.lorachemicals.Backend.model.User;
+import com.lorachemicals.Backend.model.WarehouseManager;
+import com.lorachemicals.Backend.repository.SalesRepRepository;
 import com.lorachemicals.Backend.repository.WarehouseManagerRepository;
-import com.lorachemicals.Backend.services.*;
-        import jakarta.servlet.http.HttpServletRequest;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-        import com.lorachemicals.Backend.util.JwtUtil;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
+import com.lorachemicals.Backend.services.CustomerService;
+import com.lorachemicals.Backend.services.RouteService;
+import com.lorachemicals.Backend.services.SalesrepService;
+import com.lorachemicals.Backend.services.UserService;
+import com.lorachemicals.Backend.services.WarehouseManagerService;
+import com.lorachemicals.Backend.util.JwtUtil;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.server.ResponseStatusException;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/users")
@@ -164,8 +184,7 @@ public class UserController {
             User savedUser = userService.addUser(user);
 
             if ("salesrep".equalsIgnoreCase(savedUser.getRole())) {
-                SalesRep salesRep = new SalesRep();
-                salesRep.setUser(savedUser);
+                SalesRep salesRep = new SalesRep(savedUser); // This will set initial status to 1
                 salesrepService.saveSalesRep(salesRep);
             } else if ("warehouse".equalsIgnoreCase(savedUser.getRole())) {
                 WarehouseManager warehouseManager = new WarehouseManager();
@@ -344,6 +363,46 @@ public class UserController {
         try {
             List<SalesRep> salesreps = salesrepService.getAllSalesreps();
             return ResponseEntity.ok(salesreps);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Internal Server Error: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("get-active-salesreps")
+    public ResponseEntity<?> getActiveSalesReps(HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse", "admin");
+        try {
+            List<SalesRep> activeSalesReps = salesrepService.getActiveSalesReps();
+            return ResponseEntity.ok(activeSalesReps);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Internal Server Error: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("get-all-salesreps-with-details")
+    public ResponseEntity<?> getAllSalesrepsWithDetails(HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "admin");
+        try {
+            List<SalesRepResponseDTO> salesreps = salesrepService.getAllSalesRepsWithDetails();
+            return ResponseEntity.ok(salesreps);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Internal Server Error: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("update-salesrep-status")
+    public ResponseEntity<?> updateSalesRepStatus(@RequestBody SalesRepStatusUpdateDTO statusUpdateDTO, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "admin");
+        try {
+            SalesRep updatedSalesRep = salesrepService.updateSalesRepStatus(
+                statusUpdateDTO.getSrepid(), 
+                statusUpdateDTO.getStatus()
+            );
+            if (updatedSalesRep != null) {
+                return ResponseEntity.ok("SalesRep status updated successfully");
+            } else {
+                return ResponseEntity.status(404).body("SalesRep not found");
+            }
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Internal Server Error: " + e.getMessage());
         }
