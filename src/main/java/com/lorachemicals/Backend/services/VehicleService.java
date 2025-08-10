@@ -43,7 +43,7 @@ public class VehicleService {
                     null, // Will set image after processing
                     requestDTO.getSeats(),
                     requestDTO.getDate(),
-                    requestDTO.getStatus()
+                    "active"     //this is vehicle status saving as 1 when create vehicle
             );
 
             // Handle image if provided
