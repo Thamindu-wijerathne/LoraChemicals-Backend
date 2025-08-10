@@ -4,41 +4,22 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.lorachemicals.Backend.model.*;
+import com.lorachemicals.Backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.lorachemicals.Backend.dto.BatchInventoryDeliveryResponseDTO;
 import com.lorachemicals.Backend.dto.DeliveryRequestDTO;
 import com.lorachemicals.Backend.dto.DeliveryResponseDTO;
-import com.lorachemicals.Backend.model.BatchInventory;
-import com.lorachemicals.Backend.model.BatchInventoryDelivery;
-import com.lorachemicals.Backend.model.BatchInventoryDeliveryId;
-import com.lorachemicals.Backend.model.BatchInventoryWithoutBox;
-import com.lorachemicals.Backend.model.BatchType;
-import com.lorachemicals.Backend.model.BatchTypeWithoutBox;
-import com.lorachemicals.Backend.model.CustomerOrder;
-import com.lorachemicals.Backend.model.Delivery;
-import com.lorachemicals.Backend.model.ParentBatchType;
-import com.lorachemicals.Backend.model.Route;
-import com.lorachemicals.Backend.model.SalesRep;
-import com.lorachemicals.Backend.model.Vehicle;
-import com.lorachemicals.Backend.model.WarehouseManager;
-import com.lorachemicals.Backend.repository.BatchInventoryDeliveryRepository;
-import com.lorachemicals.Backend.repository.BatchInventoryRepository;
-import com.lorachemicals.Backend.repository.BatchInventoryWithoutBoxRepository;
-import com.lorachemicals.Backend.repository.BatchTypeRepository;
-import com.lorachemicals.Backend.repository.BatchTypeWithoutBoxRepository;
-import com.lorachemicals.Backend.repository.CustomerOrderRepository;
-import com.lorachemicals.Backend.repository.DeliveryRepository;
-import com.lorachemicals.Backend.repository.RouteRepository;
-import com.lorachemicals.Backend.repository.SalesRepRepository;
-import com.lorachemicals.Backend.repository.VehicleRepository;
-import com.lorachemicals.Backend.repository.WarehouseManagerRepository;
 
 import jakarta.transaction.Transactional;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
 public class DeliveryService {
+
+    private static final Logger logger = LoggerFactory.getLogger(DeliveryService.class);
 
     @Autowired
     private DeliveryRepository deliveryRepository;
@@ -72,6 +53,9 @@ public class DeliveryService {
 
     @Autowired
     private BatchInventoryWithoutBoxRepository batchInventoryWithoutBoxRepository;
+
+    @Autowired
+    private DeliveryOrderRepository deliveryOrderRepository;
 
     @Transactional
     public DeliveryResponseDTO createDelivery(DeliveryRequestDTO requestDTO) {
@@ -121,6 +105,25 @@ public class DeliveryService {
             vehicleRepository.save(vehicle);
             
             Delivery savedDelivery = deliveryRepository.save(delivery);
+
+            // 2. Loop orders and save into delivery_order table
+            for (DeliveryRequestDTO.SelectedOrder orderDTO : requestDTO.getSelectedOrders()) {
+                Long orderId = orderDTO.getOrderid();
+
+                CustomerOrder order = customerOrderRepository.findById(orderId)
+                        .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+
+                DeliveryOrder deliveryOrder = new DeliveryOrder();
+                deliveryOrder.setDelivery(savedDelivery);
+                deliveryOrder.setCustomerOrder(order);
+
+                // Set the composite key
+                deliveryOrder.setId(new DeliveryOrderId(savedDelivery.getDeliveryid(), orderId));
+
+                deliveryOrderRepository.save(deliveryOrder);
+            }
+
+
             
             if (requestDTO.getBatchInventoryDetails() != null && !requestDTO.getBatchInventoryDetails().isEmpty()) {
                 System.out.println("📦 PROCESSING " + requestDTO.getBatchInventoryDetails().size() + " BATCH INVENTORY DETAILS:");
@@ -322,152 +325,120 @@ public class DeliveryService {
 
     @Transactional
     public boolean updateDeliveryStatus(Long deliveryId, int newStatus) {
-        System.out.println("🔄 Starting delivery status update - ID: " + deliveryId + ", New Status: " + newStatus);
-        
+        logger.info("🔄 Starting delivery status update - ID: {}, New Status: {}", deliveryId, newStatus);
+
         try {
             if (deliveryId == null) {
                 throw new RuntimeException("Delivery ID cannot be null");
             }
-            
+
             Optional<Delivery> deliveryOpt = deliveryRepository.findById(deliveryId);
-            if (deliveryOpt.isPresent()) {
-                Delivery delivery = deliveryOpt.get();
-                System.out.println("✅ Found delivery: " + delivery.getDeliveryid() + " with current status: " + delivery.getStatus());
-                
-                // When completing delivery (status = 0), restore resources and inventory
-                if (newStatus == 0) {
-                    // 1. Set came date
-                    delivery.setCamedate(java.time.LocalDateTime.now());
-                    
-                    // 2. Update Sales Rep status to 1 (available)
-                    SalesRep salesRep = delivery.getSalesRep();
-                    if (salesRep != null) {
-                        salesRep.setStatus(1);
-                        salesRepRepository.save(salesRep);
-                        System.out.println("✅ Sales Rep " + salesRep.getSrepid() + " status updated to available");
-                    }
-                    
-                    // 3. Update Vehicle status to 1 (available) - Vehicle status is String
-                    Vehicle vehicle = delivery.getVehicle();
-                    if (vehicle != null) {
-                        vehicle.setStatus("1");
-                        vehicleRepository.save(vehicle);
-                        System.out.println("✅ Vehicle " + vehicle.getId() + " status updated to available");
-                    }
-                    
-                    // 4. Validate and restore batch inventory quantities
-                    List<BatchInventoryDelivery> batchItems = batchInventoryDeliveryRepository.findById_Deliveryid(deliveryId);
-                    System.out.println("📦 Found " + batchItems.size() + " batch items to restore for delivery ID: " + deliveryId);
-                    
-                    if (batchItems.isEmpty()) {
-                        System.err.println("⚠️ WARNING: No batch items found for delivery " + deliveryId + ". Nothing to restore.");
-                        return true; // Continue with delivery status update even if no items to restore
-                    }
-                    
-                    for (BatchInventoryDelivery batchItem : batchItems) {
-                        String inventoryType = batchItem.getId().getType();
-                        Long batchTypeId = batchItem.getId().getBatchtypeid();
-                        int originalQuantity = batchItem.getQuantity(); // Original quantity requested
-                        int currentQuantity = batchItem.getCurrentQuantity(); // Current quantity to restore
-                        
-                        System.out.println("🔄 Processing batch item - Type: " + inventoryType + 
-                            ", BatchTypeID: " + batchTypeId + 
-                            ", Original Quantity: " + originalQuantity + 
-                            ", Current Quantity to Restore: " + currentQuantity);
-                        
-                        if (currentQuantity <= 0) {
-                            System.out.println("⚠️ Skipping restoration - Current quantity is " + currentQuantity);
-                            continue;
-                        }
-                        
-                        // Validate that currentQuantity makes sense
-                        if (currentQuantity > originalQuantity) {
-                            System.err.println("❌ WARNING: Current quantity (" + currentQuantity + 
-                                ") is greater than original quantity (" + originalQuantity + 
-                                "). This might indicate a data issue.");
-                        }
-                        
-                        if ("with_box".equals(inventoryType)) {
-                            // Restore to BatchInventory (with box)
-                            List<BatchInventory> batchInventories = batchInventoryRepository.findByParentBatchTypeId(batchTypeId);
-                            if (!batchInventories.isEmpty()) {
-                                // Find the inventory with the lowest batch_quantity to restore to (FIFO approach)
-                                // This helps balance the inventory across different records
-                                BatchInventory targetInventory = batchInventories.stream()
-                                    .min((inv1, inv2) -> Integer.compare(inv1.getBatch_quantity(), inv2.getBatch_quantity()))
-                                    .orElse(batchInventories.get(0));
-                                
-                                int beforeQuantity = targetInventory.getBatch_quantity();
-                                int afterQuantity = beforeQuantity + currentQuantity;
-                                targetInventory.setBatch_quantity(afterQuantity);
-                                batchInventoryRepository.save(targetInventory);
-                                System.out.println("✅ RESTORED to BatchInventory (with box):");
-                                System.out.println("   - Inventory ID: " + targetInventory.getInventoryid());
-                                System.out.println("   - Batch Type ID: " + batchTypeId);
-                                System.out.println("   - Before: " + beforeQuantity + " batches");
-                                System.out.println("   - Restored: +" + currentQuantity + " batches");
-                                System.out.println("   - After: " + afterQuantity + " batches");
-                            } else {
-                                System.err.println("❌ ERROR: No BatchInventory found for batch type " + batchTypeId + " to restore " + currentQuantity + " batches");
-                            }
-                            
-                        } else if ("without_box".equals(inventoryType)) {
-                            // Restore to BatchInventoryWithoutBox
-                            List<BatchInventoryWithoutBox> batchInventoriesWithoutBox = batchInventoryWithoutBoxRepository.findByParentBatchTypeId(batchTypeId);
-                            if (!batchInventoriesWithoutBox.isEmpty()) {
-                                // Find the inventory with the lowest batch_quantity to restore to (FIFO approach)
-                                BatchInventoryWithoutBox targetInventory = batchInventoriesWithoutBox.stream()
-                                    .min((inv1, inv2) -> Integer.compare(inv1.getBatch_quantity(), inv2.getBatch_quantity()))
-                                    .orElse(batchInventoriesWithoutBox.get(0));
-                                
-                                int beforeQuantity = targetInventory.getBatch_quantity();
-                                int afterQuantity = beforeQuantity + currentQuantity;
-                                targetInventory.setBatch_quantity(afterQuantity);
-                                batchInventoryWithoutBoxRepository.save(targetInventory);
-                                System.out.println("✅ RESTORED to BatchInventoryWithoutBox:");
-                                System.out.println("   - Inventory ID: " + targetInventory.getInventoryid());
-                                System.out.println("   - Batch Type ID: " + batchTypeId);
-                                System.out.println("   - Before: " + beforeQuantity + " batches");
-                                System.out.println("   - Restored: +" + currentQuantity + " batches");
-                                System.out.println("   - After: " + afterQuantity + " batches");
-                            } else {
-                                System.err.println("❌ ERROR: No BatchInventoryWithoutBox found for batch type " + batchTypeId + " to restore " + currentQuantity + " batches");
-                            }
-                        } else {
-                            System.err.println("❌ ERROR: Unknown inventory type: " + inventoryType + " for batch type " + batchTypeId);
-                        }
-                    }
-                    
-                    // Summary of restoration
-                    int totalItemsProcessed = batchItems.size();
-                    int totalQuantityRestored = batchItems.stream()
-                        .mapToInt(BatchInventoryDelivery::getCurrentQuantity)
-                        .sum();
-                    System.out.println("📊 RESTORATION SUMMARY:");
-                    System.out.println("   - Total batch items processed: " + totalItemsProcessed);
-                    System.out.println("   - Total quantities restored: " + totalQuantityRestored + " batches");
-                }
-                
-                // Update delivery status
-                delivery.setStatus(newStatus);
-                deliveryRepository.save(delivery);
-                
-                System.out.println("✅ Delivery " + deliveryId + " status updated to " + newStatus);
-                if (newStatus == 0) {
-                    System.out.println("✅ Trip completion process finished - resources restored and made available");
-                }
-                
-                return true;
-            } else {
+            if (deliveryOpt.isEmpty()) {
                 throw new RuntimeException("Delivery not found with ID: " + deliveryId);
             }
-        } catch (RuntimeException e) {
-            System.err.println("❌ Runtime error updating delivery status: " + e.getMessage());
-            throw e; // Re-throw runtime exceptions
+            Delivery delivery = deliveryOpt.get();
+            logger.info("✅ Found delivery: {} with current status: {}", delivery.getDeliveryid(), delivery.getStatus());
+
+            if (newStatus == 0) { // Completing delivery, restore resources
+
+                // 1. Set came date
+                delivery.setCamedate(java.time.LocalDateTime.now());
+
+                // 2. Update Sales Rep status to 1 (available)
+                SalesRep salesRep = delivery.getSalesRep();
+                if (salesRep != null) {
+                    salesRep.setStatus(1);
+                    salesRepRepository.save(salesRep);
+                    logger.info("✅ Sales Rep {} status updated to available", salesRep.getSrepid());
+                }
+
+                // 3. Update Vehicle status to "1" (available)
+                Vehicle vehicle = delivery.getVehicle();
+                if (vehicle != null) {
+                    vehicle.setStatus("1");
+                    vehicleRepository.save(vehicle);
+                    logger.info("✅ Vehicle {} status updated to available", vehicle.getId());
+                }
+
+                // 4. Restore batch inventory quantities
+                List<BatchInventoryDelivery> batchItems = batchInventoryDeliveryRepository.findById_Deliveryid(deliveryId);
+                logger.info("📦 Found {} batch items to restore for delivery ID: {}", batchItems.size(), deliveryId);
+
+                for (BatchInventoryDelivery batchItem : batchItems) {
+                    Long batchTypeId = batchItem.getId().getBatchtypeid();
+                    int currentQuantity = batchItem.getCurrentQuantity();
+
+                    logger.info("🔄 Processing batch item - BatchTypeID: {}, Current Quantity to Restore: {}", batchTypeId, currentQuantity);
+
+                    if (currentQuantity <= 0) {
+                        logger.warn("⚠️ Skipping restoration - Current quantity is {}", currentQuantity);
+                        continue;
+                    }
+
+                    // Try find in BatchInventory (with box)
+                    List<BatchInventory> batchInventories = batchInventoryRepository.findByParentBatchTypeId(batchTypeId);
+                    if (!batchInventories.isEmpty()) {
+                        BatchInventory targetInventory = batchInventories.stream()
+                                .min((i1, i2) -> Integer.compare(i1.getBatch_quantity(), i2.getBatch_quantity()))
+                                .orElse(batchInventories.get(0));
+
+                        int beforeQty = targetInventory.getBatch_quantity();
+                        targetInventory.setBatch_quantity(beforeQty + currentQuantity);
+                        batchInventoryRepository.save(targetInventory);
+
+                        logger.info("✅ Restored {} batches to BatchInventory (with box) ID: {}", currentQuantity, targetInventory.getInventoryid());
+                        continue; // Skip searching in without box
+                    }
+
+                    // If not found, try BatchInventoryWithoutBox (without box)
+                    List<BatchInventoryWithoutBox> batchInventoriesWithoutBox = batchInventoryWithoutBoxRepository.findByParentBatchTypeId(batchTypeId);
+                    if (!batchInventoriesWithoutBox.isEmpty()) {
+                        BatchInventoryWithoutBox targetInventory = batchInventoriesWithoutBox.stream()
+                                .min((i1, i2) -> Integer.compare(i1.getBatch_quantity(), i2.getBatch_quantity()))
+                                .orElse(batchInventoriesWithoutBox.get(0));
+
+                        int beforeQty = targetInventory.getBatch_quantity();
+                        targetInventory.setBatch_quantity(beforeQty + currentQuantity);
+                        batchInventoryWithoutBoxRepository.save(targetInventory);
+
+                        logger.info("✅ Restored {} batches to BatchInventoryWithoutBox ID: {}", currentQuantity, targetInventory.getInventoryid());
+                        continue;
+                    }
+
+                    // If not found in either table
+                    logger.error("❌ No BatchInventory or BatchInventoryWithoutBox found for batch type {} to restore {} batches", batchTypeId, currentQuantity);
+                }
+
+
+                // 5. Update linked orders status to "pending"
+                List<DeliveryOrder> linkedOrders = deliveryOrderRepository.findByDelivery_Deliveryid(deliveryId);
+                logger.info("Linked orders count: {}", linkedOrders.size());
+
+                for (DeliveryOrder deliveryOrder : linkedOrders) {
+                    CustomerOrder order = deliveryOrder.getCustomerOrder();
+                    if (order != null && "ongoing".equalsIgnoreCase(order.getStatus())) {
+                        order.setStatus("pending");
+                        customerOrderRepository.save(order);
+                        logger.info("✅ Updated order {} status to 'pending'", order.getOrderid());
+                    }
+                }
+            }
+
+            // Update delivery status
+            delivery.setStatus(newStatus);
+            deliveryRepository.save(delivery);
+
+            logger.info("✅ Delivery {} status updated to {}", deliveryId, newStatus);
+            if (newStatus == 0) {
+                logger.info("✅ Trip completion process finished - resources restored and made available");
+            }
+
+            return true;
+
         } catch (Exception e) {
-            System.err.println("❌ Error updating delivery status and restoring resources: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("❌ Error updating delivery status: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to update delivery status: " + e.getMessage());
         }
     }
+
 }
