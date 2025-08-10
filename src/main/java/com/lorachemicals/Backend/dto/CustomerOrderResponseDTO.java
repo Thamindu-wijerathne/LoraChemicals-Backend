@@ -18,7 +18,9 @@ public class CustomerOrderResponseDTO {
     private Long customerId;
     private String customerName;  // optional extra for UI display
     private String route;
+    private Long routeid;
 
     private List<CustomerOrderItemResponseDTO> items; // ✅ new
+
 
 }

@@ -132,6 +132,7 @@ public class CustomerOrderService {
 
             if (customer != null && customer.getRoute() != null) {
                 dto.setRoute(customer.getRoute().getDistrict()); // assuming 'route' in DTO is a String
+                dto.setRouteid(customer.getRoute().getRouteid());
             } else {
                 dto.setRoute("N/A"); // or null, as fallback
             }

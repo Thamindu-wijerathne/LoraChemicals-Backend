@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -43,7 +44,7 @@ public class VehicleService {
                     null, // Will set image after processing
                     requestDTO.getSeats(),
                     requestDTO.getDate(),
-                    "active"     //this is vehicle status saving as 1 when create vehicle
+                    "1"     //this is vehicle status saving as 1 when create vehicle
             );
 
             // Handle image if provided

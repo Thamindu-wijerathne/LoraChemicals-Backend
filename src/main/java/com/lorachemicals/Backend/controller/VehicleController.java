@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -75,7 +76,11 @@ public class VehicleController {
         logger.info("PUT /Update Vehicle status Api Called {}", vehicleRequestDTO);
         try {
             logger.info("PUT /Update Vehicle status Api Called");
-            vehicleService.updateVehicleStatus(id, vehicleRequestDTO.getStatus());
+            if(Objects.equals(vehicleRequestDTO.getStatus(), "maintenance")) {
+                vehicleService.updateVehicleStatus(id, "2");
+            } else if (Objects.equals(vehicleRequestDTO.getStatus(), "active")) {
+                vehicleService.updateVehicleStatus(id, "1");
+            }
             return ResponseEntity.ok("Vehicle status updated successfully for id: " + id);
 
         } catch (Exception e) {
