@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -42,7 +43,8 @@ public class VehicleService {
                     requestDTO.getDescription(),
                     null, // Will set image after processing
                     requestDTO.getSeats(),
-                    requestDTO.getDate()
+                    requestDTO.getDate(),
+                    "1"     //this is vehicle status saving as 1 when create vehicle
             );
 
             // Handle image if provided
@@ -181,6 +183,13 @@ public class VehicleService {
         }
     }
 
+    public void updateVehicleStatus(Long id, String status) {
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Vehicle not found with id: " + id));
+        vehicle.setStatus(status);
+        vehicleRepository.save(vehicle);
+    }
+
     private VehicleResponseDTO convertToResponseDTO(Vehicle vehicle) {
         VehicleResponseDTO dto = new VehicleResponseDTO();
         dto.setId(vehicle.getId());
@@ -190,6 +199,7 @@ public class VehicleService {
         dto.setDescription(vehicle.getDescription());
         dto.setSeats(vehicle.getSeats());
         dto.setDate(vehicle.getDate());
+        dto.setStatus(vehicle.getStatus());
 
         // Set image URL if image exists
         String imageUrl = null;
@@ -200,4 +210,6 @@ public class VehicleService {
 
         return dto;
     }
+
+
 }

@@ -27,10 +27,17 @@ public class BatchTypeController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BatchTypeResponseDTO> getAllBatchTypesbyid(@PathVariable Long id,HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "admin"); // ✅ Access check
-        return ResponseEntity.ok(batchTypeService.getAllBatchTypesbyid(id , request));
+    public ResponseEntity<?> getAllBatchTypesbyid(@PathVariable Long id, HttpServletRequest request) {
+        try {
+            AccessControlUtil.checkAccess(request, "admin", "warehouse"); // ✅ Access check
+            BatchTypeResponseDTO batchTypeResponseDTO = batchTypeService.getAllBatchTypesbyid(id, request);
+            return ResponseEntity.ok(batchTypeResponseDTO);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error: " + ex.getMessage());
+        }
     }
+
 
     @GetMapping("/ptv/{ptvid}")
     public ResponseEntity<List<BatchTypeResponseDTO>> getAllBatchTypesbyptvid(@PathVariable Long ptvid,HttpServletRequest request) {

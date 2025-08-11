@@ -22,7 +22,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/vehicles")
@@ -68,6 +70,24 @@ public class VehicleController {
         }
     }
 
+    @PutMapping("/status/{id}")
+    public ResponseEntity<?> updateVehicleStatus(@PathVariable Long id, HttpServletRequest request, @RequestBody VehicleRequestDTO vehicleRequestDTO) {
+        AccessControlUtil.checkAccess(request, "admin");
+        logger.info("PUT /Update Vehicle status Api Called {}", vehicleRequestDTO);
+        try {
+            logger.info("PUT /Update Vehicle status Api Called");
+            if(Objects.equals(vehicleRequestDTO.getStatus(), "maintenance")) {
+                vehicleService.updateVehicleStatus(id, "2");
+            } else if (Objects.equals(vehicleRequestDTO.getStatus(), "active")) {
+                vehicleService.updateVehicleStatus(id, "1");
+            }
+            return ResponseEntity.ok("Vehicle status updated successfully for id: " + id);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Vehicle cannot update with id: " + id);
+        }
+    }
+
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateVehicle(
             @PathVariable Long id,
@@ -108,7 +128,7 @@ public class VehicleController {
     public ResponseEntity<?> getAllVehicles(HttpServletRequest request) {
         try {
             logger.info("GET /Get All Vehicles Api Called");
-            AccessControlUtil.checkAccess(request, "admin");
+            AccessControlUtil.checkAccess(request, "admin", "warehouse");
             List<VehicleResponseDTO> vehicles = vehicleService.getAllVehicles();
             logger.info("GET vehicle data : {}", vehicles);
             return new ResponseEntity<>(vehicles, HttpStatus.OK);

@@ -109,6 +109,7 @@ public class BatchTypeService {
 
         dto.setBatchtypename(bt.getBatchtypename());
 
+        dto.setImageURL(bt.getProductTypeVolume().getImage());
         return dto;
     }
 }

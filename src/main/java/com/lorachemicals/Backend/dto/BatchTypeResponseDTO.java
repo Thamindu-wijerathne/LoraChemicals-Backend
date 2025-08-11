@@ -20,6 +20,8 @@ public class BatchTypeResponseDTO {
 
     private String batchtypename;
 
+    private String imageURL;
+
     public BatchTypeResponseDTO() {
     }
 }

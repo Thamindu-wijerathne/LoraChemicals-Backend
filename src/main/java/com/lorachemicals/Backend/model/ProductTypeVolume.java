@@ -56,6 +56,7 @@ public class ProductTypeVolume {
         return productType;
     }
 
+    public Long getVolume() { return this.volume; }
     public BigDecimal getUnitPrice() { return unitPrice; }
 
 

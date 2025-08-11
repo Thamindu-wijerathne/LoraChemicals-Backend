@@ -14,11 +14,12 @@ public class VehicleResponseDTO {
     private String date;
     private Long seats;
     private String image;
+    private String status;
 
     public VehicleResponseDTO() {
     }
 
-    public VehicleResponseDTO(Long id, String vehicleNo, String vehicleType, String capacity, Long seats, String date, String image) {
+    public VehicleResponseDTO(Long id, String vehicleNo, String vehicleType, String capacity, Long seats, String date, String image, String status) {
         this.id = id;
         this.vehicleNo = vehicleNo;
         this.vehicleType = vehicleType;
@@ -26,6 +27,7 @@ public class VehicleResponseDTO {
         this.seats = seats;
         this.date = date;
         this.image = image;
+        this.status = status;
     }
 
     public Long getId() {
@@ -73,6 +75,7 @@ public class VehicleResponseDTO {
                 ", date='" + date + '\'' +
                 ", seats=" + seats +
                 ", image='" + image + '\'' +
+                ", status='" + status + '\'' +
                 '}';
     }
 

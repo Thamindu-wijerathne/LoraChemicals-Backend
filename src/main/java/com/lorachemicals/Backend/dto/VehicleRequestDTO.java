@@ -13,11 +13,12 @@ public class VehicleRequestDTO {
     private String date;
     private String image;
     private String description;
+    private String status;
 
     public VehicleRequestDTO() {
     }
 
-    public VehicleRequestDTO(String vehicleNo, String vehicleType, String capacity, Long seats, String date, String description, String image) {
+    public VehicleRequestDTO(String vehicleNo, String vehicleType, String capacity, Long seats, String date, String description, String image, String status) {
         this.vehicleNo = vehicleNo;
         this.vehicleType = vehicleType;
         this.capacity = capacity;
@@ -25,6 +26,7 @@ public class VehicleRequestDTO {
         this.date = date;
         this.image = image;
         this.description = description;
+        this.status = status;
     }
 
     public String getVehicleNo() {
@@ -50,4 +52,19 @@ public class VehicleRequestDTO {
     public void setCapacity(String capacity) {
         this.capacity = capacity;
     }
+
+    @Override
+    public String toString() {
+        return "VehicleRequestDTO{" +
+                "vehicleNo='" + vehicleNo + '\'' +
+                ", vehicleType='" + vehicleType + '\'' +
+                ", capacity='" + capacity + '\'' +
+                ", seats=" + seats +
+                ", date='" + date + '\'' +
+                ", image='" + image + '\'' +
+                ", description='" + description + '\'' +
+                ", status='" + status + '\'' +
+                '}';
+    }
+
 }

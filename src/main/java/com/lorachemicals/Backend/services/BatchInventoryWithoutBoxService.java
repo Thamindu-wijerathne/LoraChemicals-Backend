@@ -30,7 +30,7 @@ public class BatchInventoryWithoutBoxService {
     // Get all batch inventories without box
     public List<BatchInventoryWithoutBox> getAllBatchInventoriesWithoutBox() {
         try {
-            return batchInventoryWithoutBoxRepository.findAll();
+            return batchInventoryWithoutBoxRepository.findAllWithParentBatchType();
         } catch (Exception e) {
             throw new RuntimeException("Failed to fetch batch inventories without box: " + e.getMessage(), e);
         }
