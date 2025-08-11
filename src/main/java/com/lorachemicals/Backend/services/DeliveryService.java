@@ -1,21 +1,50 @@
 package com.lorachemicals.Backend.services;
 
+import java.math.BigDecimal;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.lorachemicals.Backend.model.*;
-import com.lorachemicals.Backend.repository.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.lorachemicals.Backend.dto.BatchInventoryDeliveryResponseDTO;
 import com.lorachemicals.Backend.dto.DeliveryRequestDTO;
 import com.lorachemicals.Backend.dto.DeliveryResponseDTO;
+import com.lorachemicals.Backend.dto.SalesRepDeliveryResponseDTO;
+import com.lorachemicals.Backend.model.BatchInventory;
+import com.lorachemicals.Backend.model.BatchInventoryDelivery;
+import com.lorachemicals.Backend.model.BatchInventoryDeliveryId;
+import com.lorachemicals.Backend.model.BatchInventoryWithoutBox;
+import com.lorachemicals.Backend.model.BatchType;
+import com.lorachemicals.Backend.model.BatchTypeWithoutBox;
+import com.lorachemicals.Backend.model.CustomerOrder;
+import com.lorachemicals.Backend.model.Delivery;
+import com.lorachemicals.Backend.model.DeliveryOrder;
+import com.lorachemicals.Backend.model.DeliveryOrderId;
+import com.lorachemicals.Backend.model.ParentBatchType;
+import com.lorachemicals.Backend.model.Route;
+import com.lorachemicals.Backend.model.SalesRep;
+import com.lorachemicals.Backend.model.Vehicle;
+import com.lorachemicals.Backend.model.WarehouseManager;
+import com.lorachemicals.Backend.repository.BatchInventoryDeliveryRepository;
+import com.lorachemicals.Backend.repository.BatchInventoryRepository;
+import com.lorachemicals.Backend.repository.BatchInventoryWithoutBoxRepository;
+import com.lorachemicals.Backend.repository.BatchTypeRepository;
+import com.lorachemicals.Backend.repository.BatchTypeWithoutBoxRepository;
+import com.lorachemicals.Backend.repository.CustomerOrderItemRepository;
+import com.lorachemicals.Backend.repository.CustomerOrderRepository;
+import com.lorachemicals.Backend.repository.DeliveryOrderRepository;
+import com.lorachemicals.Backend.repository.DeliveryRepository;
+import com.lorachemicals.Backend.repository.RouteRepository;
+import com.lorachemicals.Backend.repository.SalesRepRepository;
+import com.lorachemicals.Backend.repository.VehicleRepository;
+import com.lorachemicals.Backend.repository.WarehouseManagerRepository;
 
 import jakarta.transaction.Transactional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 @Service
 public class DeliveryService {
 
@@ -57,6 +86,9 @@ public class DeliveryService {
     @Autowired
     private DeliveryOrderRepository deliveryOrderRepository;
 
+    @Autowired
+    private CustomerOrderItemRepository customerOrderItemRepository;
+
     @Transactional
     public DeliveryResponseDTO createDelivery(DeliveryRequestDTO requestDTO) {
         try {
@@ -73,7 +105,7 @@ public class DeliveryService {
             } else {
                 delivery.setDispatchdate(java.time.LocalDateTime.now());
             }
-            
+
             if (requestDTO.getCamedate() != null && !requestDTO.getCamedate().isEmpty()) {
                 String dateStr = requestDTO.getCamedate();
                 if (dateStr.endsWith("Z")) {
@@ -84,7 +116,7 @@ public class DeliveryService {
                 }
                 delivery.setCamedate(java.time.LocalDateTime.parse(dateStr));
             }
-            
+
             delivery.setStatus(requestDTO.getStatus());
 
             SalesRep salesRep = salesRepRepository.findById(requestDTO.getSrepid())
@@ -100,10 +132,10 @@ public class DeliveryService {
             delivery.setVehicle(vehicle);
 
             salesRep.setStatus(0);
-            salesRepRepository.save(salesRep);            
+            salesRepRepository.save(salesRep);
             vehicle.setStatus("0");
             vehicleRepository.save(vehicle);
-            
+
             Delivery savedDelivery = deliveryRepository.save(delivery);
 
             // 2. Loop orders and save into delivery_order table
@@ -124,15 +156,14 @@ public class DeliveryService {
             }
 
 
-            
             if (requestDTO.getBatchInventoryDetails() != null && !requestDTO.getBatchInventoryDetails().isEmpty()) {
                 System.out.println("📦 PROCESSING " + requestDTO.getBatchInventoryDetails().size() + " BATCH INVENTORY DETAILS:");
-                
+
                 for (DeliveryRequestDTO.BatchInventoryDetail batchDetail : requestDTO.getBatchInventoryDetails()) {
                     BatchInventoryDelivery batchDelivery = new BatchInventoryDelivery();
                     Long batchTypeId = null;
                     ParentBatchType parentBatchType = null;
-                    
+
                     if ("with_box".equals(batchDetail.getInventoryType())) {
                         // Look in regular BatchType table for with_box items
                         BatchType batchType = batchTypeRepository.findById(batchDetail.getBatchtypeid())
@@ -157,30 +188,30 @@ public class DeliveryService {
                             batchDetail.getType()
                     );
                     batchDelivery.setId(batchId);
-                    
+
                     // Set relationships
                     batchDelivery.setBatchType(parentBatchType);
                     batchDelivery.setDelivery(savedDelivery);
-                    
+
                     // Set warehouse manager
                     WarehouseManager warehouseManager = warehouseManagerRepository.findById(batchDetail.getWmid())
                             .orElseThrow(() -> new RuntimeException("WarehouseManager not found: " + batchDetail.getWmid()));
                     System.out.println("✅ Found WarehouseManager: " + warehouseManager.getWmid());
                     batchDelivery.setWarehouseManager(warehouseManager);
-                    
+
                     // Set quantities
                     System.out.println("   🔢 Setting delivery record quantities - Quantity: " + batchDetail.getQuantity() + ", CurrentQuantity: " + batchDetail.getCurrentQuantity());
                     batchDelivery.setQuantity(batchDetail.getQuantity());
                     batchDelivery.setCurrentQuantity(batchDetail.getCurrentQuantity());
-                    
+
                     // Save batch delivery record
                     batchInventoryDeliveryRepository.save(batchDelivery);
                     System.out.println("   ✅ BatchInventoryDelivery record created for " + batchDetail.getType().toUpperCase() + " type with quantity: " + batchDetail.getQuantity());
-                    
+
                     // Deduct inventory from the specific inventory record
-                    if ("orders".equals(batchDetail.getType()) || "extras".equals(batchDetail.getType())) {   
+                    if ("orders".equals(batchDetail.getType()) || "extras".equals(batchDetail.getType())) {
                         boolean deductionSuccessful = false;
-                        
+
                         // Deduct from the specific inventory record based on type
                         if ("with_box".equals(batchDetail.getInventoryType())) {
                             // Deduct from BatchInventory
@@ -192,12 +223,12 @@ public class DeliveryService {
                                     inventory.setBatch_quantity(newBatchQuantity);
                                     batchInventoryRepository.save(inventory);
                                     deductionSuccessful = true;
-                                    
-                                    System.out.println("   ✅ BatchInventory (ID: " + inventory.getInventoryid() + ") updated: " + 
-                                        availableBatches + " batches -> " + newBatchQuantity + " batches (-" + batchDetail.getQuantity() + " batches)");
+
+                                    System.out.println("   ✅ BatchInventory (ID: " + inventory.getInventoryid() + ") updated: " +
+                                            availableBatches + " batches -> " + newBatchQuantity + " batches (-" + batchDetail.getQuantity() + " batches)");
                                 } else {
-                                    throw new RuntimeException("Insufficient inventory in BatchInventory ID: " + batchDetail.getInventoryid() + 
-                                        ". Available: " + availableBatches + ", Required: " + batchDetail.getQuantity());
+                                    throw new RuntimeException("Insufficient inventory in BatchInventory ID: " + batchDetail.getInventoryid() +
+                                            ". Available: " + availableBatches + ", Required: " + batchDetail.getQuantity());
                                 }
                             } else {
                                 throw new RuntimeException("BatchInventory not found for ID: " + batchDetail.getInventoryid());
@@ -212,12 +243,12 @@ public class DeliveryService {
                                     inventory.setBatch_quantity(newBatchQuantity);
                                     batchInventoryWithoutBoxRepository.save(inventory);
                                     deductionSuccessful = true;
-                                    
-                                    System.out.println("   ✅ BatchInventoryWithoutBox (ID: " + inventory.getId() + ") updated: " + 
-                                        availableBatches + " batches -> " + newBatchQuantity + " batches (-" + batchDetail.getQuantity() + " batches)");
+
+                                    System.out.println("   ✅ BatchInventoryWithoutBox (ID: " + inventory.getId() + ") updated: " +
+                                            availableBatches + " batches -> " + newBatchQuantity + " batches (-" + batchDetail.getQuantity() + " batches)");
                                 } else {
-                                    throw new RuntimeException("Insufficient inventory in BatchInventoryWithoutBox ID: " + batchDetail.getInventoryid() + 
-                                        ". Available: " + availableBatches + ", Required: " + batchDetail.getQuantity());
+                                    throw new RuntimeException("Insufficient inventory in BatchInventoryWithoutBox ID: " + batchDetail.getInventoryid() +
+                                            ". Available: " + availableBatches + ", Required: " + batchDetail.getQuantity());
                                 }
                             } else {
                                 throw new RuntimeException("BatchInventoryWithoutBox not found for ID: " + batchDetail.getInventoryid());
@@ -225,17 +256,17 @@ public class DeliveryService {
                         } else {
                             throw new RuntimeException("Unknown inventory type: " + batchDetail.getInventoryType());
                         }
-                        
+
                         if (deductionSuccessful) {
-                            System.out.println("   ✅ Successfully deducted " + batchDetail.getQuantity() + " batches from " + 
-                                batchDetail.getInventoryType() + " inventory ID: " + batchDetail.getInventoryid());
-                            System.out.println("   📊 SUMMARY: DeliveryRecord.quantity=" + batchDetail.getQuantity() + 
-                                ", DeductedFromInventory=" + batchDetail.getQuantity() + " ✅ MATCH");
+                            System.out.println("   ✅ Successfully deducted " + batchDetail.getQuantity() + " batches from " +
+                                    batchDetail.getInventoryType() + " inventory ID: " + batchDetail.getInventoryid());
+                            System.out.println("   📊 SUMMARY: DeliveryRecord.quantity=" + batchDetail.getQuantity() +
+                                    ", DeductedFromInventory=" + batchDetail.getQuantity() + " ✅ MATCH");
                         }
                     }
                 }
             }
-            
+
             // Update selected orders status to "ongoing" 
             if (requestDTO.getSelectedOrders() != null && !requestDTO.getSelectedOrders().isEmpty()) {
                 System.out.println("📋 UPDATING " + requestDTO.getSelectedOrders().size() + " ORDERS TO 'ONGOING' STATUS:");
@@ -441,4 +472,154 @@ public class DeliveryService {
         }
     }
 
+
+    //view details about on going details by srep
+    public SalesRepDeliveryResponseDTO getDetailedDeliveryBySalesRep(Long srepid) {
+        try {
+            Delivery delivery = deliveryRepository
+                    .findBySalesRep_SrepidAndStatus(srepid, 1)
+                    .stream()
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("No active deliveries found for sales rep " + srepid));
+
+            // Batch inventories
+            List<SalesRepDeliveryResponseDTO.DeliveryBatchInventoryDetail> batchDetails =
+                    batchInventoryDeliveryRepository.findByDelivery_Deliveryid(delivery.getDeliveryid())
+                            .stream()
+                            .map(b -> {
+                                SalesRepDeliveryResponseDTO.DeliveryBatchInventoryDetail d = new SalesRepDeliveryResponseDTO.DeliveryBatchInventoryDetail();
+                                if (b.getId() != null) {
+                                    d.setBatchtypeid(b.getId().getBatchtypeid());
+                                    d.setDeliveryid(b.getId().getDeliveryid());
+                                    d.setDatetime(b.getId().getDatetime());
+                                    d.setType(b.getId().getType());
+                                }
+                                d.setQuantity(b.getQuantity());
+                                d.setCurrentQuantity(b.getCurrentQuantity());
+
+                                Optional.ofNullable(b.getWarehouseManager())
+                                        .ifPresent(wm -> {
+                                            d.setWmid(wm.getWmid());
+                                            Optional.ofNullable(wm.getUser())
+                                                    .ifPresent(u -> d.setWarehouseManagerName((u.getFname() != null ? u.getFname() : "") + " " + (u.getLname() != null ? u.getLname() : "")));
+                                        });
+
+                                Optional.ofNullable(b.getBatchType()).ifPresent(parent -> {
+                                    d.setBatchTypeName(parent.getBatchtypename());
+                                    
+                                    // Set the parent batch type's unique batch code
+                                    d.setBatchCode(parent.getUniqueBatchCode());
+                                    
+                                    logger.info("🏷️ Batch Type ID: {}, Name: {}, Unique Code: {}", 
+                                        parent.getId(), parent.getBatchtypename(), parent.getUniqueBatchCode());
+                                    
+                                    batchTypeRepository.findById(parent.getId()).ifPresentOrElse(bt -> {
+                                        d.setInventoryType("with_box");
+                                        Optional.ofNullable(bt.getProductTypeVolume()).ifPresent(ptv -> {
+                                            Optional.ofNullable(ptv.getProductType()).ifPresent(pt -> d.setProductName(pt.getName()));
+                                            Optional.ofNullable(ptv.getVolume()).ifPresent(v -> d.setVolume(v.doubleValue()));
+                                        });
+                                        Optional.ofNullable(bt.getBoxType()).ifPresent(box -> {
+                                            d.setBoxTypeName(box.getName());
+                                            d.setQuantityInBox(box.getQuantityInBox());
+                                        });
+                                    }, () -> batchTypeWithoutBoxRepository.findById(parent.getId()).ifPresent(btwb -> {
+                                        d.setInventoryType("without_box");
+                                        Optional.ofNullable(btwb.getProductTypeVolume()).ifPresent(ptv -> {
+                                            Optional.ofNullable(ptv.getProductType()).ifPresent(pt -> d.setProductName(pt.getName()));
+                                            Optional.ofNullable(ptv.getVolume()).ifPresent(v -> d.setVolume(v.doubleValue()));
+                                        });
+                                        d.setQuantityInBox(1);
+                                    }));
+                                });
+                                return d;
+                            }).collect(Collectors.toList());
+
+            // Orders
+            List<SalesRepDeliveryResponseDTO.DeliveryOrderDetail> orderDetails =
+                    deliveryOrderRepository.findByDelivery_Deliveryid(delivery.getDeliveryid())
+                            .stream()
+                            .map(doe -> {
+                                SalesRepDeliveryResponseDTO.DeliveryOrderDetail od = new SalesRepDeliveryResponseDTO.DeliveryOrderDetail();
+                                Optional.ofNullable(doe.getCustomerOrder()).ifPresent(order -> {
+                                    od.setOrderid(order.getOrderid());
+                                    od.setOrderStatus(order.getStatus());
+                                    Optional.ofNullable(order.getTotal()).ifPresent(t -> od.setOrderTotal(t.doubleValue()));
+                                    Optional.ofNullable(doe.getDelivery()).ifPresent(d -> od.setDeliveryid(d.getDeliveryid()));
+
+                                    Optional.ofNullable(order.getUser()).ifPresent(c -> {
+                                        od.setCustomerId(c.getId());
+                                        od.setCustomerName((c.getFname() != null ? c.getFname() : "") + " " + (c.getLname() != null ? c.getLname() : ""));
+                                        od.setCustomerEmail(c.getEmail());
+                                        od.setCustomerAddress(c.getAddress());
+                                        od.setCustomerPhone(c.getPhone());
+                                    });
+
+                                    Optional.ofNullable(order.getDelivered_date())
+                                            .ifPresent(dd -> od.setOrderDate(dd.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()));
+
+                                    od.setOrderItems(
+                                            customerOrderItemRepository.findByCustomerOrder_Orderid(order.getOrderid())
+                                                    .stream()
+                                                    .map(item -> {
+                                                        SalesRepDeliveryResponseDTO.OrderItem oi = new SalesRepDeliveryResponseDTO.OrderItem();
+                                                        oi.setItemid(item.getOrderitemid());
+                                                        Optional.ofNullable(item.getQuantity()).ifPresent(q -> {
+                                                            oi.setQuantity(q.intValue());
+                                                            Optional.ofNullable(item.getProductTotal())
+                                                                    .ifPresent(total -> {
+                                                                        if (q > 0) {
+                                                                            oi.setUnitPrice(total.divide(BigDecimal.valueOf(q)).doubleValue());
+                                                                            oi.setTotalPrice(total.doubleValue());
+                                                                        }
+                                                                    });
+                                                        });
+                                                        Optional.ofNullable(item.getProductTypeVolume()).ifPresent(ptv -> {
+                                                            Optional.ofNullable(ptv.getProductType()).ifPresent(pt -> oi.setProductTypeName(pt.getName()));
+                                                            Optional.ofNullable(ptv.getVolume()).ifPresent(v -> oi.setVolume(v.doubleValue()));
+                                                            oi.setProductImage(ptv.getImage());
+                                                        });
+                                                        return oi;
+                                                    })
+                                                    .collect(Collectors.toList())
+                                    );
+                                });
+                                return od;
+                            }).collect(Collectors.toList());
+
+            // Build main DTO
+            SalesRepDeliveryResponseDTO dto = new SalesRepDeliveryResponseDTO();
+            dto.setDeliveryid(delivery.getDeliveryid());
+            dto.setDispatchdate(delivery.getDispatchdate());
+            dto.setCamedate(delivery.getCamedate());
+            dto.setStatus(delivery.getStatus());
+
+            Optional.ofNullable(delivery.getSalesRep()).ifPresent(sr -> {
+                dto.setSrepid(sr.getSrepid());
+                Optional.ofNullable(sr.getUser()).ifPresent(u -> {
+                    dto.setSalesRepName((u.getFname() != null ? u.getFname() : "") + " " + (u.getLname() != null ? u.getLname() : ""));
+                    dto.setSalesRepEmail(u.getEmail());
+                });
+            });
+
+            Optional.ofNullable(delivery.getRoute()).ifPresent(r -> {
+                dto.setRouteid(r.getRouteid());
+                dto.setRouteName(r.getDistrict() != null ? r.getDistrict() : "Unknown Route");
+            });
+
+            Optional.ofNullable(delivery.getVehicle()).ifPresent(v -> {
+                dto.setVehicleid(v.getId());
+                dto.setVehicleNumber(v.getVehicleNo() != null ? v.getVehicleNo() : "Unknown Vehicle");
+                dto.setVehicleLicensePlate(v.getVehicleNo() != null ? v.getVehicleNo() : "Unknown");
+            });
+
+            dto.setBatchInventoryDetails(batchDetails);
+            dto.setDeliveryOrders(orderDetails);
+
+            return dto;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch delivery details for sales rep " + srepid, e);
+        }
+    }
 }

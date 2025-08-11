@@ -11,4 +11,5 @@ public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
     List<Delivery> findByRoute_Routeid(Long routeid);
     List<Delivery> findByVehicle_Id(Long vehicleid);
     List<Delivery> findByStatus(int status);
+    List<Delivery> findBySalesRep_SrepidAndStatus(Long srepid, int status);
 }

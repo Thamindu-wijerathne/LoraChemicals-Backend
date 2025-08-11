@@ -12,4 +12,5 @@ public interface BatchInventoryDeliveryRepository extends JpaRepository<BatchInv
     List<BatchInventoryDelivery> findById_Batchtypeid(Long batchtypeid);
     List<BatchInventoryDelivery> findById_Type(String type);
     List<BatchInventoryDelivery> findByWarehouseManager_Wmid(Long wmid);
+    List<BatchInventoryDelivery> findByDelivery_Deliveryid(Long deliveryid);
 }

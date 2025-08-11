@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.lorachemicals.Backend.dto.DeliveryRequestDTO;
 import com.lorachemicals.Backend.dto.DeliveryResponseDTO;
+import com.lorachemicals.Backend.dto.SalesRepDeliveryResponseDTO;
 import com.lorachemicals.Backend.services.DeliveryService;
 import com.lorachemicals.Backend.util.AccessControlUtil;
 
@@ -70,6 +71,25 @@ public class DeliveryController {
     public ResponseEntity<List<DeliveryResponseDTO>> getDeliveriesByStatus(@PathVariable int status) {
         List<DeliveryResponseDTO> deliveries = deliveryService.getDeliveriesByStatus(status);
         return new ResponseEntity<>(deliveries, HttpStatus.OK);
+    }
+
+
+    // view on going delivery details by spesific salesrep
+    @GetMapping("/salesrep/{srepid}/detailed")
+    public ResponseEntity<SalesRepDeliveryResponseDTO> getDetailedDeliveryBySalesRep(@PathVariable Long srepid, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "salesrep", "admin", "warehouse");
+        try {
+            SalesRepDeliveryResponseDTO delivery = deliveryService.getDetailedDeliveryBySalesRep(srepid);
+            if (delivery != null) {
+                return new ResponseEntity<>(delivery, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            System.err.println("❌ Error getting detailed delivery for sales rep " + srepid + ": " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(null);
+        }
     }
 
     @PutMapping("/{id}/status")
