@@ -34,7 +34,7 @@ public class BatchInventoryWithoutBoxController {
     // GET all batch inventories without box
     @GetMapping("/all")
     public ResponseEntity<?> getAllBatchInventoriesWithoutBox(HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse", "admin");
+        AccessControlUtil.checkAccess(request, "warehouse", "admin","salesrep");
         try {
             List<BatchInventoryWithoutBox> batchInventories = batchInventoryWithoutBoxService.getAllBatchInventoriesWithoutBox();
             return new ResponseEntity<>(batchInventories, HttpStatus.OK);

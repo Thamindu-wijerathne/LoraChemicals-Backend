@@ -23,7 +23,7 @@ public class BatchInventoryController {
     // GET all batch inventories
     @GetMapping("/all")
     public ResponseEntity<?> getAllBatchInventories(HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "warehouse", "admin");
+        AccessControlUtil.checkAccess(request, "warehouse", "admin","salesrep");
         try {
             List<BatchInventory> batchInventories = batchInventoryService.getAllBatchInventories();
             return new ResponseEntity<>(batchInventories, HttpStatus.OK);
