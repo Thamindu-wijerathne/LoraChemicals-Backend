@@ -32,6 +32,13 @@ public class CustomerOrderService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private BatchInventoryDeliveryRepository batchInventoryDeliveryRepository;
+
+
+    @Autowired
+    private BatchInventoryRepository batchInventoryRepository;
+
     @Transactional
     public CustomerOrder createOrder(CustomerOrderRequestDTO data) {
         try {
@@ -178,5 +185,31 @@ public class CustomerOrderService {
     }
 
 
+    @Transactional
+    public void completeOrder(Long orderId, CustomerOrderRequestDTO requestDTO) {
+        CustomerOrder order = orderRepository.findByOrderid(orderId);
+        if (order == null) throw new RuntimeException("Order not found: " + orderId);
+
+        order.setStatus("Complete");
+        orderRepository.save(order);
+
+        // Deduct batches
+        for (CustomerOrderRequestDTO.BatchDeduction deduction : requestDTO.getBatchDeductions()) {
+            BatchInventoryDelivery batch = batchInventoryDeliveryRepository
+                    .findByBatchType_IdAndDelivery_DeliveryidAndId_TypeAndId_Datetime(
+                            deduction.getBatchtypeid(),
+                            deduction.getDeliveryid(),
+                            deduction.getType(),
+                            deduction.getDatetime()
+                    );
+
+            if (batch == null)
+                throw new RuntimeException("Batch not found: " + deduction.getBatchtypeid());
+
+            batch.setCurrentQuantity(batch.getCurrentQuantity() - deduction.getBoxesToDeduct());
+            batchInventoryDeliveryRepository.save(batch);
+
+        }
+    }
 
 }
