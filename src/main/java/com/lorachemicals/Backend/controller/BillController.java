@@ -1,17 +1,24 @@
 package com.lorachemicals.Backend.controller;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.lorachemicals.Backend.dto.BillRequestDTO;
 import com.lorachemicals.Backend.dto.BillResponseDTO;
 import com.lorachemicals.Backend.model.Bill;
 import com.lorachemicals.Backend.services.BillService;
 import com.lorachemicals.Backend.util.AccessControlUtil;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.aot.generate.AccessControl;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/bill")
@@ -70,9 +77,26 @@ public class BillController {
             List<BillResponseDTO> response = bills.stream()
                     .map(billService::convertToDTO)
                     .toList();
-            return ResponseEntity.ok(bills);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/{billId}")
+    public ResponseEntity<?> getBillById(@PathVariable Long billId, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "salesrep", "admin", "warehouse");
+        try {
+            BillResponseDTO response = billService.getBillById(billId);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            logger.error("Error fetching bill by ID: {}", billId, e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Bill not found: " + e.getMessage());
+        } catch (Exception e) {
+            logger.error("Unexpected error fetching bill by ID: {}", billId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Unexpected error: " + e.getMessage());
         }
     }
 

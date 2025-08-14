@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.lorachemicals.Backend.dto.DeliveryRequestDTO;
 import com.lorachemicals.Backend.dto.DeliveryResponseDTO;
 import com.lorachemicals.Backend.dto.SalesRepDeliveryResponseDTO;
+import com.lorachemicals.Backend.dto.DeductExtrasRequestDTO;
 import com.lorachemicals.Backend.services.DeliveryService;
 import com.lorachemicals.Backend.util.AccessControlUtil;
 
@@ -107,6 +108,22 @@ public class DeliveryController {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         } catch (Exception e) {
             System.err.println("❌ Unexpected error updating delivery status: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/deduct-extras")
+    public ResponseEntity<?> deductExtrasFromVehicle(@RequestBody DeductExtrasRequestDTO requestDTO, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "salesrep", "admin");
+        try {
+            String result = deliveryService.deductExtrasFromVehicle(requestDTO);
+            return ResponseEntity.ok().body(result);
+        } catch (RuntimeException e) {
+            System.err.println("❌ Runtime error deducting extras: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("❌ Unexpected error deducting extras: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
         }

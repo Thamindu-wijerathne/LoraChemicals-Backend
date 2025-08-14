@@ -52,6 +52,8 @@ public class SalesRepDeliveryResponseDTO {
         private Long parentBatchId;
         private String batchCode;
         private String parentBatchCode;
+        private int ptvid;
+        private String imageurl;
     }
 
     @Getter

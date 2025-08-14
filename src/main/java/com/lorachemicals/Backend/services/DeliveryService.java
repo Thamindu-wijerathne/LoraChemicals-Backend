@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.lorachemicals.Backend.dto.BatchInventoryDeliveryResponseDTO;
+import com.lorachemicals.Backend.dto.DeductExtrasDTO;
+import com.lorachemicals.Backend.dto.DeductExtrasRequestDTO;
 import com.lorachemicals.Backend.dto.DeliveryRequestDTO;
 import com.lorachemicals.Backend.dto.DeliveryResponseDTO;
 import com.lorachemicals.Backend.dto.SalesRepDeliveryResponseDTO;
@@ -516,6 +518,8 @@ public class DeliveryService {
                                     batchTypeRepository.findById(parent.getId()).ifPresentOrElse(bt -> {
                                         d.setInventoryType("with_box");
                                         Optional.ofNullable(bt.getProductTypeVolume()).ifPresent(ptv -> {
+                                            d.setPtvid(ptv.getPtvid().intValue()); // Set the ptvid (convert Long to int)
+                                            d.setImageurl(ptv.getImage()); // Set the image URL
                                             Optional.ofNullable(ptv.getProductType()).ifPresent(pt -> d.setProductName(pt.getName()));
                                             Optional.ofNullable(ptv.getVolume()).ifPresent(v -> d.setVolume(v.doubleValue()));
                                         });
@@ -526,6 +530,8 @@ public class DeliveryService {
                                     }, () -> batchTypeWithoutBoxRepository.findById(parent.getId()).ifPresent(btwb -> {
                                         d.setInventoryType("without_box");
                                         Optional.ofNullable(btwb.getProductTypeVolume()).ifPresent(ptv -> {
+                                            d.setPtvid(ptv.getPtvid().intValue()); // Set the ptvid (convert Long to int)
+                                            d.setImageurl(ptv.getImage()); // Set the image URL
                                             Optional.ofNullable(ptv.getProductType()).ifPresent(pt -> d.setProductName(pt.getName()));
                                             Optional.ofNullable(ptv.getVolume()).ifPresent(v -> d.setVolume(v.doubleValue()));
                                         });
@@ -620,6 +626,51 @@ public class DeliveryService {
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to fetch delivery details for sales rep " + srepid, e);
+        }
+    }
+
+    @Transactional
+    public String deductExtrasFromVehicle(DeductExtrasRequestDTO request) {
+        try {
+            logger.info("Processing extras deduction for sales rep: {}", request.getSrepid());
+            
+            if (request.getDeductions() == null || request.getDeductions().isEmpty()) {
+                throw new RuntimeException("No deductions provided in request");
+            }
+
+            for (DeductExtrasDTO deduction : request.getDeductions()) {
+                logger.info("Processing deduction for batch: {}", deduction.getBatchtypeid());
+                
+                BatchInventoryDelivery batch = batchInventoryDeliveryRepository
+                        .findByBatchType_IdAndDelivery_DeliveryidAndId_TypeAndId_Datetime(
+                                deduction.getBatchtypeid(),
+                                deduction.getDeliveryid(),
+                                deduction.getType(),
+                                deduction.getDatetime()
+                        );
+
+                if (batch == null) {
+                    throw new RuntimeException("Batch not found: " + deduction.getBatchtypeid());
+                }
+
+                // Check if there's enough quantity to deduct
+                if (batch.getCurrentQuantity() < deduction.getBoxesToDeduct()) {
+                    throw new RuntimeException("Insufficient quantity in batch " + deduction.getBatchtypeid() + 
+                            ". Available: " + batch.getCurrentQuantity() + ", Requested: " + deduction.getBoxesToDeduct());
+                }
+
+                // Deduct the quantity
+                batch.setCurrentQuantity(batch.getCurrentQuantity() - deduction.getBoxesToDeduct());
+                batchInventoryDeliveryRepository.save(batch);
+                
+                logger.info("Successfully deducted {} boxes from batch {}", deduction.getBoxesToDeduct(), deduction.getBatchtypeid());
+            }
+
+            return "Successfully processed " + request.getDeductions().size() + " deductions for sales rep " + request.getSrepid();
+
+        } catch (Exception e) {
+            logger.error("Error processing extras deduction: ", e);
+            throw new RuntimeException("Failed to deduct extras from vehicle inventory: " + e.getMessage(), e);
         }
     }
 }
