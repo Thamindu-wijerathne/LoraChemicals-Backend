@@ -1,7 +1,9 @@
 package com.lorachemicals.Backend.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import com.lorachemicals.Backend.model.BatchInventoryDelivery;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,4 +17,5 @@ public interface BatchInventoryRepository extends JpaRepository<BatchInventory, 
     
     @Query("SELECT bi FROM BatchInventory bi WHERE bi.parentBatchType.id = :batchTypeId")
     List<BatchInventory> findByParentBatchTypeId(@Param("batchTypeId") Long batchTypeId);
+
 }

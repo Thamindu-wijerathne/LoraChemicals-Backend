@@ -1,18 +1,35 @@
 package com.lorachemicals.Backend.services;
 
-import com.lorachemicals.Backend.dto.*;
-import com.lorachemicals.Backend.model.*;
-import com.lorachemicals.Backend.repository.*;
-import jakarta.transaction.Transactional;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
+import com.lorachemicals.Backend.dto.CustomerOrderItemRequestDTO;
+import com.lorachemicals.Backend.dto.CustomerOrderItemResponseDTO;
+import com.lorachemicals.Backend.dto.CustomerOrderRequestDTO;
+import com.lorachemicals.Backend.dto.CustomerOrderResponseDTO;
+import com.lorachemicals.Backend.dto.TrendingProductsDTO;
+import com.lorachemicals.Backend.model.BatchInventoryDelivery;
+import com.lorachemicals.Backend.model.Customer;
+import com.lorachemicals.Backend.model.CustomerOrder;
+import com.lorachemicals.Backend.model.CustomerOrderItem;
+import com.lorachemicals.Backend.model.ProductType;
+import com.lorachemicals.Backend.model.ProductTypeVolume;
+import com.lorachemicals.Backend.model.User;
+import com.lorachemicals.Backend.repository.BatchInventoryDeliveryRepository;
+import com.lorachemicals.Backend.repository.BatchInventoryRepository;
+import com.lorachemicals.Backend.repository.CustomerOrderItemRepository;
+import com.lorachemicals.Backend.repository.CustomerOrderRepository;
+import com.lorachemicals.Backend.repository.CustomerRepository;
+import com.lorachemicals.Backend.repository.ProductTypeVolumeRepository;
+import com.lorachemicals.Backend.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class CustomerOrderService {
@@ -31,6 +48,13 @@ public class CustomerOrderService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private BatchInventoryDeliveryRepository batchInventoryDeliveryRepository;
+
+
+    @Autowired
+    private BatchInventoryRepository batchInventoryRepository;
 
     @Transactional
     public CustomerOrder createOrder(CustomerOrderRequestDTO data) {
@@ -178,5 +202,56 @@ public class CustomerOrderService {
     }
 
 
+    @Transactional
+    public void completeOrder(Long orderId, CustomerOrderRequestDTO requestDTO) {
+        CustomerOrder order = orderRepository.findByOrderid(orderId);
+        if (order == null) throw new RuntimeException("Order not found: " + orderId);
+
+        // Validate inventory before making any changes
+        for (CustomerOrderRequestDTO.BatchDeduction deduction : requestDTO.getBatchDeductions()) {
+            BatchInventoryDelivery batch = batchInventoryDeliveryRepository
+                    .findByBatchType_IdAndDelivery_DeliveryidAndId_TypeAndId_Datetime(
+                            deduction.getBatchtypeid(),
+                            deduction.getDeliveryid(),
+                            deduction.getType(),
+                            deduction.getDatetime()
+                    );
+
+            if (batch == null)
+                throw new RuntimeException("Batch not found for batch type ID: " + deduction.getBatchtypeid());
+            
+            if (batch.getCurrentQuantity() < deduction.getBoxesToDeduct()) {
+                throw new RuntimeException("Insufficient inventory in batch " + deduction.getBatchtypeid() + 
+                    ". Available: " + batch.getCurrentQuantity() + ", Requested: " + deduction.getBoxesToDeduct());
+            }
+        }
+
+        // If validation passes, update order status
+        order.setStatus("Complete");
+        orderRepository.save(order);
+
+        // Deduct batches
+        for (CustomerOrderRequestDTO.BatchDeduction deduction : requestDTO.getBatchDeductions()) {
+            BatchInventoryDelivery batch = batchInventoryDeliveryRepository
+                    .findByBatchType_IdAndDelivery_DeliveryidAndId_TypeAndId_Datetime(
+                            deduction.getBatchtypeid(),
+                            deduction.getDeliveryid(),
+                            deduction.getType(),
+                            deduction.getDatetime()
+                    );
+
+            // Update current quantity
+            int newQuantity = batch.getCurrentQuantity() - deduction.getBoxesToDeduct();
+            batch.setCurrentQuantity(newQuantity);
+            batchInventoryDeliveryRepository.save(batch);
+            
+            System.out.println("✅ Deducted " + deduction.getBoxesToDeduct() + 
+                " boxes from batch " + deduction.getBatchtypeid() + 
+                ". New quantity: " + newQuantity);
+        }
+
+        System.out.println("🎉 Order " + orderId + " completed successfully with " + 
+            requestDTO.getBatchDeductions().size() + " batch deductions");
+    }
 
 }

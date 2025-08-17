@@ -89,4 +89,19 @@ public class CustomerOrderController {
         }
     }
 
+    @PutMapping("/complete-order/{id}")
+    public ResponseEntity<?> completeOrder(@PathVariable Long id, @RequestBody CustomerOrderRequestDTO requestDTO, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "salesrep");
+        System.err.println("comple order runned");
+
+        try {
+            customerOrderService.completeOrder(id, requestDTO);
+            return ResponseEntity.ok("Order Completed successfully");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Failed to complete order: " + e.getMessage());
+        }
+    }
+
+
+
 }

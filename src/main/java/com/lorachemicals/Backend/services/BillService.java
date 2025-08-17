@@ -1,15 +1,24 @@
 package com.lorachemicals.Backend.services;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.lorachemicals.Backend.dto.BillItemRequestDTO;
 import com.lorachemicals.Backend.dto.BillItemResponseDTO;
 import com.lorachemicals.Backend.dto.BillRequestDTO;
 import com.lorachemicals.Backend.dto.BillResponseDTO;
-import com.lorachemicals.Backend.model.*;
-import com.lorachemicals.Backend.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
+import com.lorachemicals.Backend.model.Bill;
+import com.lorachemicals.Backend.model.BillItem;
+import com.lorachemicals.Backend.model.CustomerBill;
+import com.lorachemicals.Backend.model.ProductTypeVolume;
+import com.lorachemicals.Backend.model.SalesRep;
+import com.lorachemicals.Backend.repository.BillItemRepository;
+import com.lorachemicals.Backend.repository.BillRepository;
+import com.lorachemicals.Backend.repository.CustomerBillRepository;
+import com.lorachemicals.Backend.repository.ProductTypeVolumeRepository;
+import com.lorachemicals.Backend.repository.SalesRepRepository;
 
 @Service
 public class BillService {
@@ -22,6 +31,9 @@ public class BillService {
 
     @Autowired
     private CustomerBillRepository customerBillRepository;
+
+    @Autowired
+    private CustomerBillService customerBillService;
 
     @Autowired
     private ProductTypeVolumeRepository productTypeVolumeRepository;
@@ -77,6 +89,12 @@ public class BillService {
         return billRepository.findAll();
     }
 
+    public BillResponseDTO getBillById(Long billId) {
+        Bill bill = billRepository.findById(billId)
+                .orElseThrow(() -> new RuntimeException("Bill not found with ID: " + billId));
+        return convertToDTO(bill);
+    }
+
     public BillResponseDTO convertToDTO(Bill bill) {
         BillResponseDTO dto = new BillResponseDTO();
         dto.setBillid(bill.getBillid());
@@ -101,6 +119,16 @@ public class BillService {
 
 
         dto.setBillItems(itemDTOs);
+        
+        // Add customer information if available using CustomerBillService
+        CustomerBill customerBill = customerBillService.getCustomerBillByBillId(bill.getBillid());
+        if (customerBill != null) {
+            dto.setShopName(customerBill.getShop_name());
+            dto.setAddress(customerBill.getAddress());
+            dto.setPhone(customerBill.getPhone());
+            dto.setDistrict(customerBill.getDistrict());
+        }
+        
         return dto;
     }
 

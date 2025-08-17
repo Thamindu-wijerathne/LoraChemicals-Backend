@@ -38,4 +38,5 @@ public class CustomerOrder {
     @OneToMany(mappedBy = "customerOrder", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<CustomerOrderItem> orderItems;
 
+
 }
