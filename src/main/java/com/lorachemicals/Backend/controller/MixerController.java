@@ -22,7 +22,7 @@ public class MixerController {
     // Get all mixers
     @GetMapping("/all")
     public ResponseEntity<?> getAllMixers(HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "admin");
+        AccessControlUtil.checkAccess(request, "admin","warehouse");
         try {
             List<Mixer> mixers = mixerService.getAllMixers();
             return new ResponseEntity<>(mixers, HttpStatus.OK);
@@ -32,18 +32,18 @@ public class MixerController {
         }
     }
 
-    @GetMapping("/pt/{id}")
-    public ResponseEntity<?> getAllByPT(@PathVariable Long id, HttpServletRequest request) {
-        AccessControlUtil.checkAccess(request, "admin", "warehouse");
-        try{
-            List<Mixer> mixers = mixerService.getMixerByProductType(id);
-            return new ResponseEntity<>(mixers, HttpStatus.OK);
-        }
-        catch(Exception e){
-            return new ResponseEntity<>("Failed to get mixers by ptid: " + e.getMessage(),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+//    @GetMapping("/pt/{id}")
+//    public ResponseEntity<?> getAllByPT(@PathVariable Long id, HttpServletRequest request) {
+//        AccessControlUtil.checkAccess(request, "admin", "warehouse");
+//        try{
+//            List<Mixer> mixers = mixerService.getMixerByProductType(id);
+//            return new ResponseEntity<>(mixers, HttpStatus.OK);
+//        }
+//        catch(Exception e){
+//            return new ResponseEntity<>("Failed to get mixers by ptid: " + e.getMessage(),
+//                    HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 
     // Get mixer by ID
     @GetMapping("/{id}")

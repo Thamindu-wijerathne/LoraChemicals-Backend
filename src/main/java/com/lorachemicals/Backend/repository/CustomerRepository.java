@@ -3,6 +3,7 @@ package com.lorachemicals.Backend.repository;
 import com.lorachemicals.Backend.model.Customer;
 import com.lorachemicals.Backend.model.SalesRep;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,5 +21,8 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     java.util.List<Customer> findByRouteRouteid(Long routeid);
 
     List<Customer> findBySalesRep(SalesRep salesRep);
+
+    @Query("SELECT COUNT(DISTINCT c.route.routeid) FROM Customer c")
+    long countDistinctRouteIds();
 
 }

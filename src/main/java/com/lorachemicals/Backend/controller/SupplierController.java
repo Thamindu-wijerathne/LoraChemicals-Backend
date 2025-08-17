@@ -107,7 +107,7 @@ public class SupplierController {
                     dto.setAddress(s.getAddress());
                     dto.setEmail(s.getEmail());
                     dto.setSupplierType(s.getSupplierType());
-                    dto.setStatus(s.getStatus());
+
                     return dto;
                 })
                 .toList();
@@ -129,7 +129,6 @@ public class SupplierController {
         supplier.setAddress(supplierDto.getAddress());
         supplier.setEmail(supplierDto.getEmail());
         supplier.setSupplierType(supplierDto.getSupplierType());
-        supplier.setStatus(supplierDto.getStatus());
 
         Supplier saved = supplierService.addSupplier(supplier);
 
@@ -142,7 +141,6 @@ public class SupplierController {
         savedDto.setAddress(saved.getAddress());
         savedDto.setEmail(saved.getEmail());
         savedDto.setSupplierType(saved.getSupplierType());
-        savedDto.setStatus(saved.getStatus());
 
         return ResponseEntity.ok(savedDto);
     }
@@ -161,7 +159,6 @@ public class SupplierController {
         supplier.setAddress(supplierDto.getAddress());
         supplier.setEmail(supplierDto.getEmail());
         supplier.setSupplierType(supplierDto.getSupplierType());
-        supplier.setStatus(supplierDto.getStatus());
 
         Supplier updated = supplierService.updateSupplier(id, supplier);
         if (updated != null) {
@@ -174,7 +171,6 @@ public class SupplierController {
             updatedDto.setAddress(updated.getAddress());
             updatedDto.setEmail(updated.getEmail());
             updatedDto.setSupplierType(updated.getSupplierType());
-            updatedDto.setStatus(updated.getStatus());
 
             return ResponseEntity.ok(updatedDto);
         } else {

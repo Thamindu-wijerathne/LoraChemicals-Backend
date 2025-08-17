@@ -86,78 +86,89 @@ public class ProductionService {
         }
     }
 
-    //create
-    @Transactional
-    public Production createProduction(ProductionRequestDTO dto) {
-        try {
-            ProductType producttype = productTypeRepository.findById(dto.getPtid())
-                    .orElseThrow(() -> new RuntimeException("Product type not found with id:" + dto.getPtid()));
+//    //create
+@Transactional
+public Production createProduction(ProductionRequestDTO dto) {
+    try {
+        ProductType producttype = productTypeRepository.findById(dto.getPtid())
+                .orElseThrow(() -> new RuntimeException("Product type not found with id:" + dto.getPtid()));
 
-            WarehouseManager wm = warehouseManagerRepository.findById(dto.getWmid())
-                    .orElseThrow(() -> new RuntimeException("Warehouse not found with id:" + dto.getWmid()));
+        WarehouseManager wm = warehouseManagerRepository.findById(dto.getWmid())
+                .orElseThrow(() -> new RuntimeException("Warehouse not found with id:" + dto.getWmid()));
 
-            Mixer mixer = mixerRepository.findById(dto.getMixerid())
-                    .orElseThrow(() -> new RuntimeException("Mixer not found with id:" + dto.getMixerid()));
+        Mixer mixer = mixerRepository.findById(dto.getMixerid())
+                .orElseThrow(() -> new RuntimeException("Mixer not found with id:" + dto.getMixerid()));
 
-            // Step 1: Get Recipe for Mixer
-            Recipe recipe = recipeRepository.findByMixer_Mixerid(dto.getMixerid())
-                    .orElseThrow(() -> new RuntimeException("No recipe found for the selected mixer."));
+        // Step 1: Use recipeItems from DTO instead of fetching recipe items from DB
+        List<ProductionRequestDTO.RecipeItemDTO> dtoItems = dto.getRecipeItems();
+        if (dtoItems == null || dtoItems.isEmpty()) {
+            throw new RuntimeException("No recipe items provided.");
+        }
 
-            List<RecipeItem> items = recipeItemRepository.findByRecipe_Recipeid(recipe.getRecipeid());
+        // Step 2: Validate availability and deduct quantities from frontend data
+        for (ProductionRequestDTO.RecipeItemDTO itemDTO : dtoItems) {
+            Long chemicalId = itemDTO.getChemicalId();
+            double requiredQty = itemDTO.getQuantity();
+            String unit = itemDTO.getUnit().toLowerCase();
 
-            // Step 2: Validate availability and deduct quantities
-            for (RecipeItem item : items) {
-                RawChemicalType rawChemicalType = item.getRawChemical();  // Chemical type from recipe
-
-                // Find all RawChemical inventory entities for this chemical type
-                List<RawChemical> rawChemicals = rawChemicalRepository.findByChemicalType(rawChemicalType);
-
-                double requiredQty = item.getQuantity();
-
-                // Sum all volumes from RawChemical entities
-                double totalAvailable = rawChemicals.stream().mapToDouble(RawChemical::getVolume).sum();
-
-                if (totalAvailable < requiredQty) {
-                    throw new RuntimeException("Insufficient quantity for chemical: " + rawChemicalType.getName());
-                }
-
-                // Get batches from SupplierRawMaterial and check batch stock availability
-                List<SupplierRawMaterial> batches = supplierRawMaterialRepository.findByChemicalIdOrderByExpAsc(
-                        rawChemicalType.getChemid()
-                );
-
-                if (!canFulfillQuantity(batches, requiredQty)) {
-                    throw new RuntimeException("Not enough batch stock for " + rawChemicalType.getName());
-                }
-
-                // Deduct quantity from SupplierRawMaterial batches (FIFO)
-                deductFromBatches(batches, requiredQty);
-
-                // Deduct quantity from RawChemical inventory
-                deductFromRawChemicals(rawChemicals, requiredQty);
+            // Convert units if needed
+            if (unit.equals("l") || unit.equals("kg")) {
+                requiredQty *= 1000;
             }
 
-            // Step 3: Save production entity
-            Production production = new Production();
-            production.setProductype(producttype);
-            production.setWarehousemanager(wm);
-            production.setMixer(mixer);
-            production.setDate(new Date());
-            production.setVolume(dto.getVolume());
-            production.setCurrentvolume(dto.getCurrentvolume());
-            production.setStatus("pending");
-            production.setExpiredate(dto.getExpiredate());
+            // Find the chemical type entity by chemicalId
+            RawChemicalType rawChemicalType = rawChemicalRepository.findByChemicalType_Chemid(chemicalId)
+                    .orElseThrow(() -> new RuntimeException("RawChemicalType not found with id: " + chemicalId)).getChemicalType();
 
-            Production saved = productionRepository.save(production);
+            // Find all RawChemical inventory entities for this chemical type
+            List<RawChemical> rawChemicals = rawChemicalRepository.findByChemicalType(rawChemicalType);
 
-            mixer.setAvailability(0); // <- This line is newly added
-            mixerRepository.save(mixer); // <- This line is newly added
+            // Sum total available volume
+            double totalAvailable = rawChemicals.stream().mapToDouble(RawChemical::getVolume).sum();
 
-            return saved;
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create production: " + e.getMessage(), e);
+            if (totalAvailable < requiredQty) {
+                throw new RuntimeException("Insufficient quantity for chemical: " + rawChemicalType.getName());
+            }
+
+            // Get batches from SupplierRawMaterial and check batch stock availability
+            List<SupplierRawMaterial> batches = supplierRawMaterialRepository.findByChemicalIdOrderByExpAsc(
+                    chemicalId
+            );
+
+            if (!canFulfillQuantity(batches, requiredQty)) {
+                throw new RuntimeException("Not enough batch stock for " + rawChemicalType.getName());
+            }
+
+            // Deduct quantity from SupplierRawMaterial batches (FIFO)
+            deductFromBatches(batches, requiredQty);
+
+            // Deduct quantity from RawChemical inventory
+            deductFromRawChemicals(rawChemicals, requiredQty);
         }
+
+        // Step 3: Save production entity
+        Production production = new Production();
+        production.setProductype(producttype);
+        production.setWarehousemanager(wm);
+        production.setMixer(mixer);
+        production.setDate(dto.getDate() != null ? dto.getDate() : new Date());
+        production.setVolume(dto.getVolume());
+        production.setCurrentvolume(dto.getCurrentvolume());
+        production.setStatus(dto.getStatus() != null ? dto.getStatus() : "pending");
+        production.setExpiredate(dto.getExpiredate());
+
+        Production saved = productionRepository.save(production);
+
+        mixer.setAvailability(0); // Mixer now unavailable
+        mixerRepository.save(mixer);
+
+        return saved;
+
+    } catch (Exception e) {
+        throw new RuntimeException("Failed to create production: " + e.getMessage(), e);
     }
+}
+
 
     private void deductFromRawChemicals(List<RawChemical> rawChemicals, double requiredQty) {
         for (RawChemical rawChem : rawChemicals) {

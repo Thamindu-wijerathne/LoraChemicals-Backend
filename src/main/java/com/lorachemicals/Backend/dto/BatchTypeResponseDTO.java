@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 public class BatchTypeResponseDTO {
 
     private Long batchtypeid;
+    private String uniqueBatchCode;
     private Long ptvid;
     private String producttypename;
 
@@ -19,5 +20,8 @@ public class BatchTypeResponseDTO {
 
     private String batchtypename;
 
-    public BatchTypeResponseDTO() {}
+    private String imageURL;
+
+    public BatchTypeResponseDTO() {
+    }
 }

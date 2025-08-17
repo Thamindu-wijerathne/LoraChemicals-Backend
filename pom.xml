@@ -84,6 +84,8 @@
 			<version>3.1.1</version> <!-- Or latest version -->
 		</dependency>
 
+
+
 	</dependencies>
 
 	<build>
@@ -96,7 +98,6 @@
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
-							<version>1.18.30</version>
 						</path>
 					</annotationProcessorPaths>
 				</configuration>
@@ -109,7 +110,6 @@
 						<exclude>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
-							<version>1.18.30</version>
 						</exclude>
 					</excludes>
 				</configuration>

@@ -11,10 +11,19 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BatchInventoryRequestDTO {
+
     @JsonProperty("batchtypeid")
-    private Long batchtypeid;
+    private Long batchtypeid; // Keep for backward compatibility
+
+    @JsonProperty("parentBatchTypeId")
+    private Long parentBatchTypeId; // New field for parent batch type
 
     private int batch_quantity;
 
     private String location;
+
+    // Helper method to get the correct batch type ID
+    public Long getEffectiveBatchTypeId() {
+        return parentBatchTypeId != null ? parentBatchTypeId : batchtypeid;
+    }
 }

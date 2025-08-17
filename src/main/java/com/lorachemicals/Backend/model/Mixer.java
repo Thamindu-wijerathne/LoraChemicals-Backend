@@ -18,9 +18,5 @@ public class Mixer {
 
     private long capacity;
 
-    @ManyToOne
-    @JoinColumn(name = "productTypeId", nullable = false)
-    private ProductType productType;
-
     private int availability;
 }

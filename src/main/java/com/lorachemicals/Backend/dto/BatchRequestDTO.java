@@ -10,7 +10,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BatchRequestDTO {
-    private Long batchtypeid;
+
+    private Long batchtypeid; // Keep for backward compatibility
+    private Long parentBatchTypeId; // New field for parent batch type
     private LocalDateTime batchdate;
 
     //box
@@ -24,4 +26,8 @@ public class BatchRequestDTO {
 
     private String status;
 
+    // Helper method to get the correct batch type ID
+    public Long getEffectiveBatchTypeId() {
+        return parentBatchTypeId != null ? parentBatchTypeId : batchtypeid;
+    }
 }

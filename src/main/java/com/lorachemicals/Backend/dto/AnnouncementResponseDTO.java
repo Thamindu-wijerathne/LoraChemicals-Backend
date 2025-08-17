@@ -1,24 +1,28 @@
 package com.lorachemicals.Backend.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-public class AnnouncementDTO {
+public class AnnouncementResponseDTO {
+
     private Long announcementID;
     private String message;
     private LocalDateTime dateTime;
+    private List<String> targetRoles;
 
-    // ✅ No-arg constructor (needed by Spring/Jackson)
-    public AnnouncementDTO() {
+    // No-arg constructor
+    public AnnouncementResponseDTO() {
     }
 
-    // ✅ All-arg constructor
-    public AnnouncementDTO(Long announcementID, String message, LocalDateTime dateTime) {
+    // All-arg constructor
+    public AnnouncementResponseDTO(Long announcementID, String message, LocalDateTime dateTime, List<String> targetRoles) {
         this.announcementID = announcementID;
         this.message = message;
         this.dateTime = dateTime;
+        this.targetRoles = targetRoles;
     }
 
-    // ✅ Getters and Setters
+    // Getters and setters
     public Long getAnnouncementID() {
         return announcementID;
     }
@@ -41,5 +45,13 @@ public class AnnouncementDTO {
 
     public void setDateTime(LocalDateTime dateTime) {
         this.dateTime = dateTime;
+    }
+
+    public List<String> getTargetRoles() {
+        return targetRoles;
+    }
+
+    public void setTargetRoles(List<String> targetRoles) {
+        this.targetRoles = targetRoles;
     }
 }

@@ -1,5 +1,6 @@
 package com.lorachemicals.Backend.dto;
 
+import com.lorachemicals.Backend.model.Route;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +17,10 @@ public class CustomerOrderResponseDTO {
     private BigDecimal total;
     private Long customerId;
     private String customerName;  // optional extra for UI display
+    private String route;
+    private Long routeid;
 
     private List<CustomerOrderItemResponseDTO> items; // ✅ new
+
 
 }

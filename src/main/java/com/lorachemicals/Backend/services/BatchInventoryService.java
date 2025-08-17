@@ -1,16 +1,18 @@
 package com.lorachemicals.Backend.services;
 
-import com.lorachemicals.Backend.model.BatchInventory;
-import com.lorachemicals.Backend.model.BatchType;
-import com.lorachemicals.Backend.repository.BatchInventoryRepository;
-import com.lorachemicals.Backend.repository.BatchTypeRepository;
-import com.lorachemicals.Backend.dto.BatchInventoryRequestDTO;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.lorachemicals.Backend.dto.BatchInventoryRequestDTO;
+import com.lorachemicals.Backend.model.BatchInventory;
+import com.lorachemicals.Backend.model.BatchType;
+import com.lorachemicals.Backend.model.ParentBatchType;
+import com.lorachemicals.Backend.repository.BatchInventoryRepository;
+import com.lorachemicals.Backend.repository.BatchTypeRepository;
+import com.lorachemicals.Backend.repository.ParentBatchTypeRepository;
 
 @Service
 public class BatchInventoryService {
@@ -21,10 +23,13 @@ public class BatchInventoryService {
     @Autowired
     private BatchTypeRepository batchTypeRepository;
 
+    @Autowired
+    private ParentBatchTypeRepository parentBatchTypeRepository;
+
     // Get all batch inventories
     public List<BatchInventory> getAllBatchInventories() {
         try {
-            return batchInventoryRepository.findAll();
+            return batchInventoryRepository.findAllWithParentBatchType();
         } catch (Exception e) {
             throw new RuntimeException("Failed to fetch batch inventories: " + e.getMessage(), e);
         }
@@ -42,11 +47,11 @@ public class BatchInventoryService {
     // Create new batch inventory
     public BatchInventory createBatchInventory(BatchInventoryRequestDTO dto) {
         try {
-            BatchType batchType = batchTypeRepository.findById(dto.getBatchtypeid())
-                    .orElseThrow(() -> new RuntimeException("Batch type not found"));
+            ParentBatchType parentBatchType = parentBatchTypeRepository.findById(dto.getEffectiveBatchTypeId())
+                    .orElseThrow(() -> new RuntimeException("Parent batch type not found"));
 
             BatchInventory batchInventory = new BatchInventory();
-            batchInventory.setBatchType(batchType);
+            batchInventory.setParentBatchType(parentBatchType);
             batchInventory.setBatch_quantity(dto.getBatch_quantity());
             batchInventory.setLocation(dto.getLocation());
 

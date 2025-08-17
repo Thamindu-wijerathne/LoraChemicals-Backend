@@ -1,20 +1,33 @@
 package com.lorachemicals.Backend.dto;
 
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class VehicleResponseDTO {
     private Long id;
     private String vehicleNo;
     private String vehicleType;
     private String capacity;
+    private String date;
+    private Long seats;
+    private String image;
+    private String status;
 
     public VehicleResponseDTO() {
     }
 
-    public VehicleResponseDTO(Long id, String vehicleNo, String vehicleType, String capacity) {
+    public VehicleResponseDTO(Long id, String vehicleNo, String vehicleType, String capacity, Long seats, String date, String image, String status) {
         this.id = id;
         this.vehicleNo = vehicleNo;
         this.vehicleType = vehicleType;
         this.capacity = capacity;
+        this.seats = seats;
+        this.date = date;
+        this.image = image;
+        this.status = status;
     }
 
     public Long getId() {
@@ -48,4 +61,22 @@ public class VehicleResponseDTO {
     public void setCapacity(String capacity) {
         this.capacity = capacity;
     }
+
+    public void setDescription(String description) {
+    }
+
+    @Override
+    public String toString() {
+        return "VehicleResponseDTO{" +
+                "id=" + id +
+                ", vehicleNo='" + vehicleNo + '\'' +
+                ", vehicleType='" + vehicleType + '\'' +
+                ", capacity='" + capacity + '\'' +
+                ", date='" + date + '\'' +
+                ", seats=" + seats +
+                ", image='" + image + '\'' +
+                ", status='" + status + '\'' +
+                '}';
+    }
+
 }

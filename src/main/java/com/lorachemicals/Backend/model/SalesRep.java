@@ -1,11 +1,15 @@
 package com.lorachemicals.Backend.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 @Setter
 @Getter
@@ -28,8 +32,17 @@ public class SalesRep {
     )
     private User user;
 
+    private int status;
+
     // Constructor
-    public SalesRep() {}
+    public SalesRep() {
+        this.status = 1; // Initial status is 1 when created by admin
+    }
+
+    public SalesRep(User user) {
+        this.user = user;
+        this.status = 1; // Initial status is 1 when created by admin
+    }
 
     public Long getSrepid() { return this.srepid; }
     public void setUser(User user) {

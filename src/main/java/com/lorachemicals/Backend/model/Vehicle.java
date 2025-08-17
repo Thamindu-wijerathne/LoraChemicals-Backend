@@ -23,11 +23,22 @@ public class Vehicle {
 
     private String vehicleType;
     private String capacity;
+    private String description;
+    private String image;
+    private Long seats;
+    private String date;
+    private String status;
 
-    public Vehicle(String vehicleNo, String vehicleType, String capacity) {
+    public Vehicle(String vehicleNo, String vehicleType, String capacity, String description, String image, Long seats, String date, String status) {
         this.vehicleNo = vehicleNo;
         this.vehicleType = vehicleType;
         this.capacity = capacity;
+        this.description = description;
+        this.image = image;
+        this.seats = seats;
+        this.date = date;
+        this.status = status;
     }
+
 
 }
