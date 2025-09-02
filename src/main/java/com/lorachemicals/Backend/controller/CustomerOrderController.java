@@ -67,6 +67,18 @@ public class CustomerOrderController {
         }
     }
 
+    @GetMapping("/get-last-five-orders")
+    public ResponseEntity<?> getLastFiveOrders(HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse");
+        try {
+            List<CustomerOrderResponseDTO> orders = customerOrderService.getLastFiveOrders();
+            return ResponseEntity.ok(orders);
+        } catch (Exception e) {
+            logger.error("Order detail get failed", e);
+            return ResponseEntity.internalServerError().body("Order detail get failed: " + e.getMessage());
+        }
+    }
+
     @PutMapping("/accept/{id}")
     public ResponseEntity<?> acceptOrderByWarehouse(@PathVariable Long id, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");

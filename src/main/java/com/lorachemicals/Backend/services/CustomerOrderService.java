@@ -188,6 +188,63 @@ public class CustomerOrderService {
         }).collect(Collectors.toList());
     }
 
+    public List<CustomerOrderResponseDTO> getLastFiveOrders() {
+        List<CustomerOrder> orders = orderRepository.findAll();
+
+        return orders.stream()
+                // Sort by delivered date descending (latest first)
+                .sorted((o1, o2) -> {
+                    if (o1.getDelivered_date() == null && o2.getDelivered_date() == null) return 0;
+                    if (o1.getDelivered_date() == null) return 1;
+                    if (o2.getDelivered_date() == null) return -1;
+                    return o2.getDelivered_date().compareTo(o1.getDelivered_date());
+                })
+                // Limit to 5 latest orders
+                .limit(5)
+                .map(order -> {
+                    CustomerOrderResponseDTO dto = new CustomerOrderResponseDTO();
+                    dto.setOrderid(order.getOrderid());
+                    dto.setDeliveredDate(order.getDelivered_date());
+                    dto.setStatus(order.getStatus());
+                    dto.setTotal(order.getTotal());
+                    dto.setCustomerId(order.getUser().getId());
+                    dto.setCustomerName(order.getUser().getName());
+
+                    Customer customer = customerRepository.findByUserId(order.getUser().getId());
+
+                    if (customer != null && customer.getRoute() != null) {
+                        dto.setRoute(customer.getRoute().getDistrict());
+                        dto.setRouteid(customer.getRoute().getRouteid());
+                    } else {
+                        dto.setRoute("N/A");
+                    }
+
+                    List<CustomerOrderItemResponseDTO> itemDTOs = order.getOrderItems().stream().map(item -> {
+                        CustomerOrderItemResponseDTO itemDTO = new CustomerOrderItemResponseDTO();
+
+                        ProductTypeVolume ptv = item.getProductTypeVolume();
+                        ProductType productType = ptv.getProductType();
+
+                        itemDTO.setPtvid(ptv.getPtvid());
+                        itemDTO.setName(ptv.getName());
+                        itemDTO.setQuantity(item.getQuantity().intValue());
+                        itemDTO.setUnitPrice(ptv.getUnitPrice());
+                        itemDTO.setProductTotal(item.getProductTotal());
+                        itemDTO.setImage(ptv.getImage());
+                        itemDTO.setProductTypeName(productType != null ? productType.getName() : null);
+                        itemDTO.setBottleTypeName(ptv.getBottletype() != null ? ptv.getBottletype().getName() : null);
+                        itemDTO.setLabelTypeName(ptv.getLabeltype() != null ? ptv.getLabeltype().getName() : null);
+                        itemDTO.setVolume(ptv.getVolume());
+
+                        return itemDTO;
+                    }).collect(Collectors.toList());
+
+                    dto.setItems(itemDTOs);
+                    return dto;
+                }).collect(Collectors.toList());
+    }
+
+
     public void acceptOrder(Long id) {
         CustomerOrder order = orderRepository.findByOrderid(id);
         if (order == null) {
