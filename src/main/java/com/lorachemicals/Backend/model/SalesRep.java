@@ -1,13 +1,6 @@
 package com.lorachemicals.Backend.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,7 +25,8 @@ public class SalesRep {
     )
     private User user;
 
-    private int status;
+    @Column(name = "\"Status\"")
+    private Integer status;
 
     // Constructor
     public SalesRep() {
