@@ -1,5 +1,6 @@
 package com.lorachemicals.Backend.services;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -48,6 +49,10 @@ public class BatchInventoryWithoutBoxService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to fetch batch inventories without box: " + e.getMessage(), e);
         }
+    }
+
+    public BigDecimal getTotalValueOfInventory() {
+
     }
 
     // Get batch inventory without box by inventory ID
