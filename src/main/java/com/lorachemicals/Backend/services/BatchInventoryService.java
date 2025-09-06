@@ -44,6 +44,15 @@ public class BatchInventoryService {
         }
     }
 
+    // Get batch inventories by batch type ID
+    public List<BatchInventory> getBatchInventoriesByBatchTypeId(Long batchTypeId) {
+        try {
+            return batchInventoryRepository.findByParentBatchTypeId(batchTypeId);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch batch inventories by batch type ID: " + e.getMessage(), e);
+        }
+    }
+
     // Create new batch inventory
     public BatchInventory createBatchInventory(BatchInventoryRequestDTO dto) {
         try {

@@ -61,6 +61,19 @@ public class BatchInventoryWithoutBoxController {
         }
     }
 
+    // GET batch inventories without box by batch type ID
+    @GetMapping("/batchtype/{batchTypeId}")
+    public ResponseEntity<?> getBatchInventoriesWithoutBoxByBatchTypeId(@PathVariable Long batchTypeId, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse", "admin");
+        try {
+            List<BatchInventoryWithoutBox> batchInventories = batchInventoryWithoutBoxService.getBatchInventoriesWithoutBoxByBatchTypeId(batchTypeId);
+            return new ResponseEntity<>(batchInventories, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to get batch inventories without box by batch type: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     // GET batch inventories without box by PTV ID
     @GetMapping("/ptv/{ptvid}")
     public ResponseEntity<?> getBatchInventoriesWithoutBoxByPtvId(@PathVariable Long ptvid, HttpServletRequest request) {
