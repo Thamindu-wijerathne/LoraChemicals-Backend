@@ -51,9 +51,9 @@ public class BatchInventoryWithoutBoxService {
         }
     }
 
-    public BigDecimal getTotalValueOfInventory() {
-
-    }
+//    public BigDecimal getTotalValueOfInventory() {
+//
+//    }
 
     // Get batch inventory without box by inventory ID
     public Optional<BatchInventoryWithoutBox> getBatchInventoryWithoutBoxById(Long inventoryId) {
