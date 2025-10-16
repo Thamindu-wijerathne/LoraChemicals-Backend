@@ -24,6 +24,10 @@ public class CustomerOrder {
 
     private BigDecimal total;
 
+    private String feedback;
+
+    private BigDecimal rate;
+
     @ManyToOne
     @JoinColumn(
             name = "customerid",

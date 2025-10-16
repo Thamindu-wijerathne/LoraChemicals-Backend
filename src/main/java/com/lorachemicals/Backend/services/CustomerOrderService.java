@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -311,4 +312,16 @@ public class CustomerOrderService {
             requestDTO.getBatchDeductions().size() + " batch deductions");
     }
 
+    public void addFeedback(Long orderId, CustomerOrderRequestDTO requestDTO) {
+        CustomerOrder order = orderRepository.findByOrderid(orderId);
+        if (order == null) {
+            throw new RuntimeException("Order not found with id " + orderId);
+        }
+        System.err.println("complete order runned" + requestDTO.getRate() + requestDTO.getFeedback() + orderId);
+
+        order.setRate(requestDTO.getRate());
+        order.setFeedback(requestDTO.getFeedback());
+        orderRepository.save(order);
+
+    }
 }

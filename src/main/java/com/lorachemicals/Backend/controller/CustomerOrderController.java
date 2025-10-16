@@ -8,8 +8,10 @@ import com.lorachemicals.Backend.model.CustomerOrderItem;
 import com.lorachemicals.Backend.services.CustomerOrderService;
 import com.lorachemicals.Backend.util.AccessControlUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aot.generate.AccessControl;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -112,6 +114,20 @@ public class CustomerOrderController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Failed to complete order: " + e.getMessage());
         }
+    }
+
+    @PostMapping("/feedback/add/{id}")
+    public ResponseEntity<?> addFeedback(@PathVariable Long id, @RequestBody CustomerOrderRequestDTO requestDTO, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "customer");
+
+        try {
+             customerOrderService.addFeedback(id, requestDTO);
+            System.err.println("complete order runned");
+
+            return ResponseEntity.ok("Feedback Given successfully");
+         } catch (Exception e) {
+             return ResponseEntity.internalServerError().body("Failed to complete order: "+ e.getMessage());
+         }
     }
 
 
