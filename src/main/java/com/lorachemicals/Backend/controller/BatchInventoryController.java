@@ -42,6 +42,18 @@ public class BatchInventoryController {
         }
     }
 
+    @GetMapping("/low-stock")
+    public ResponseEntity<?> getLowStockBatchInventories(HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse", "admin","salesrep");
+        try {
+            List<BatchInventory> batchInventories = batchInventoryService.getLowStockBatchInventories();
+            return new ResponseEntity<>(batchInventories, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to get batch inventories: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     // GET batch inventory by inventory ID
     @GetMapping("/{inventoryId}")
     public ResponseEntity<?> getBatchInventoryById(@PathVariable Long inventoryId, HttpServletRequest request) {

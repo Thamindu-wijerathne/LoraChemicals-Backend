@@ -22,8 +22,6 @@ public interface CustomerOrderItemRepository extends JpaRepository<CustomerOrder
     """)
     List<TrendingProductsDTO> findTrendingProducts(Pageable pageable);
 
-    @Query("SELECT SUM(productTotal) FROM CustomerOrderItem")
-    Double getTotalSales();
 
     List<CustomerOrderItem> findByCustomerOrder_Orderid(Long orderid);
 

@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.lorachemicals.Backend.dto.BatchInventoryRequestDTO;
@@ -30,6 +32,16 @@ public class BatchInventoryService {
     public List<BatchInventory> getAllBatchInventories() {
         try {
             return batchInventoryRepository.findAllWithParentBatchType();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch batch inventories: " + e.getMessage(), e);
+        }
+    }
+
+    public List<BatchInventory> getLowStockBatchInventories() {
+        try {
+            Pageable topFive = PageRequest.of(0, 5);
+
+            return batchInventoryRepository.findLastFiveLowStock(95, topFive);
         } catch (Exception e) {
             throw new RuntimeException("Failed to fetch batch inventories: " + e.getMessage(), e);
         }

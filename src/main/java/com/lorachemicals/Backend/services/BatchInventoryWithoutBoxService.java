@@ -1,8 +1,11 @@
 package com.lorachemicals.Backend.services;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +38,22 @@ public class BatchInventoryWithoutBoxService {
             throw new RuntimeException("Failed to fetch batch inventories without box: " + e.getMessage(), e);
         }
     }
+
+    public List<BatchInventoryWithoutBox> getLowStockBatchInventoriesWithoutBox() {
+        try {
+            int threshold  = 10;
+            return batchInventoryWithoutBoxRepository.findLowStockWithParentBatchType(threshold)
+                    .stream()
+                    .limit(5) // get last 5
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch batch inventories without box: " + e.getMessage(), e);
+        }
+    }
+
+//    public BigDecimal getTotalValueOfInventory() {
+//
+//    }
 
     // Get batch inventory without box by inventory ID
     public Optional<BatchInventoryWithoutBox> getBatchInventoryWithoutBoxById(Long inventoryId) {
