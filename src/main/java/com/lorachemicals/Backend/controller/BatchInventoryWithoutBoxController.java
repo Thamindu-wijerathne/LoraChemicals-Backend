@@ -8,13 +8,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lorachemicals.Backend.dto.BatchInventoryWithoutBoxRequestDTO;
@@ -69,6 +67,19 @@ public class BatchInventoryWithoutBoxController {
             }
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to get batch inventory without box: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // GET batch inventories without box by batch type ID
+    @GetMapping("/batchtype/{batchTypeId}")
+    public ResponseEntity<?> getBatchInventoriesWithoutBoxByBatchTypeId(@PathVariable Long batchTypeId, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse", "admin");
+        try {
+            List<BatchInventoryWithoutBox> batchInventories = batchInventoryWithoutBoxService.getBatchInventoriesWithoutBoxByBatchTypeId(batchTypeId);
+            return new ResponseEntity<>(batchInventories, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to get batch inventories without box by batch type: " + e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -130,14 +141,14 @@ public class BatchInventoryWithoutBoxController {
         }
     }
 
-    // PATCH update location
-    @PatchMapping("/{inventoryId}/location")
+    // PUT update location
+    @PutMapping("/{inventoryId}/location")
     public ResponseEntity<?> updateLocation(@PathVariable Long inventoryId,
-            @RequestParam String location,
+            @RequestBody BatchInventoryWithoutBoxRequestDTO dto,
             HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse", "admin");
         try {
-            BatchInventoryWithoutBox updated = batchInventoryWithoutBoxService.updateLocation(inventoryId, location);
+            BatchInventoryWithoutBox updated = batchInventoryWithoutBoxService.updateLocation(inventoryId, dto.getLocation());
             return new ResponseEntity<>(updated, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to update location: " + e.getMessage(),

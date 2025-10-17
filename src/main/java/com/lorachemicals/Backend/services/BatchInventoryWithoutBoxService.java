@@ -64,6 +64,15 @@ public class BatchInventoryWithoutBoxService {
         }
     }
 
+    // Get batch inventories without box by batch type ID
+    public List<BatchInventoryWithoutBox> getBatchInventoriesWithoutBoxByBatchTypeId(Long batchTypeId) {
+        try {
+            return batchInventoryWithoutBoxRepository.findByParentBatchTypeId(batchTypeId);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch batch inventories without box by batch type ID: " + e.getMessage(), e);
+        }
+    }
+
     // Get batch inventories without box by PTV ID
     public List<BatchInventoryWithoutBox> getBatchInventoriesWithoutBoxByPtvId(Long ptvid) {
         try {

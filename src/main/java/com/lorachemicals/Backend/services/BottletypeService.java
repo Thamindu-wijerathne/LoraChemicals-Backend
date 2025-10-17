@@ -1,21 +1,26 @@
 package com.lorachemicals.Backend.services;
 
-import com.lorachemicals.Backend.model.Bottletype;
-import com.lorachemicals.Backend.repository.BottletypeRepository;
-import com.lorachemicals.Backend.dto.BottletypeRequestDTO;
-import com.lorachemicals.Backend.dto.BottletypeResponseDTO;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.lorachemicals.Backend.dto.BottletypeRequestDTO;
+import com.lorachemicals.Backend.dto.BottletypeResponseDTO;
+import com.lorachemicals.Backend.model.Bottle;
+import com.lorachemicals.Backend.model.Bottletype;
+import com.lorachemicals.Backend.repository.BottletypeRepository;
 
 @Service
 public class BottletypeService {
 
     @Autowired
     private BottletypeRepository bottletypeRepository;
+
+    @Autowired
+    private BottleService bottleService;
 
     // Get all bottle types
     public List<BottletypeResponseDTO> getAllBottletypes() {
@@ -73,15 +78,30 @@ public class BottletypeService {
     // Delete a bottle type
     public boolean deleteBottleType(Long id) {
         try {
-            if (bottletypeRepository.existsById(id)) {
-                bottletypeRepository.deleteById(id);
-                return true;
-            } else {
+            if (!bottletypeRepository.existsById(id)) {
                 return false; // not found
             }
+
+            // Check if there are any bottles with this bottle type
+            List<Bottle> bottles = bottleService.getBottlesByBottleTypeId(id);
+            
+            // Check if any bottle has quantity > 0
+            boolean hasInventory = bottles.stream().anyMatch(bottle -> bottle.getQuantity() > 0);
+            
+            if (hasInventory) {
+                throw new RuntimeException("Cannot delete bottle type because it has inventory in stock. Please clear the inventory first.");
+            }
+
+            // Delete all bottle inventory records with quantity = 0
+            for (Bottle bottle : bottles) {
+                bottleService.deleteBottle(bottle.getInventoryid());
+            }
+
+            // Now delete the bottle type
+            bottletypeRepository.deleteById(id);
+            return true;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 

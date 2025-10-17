@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.lorachemicals.Backend.dto.DeductExtrasRequestDTO;
 import com.lorachemicals.Backend.dto.DeliveryRequestDTO;
 import com.lorachemicals.Backend.dto.DeliveryResponseDTO;
 import com.lorachemicals.Backend.dto.SalesRepDeliveryResponseDTO;
-import com.lorachemicals.Backend.dto.DeductExtrasRequestDTO;
 import com.lorachemicals.Backend.services.DeliveryService;
 import com.lorachemicals.Backend.util.AccessControlUtil;
 
@@ -124,6 +124,23 @@ public class DeliveryController {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         } catch (Exception e) {
             System.err.println("❌ Unexpected error deducting extras: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
+    }
+
+    // Get orders by delivery ID
+    @GetMapping("/{deliveryId}/orders")
+    public ResponseEntity<?> getOrdersByDeliveryId(@PathVariable Long deliveryId, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse", "admin", "salesrep");
+        try {
+            List<SalesRepDeliveryResponseDTO.DeliveryOrderDetail> orders = deliveryService.getOrdersByDeliveryId(deliveryId);
+            return ResponseEntity.ok().body(orders);
+        } catch (RuntimeException e) {
+            System.err.println("❌ Runtime error getting orders for delivery " + deliveryId + ": " + e.getMessage());
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("❌ Unexpected error getting orders for delivery " + deliveryId + ": " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
         }

@@ -1,17 +1,28 @@
 package com.lorachemicals.Backend.controller;
 
-import com.lorachemicals.Backend.dto.RawChemicalTypeResponseDTO;
-import com.lorachemicals.Backend.model.RawChemicalType;
-import com.lorachemicals.Backend.services.RawChemicalTypeService;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.lorachemicals.Backend.dto.RawChemicalTypeResponseDTO;
+import com.lorachemicals.Backend.model.RawChemicalType;
+import com.lorachemicals.Backend.services.RawChemicalTypeService;
+import com.lorachemicals.Backend.util.AccessControlUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/raw-chemical-types")
@@ -92,6 +103,39 @@ public class RawChemicalTypeController {
             return new ResponseEntity<>("Chemical type deleted successfully", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to delete chemical type", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // CHECK INVENTORY
+    @GetMapping("/check-inventory/{chemid}")
+    public ResponseEntity<?> checkInventory(@PathVariable Long chemid, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "admin");
+        try {
+            RawChemicalTypeService.InventoryStatus status = rawChemicalTypeService.checkInventoryStatus(chemid);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("hasInventory", status.isHasInventory());
+            response.put("totalQuantity", status.getTotalQuantity());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", e.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // DELETE WITH INVENTORY CHECK
+    @DeleteMapping("/safe-delete/{chemid}")
+    public ResponseEntity<?> safeDelete(@PathVariable Long chemid, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "admin");
+        try {
+            rawChemicalTypeService.deleteChemicalTypeWithInventoryCheck(chemid);
+            return new ResponseEntity<>("Chemical type deleted successfully", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to delete chemical type: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 }

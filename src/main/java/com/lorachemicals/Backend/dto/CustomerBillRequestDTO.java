@@ -11,4 +11,5 @@ public class CustomerBillRequestDTO {
     private String phone;
     private Long billid; // ID of the related Bill
     private String district;
+    private Long deliveryid; // ID of the related Delivery
 }

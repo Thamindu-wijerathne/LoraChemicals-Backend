@@ -1,21 +1,26 @@
 package com.lorachemicals.Backend.services;
 
-import com.lorachemicals.Backend.model.BoxType;
-import com.lorachemicals.Backend.repository.BoxTypeRepository;
-import com.lorachemicals.Backend.dto.BoxTypeRequestDTO;
-import com.lorachemicals.Backend.dto.BoxTypeResponseDTO;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.lorachemicals.Backend.dto.BoxTypeRequestDTO;
+import com.lorachemicals.Backend.dto.BoxTypeResponseDTO;
+import com.lorachemicals.Backend.model.Box;
+import com.lorachemicals.Backend.model.BoxType;
+import com.lorachemicals.Backend.repository.BoxTypeRepository;
 
 @Service
 public class BoxTypeService {
 
     @Autowired
     private BoxTypeRepository boxTypeRepository;
+
+    @Autowired
+    private BoxService boxService;
 
     // Get all box types
     public List<BoxTypeResponseDTO> getAllBoxTypes() {
@@ -73,15 +78,30 @@ public class BoxTypeService {
     // Delete a box type
     public boolean deleteBoxType(Long id) {
         try {
-            if (boxTypeRepository.existsById(id)) {
-                boxTypeRepository.deleteById(id);
-                return true;
-            } else {
+            if (!boxTypeRepository.existsById(id)) {
                 return false; // not found
             }
+
+            // Check if there are any boxes with this box type
+            List<Box> boxes = boxService.getBoxesByBoxTypeId(id);
+            
+            // Check if any box has quantity > 0
+            boolean hasInventory = boxes.stream().anyMatch(box -> box.getQuantity() > 0);
+            
+            if (hasInventory) {
+                throw new RuntimeException("Cannot delete box type because it has inventory in stock. Please clear the inventory first.");
+            }
+
+            // Delete all box inventory records with quantity = 0
+            for (Box box : boxes) {
+                boxService.deleteBox(box.getInventoryid());
+            }
+
+            // Now delete the box type
+            boxTypeRepository.deleteById(id);
+            return true;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 

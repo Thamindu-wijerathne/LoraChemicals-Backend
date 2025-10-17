@@ -1,17 +1,16 @@
 package com.lorachemicals.Backend.services;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.lorachemicals.Backend.dto.RawChemicalRequestDTO;
 import com.lorachemicals.Backend.model.RawChemical;
 import com.lorachemicals.Backend.model.RawChemicalType;
 import com.lorachemicals.Backend.repository.RawChemicalRepository;
 import com.lorachemicals.Backend.repository.RawChemicalTypeRepository;
-import com.lorachemicals.Backend.dto.RawChemicalRequestDTO;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class RawChemicalService {
@@ -106,6 +105,18 @@ public class RawChemicalService {
             rawChemicalRepository.deleteById(inventoryId);
         } catch (Exception e) {
             throw new RuntimeException("Failed to delete raw chemical: " + e.getMessage(), e);
+        }
+    }
+
+    // Get raw chemicals by chemical type ID
+    public List<RawChemical> getRawChemicalsByChemicalTypeId(Long chemid) {
+        try {
+            // Find the chemical type first
+            RawChemicalType chemicalType = rawChemicalTypeRepository.findById(chemid)
+                    .orElseThrow(() -> new RuntimeException("Chemical type not found"));
+            return rawChemicalRepository.findByChemicalType(chemicalType);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch raw chemicals by type: " + e.getMessage(), e);
         }
     }
 }

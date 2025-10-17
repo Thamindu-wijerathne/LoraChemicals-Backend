@@ -21,6 +21,10 @@ public class BillResponseDTO {
     private String address;
     private String phone;
     private String district;
+    
+    // Delivery information
+    private Long deliveryId;
+    private String deliveryStatus;
 
 
 }

@@ -1,21 +1,26 @@
 package com.lorachemicals.Backend.services;
 
-import com.lorachemicals.Backend.dto.LabeltypeRequestDTO;
-import com.lorachemicals.Backend.dto.LabeltypeResponseDTO;
-import com.lorachemicals.Backend.model.Labeltype;
-import com.lorachemicals.Backend.repository.LabeltypeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.lorachemicals.Backend.dto.LabeltypeRequestDTO;
+import com.lorachemicals.Backend.dto.LabeltypeResponseDTO;
+import com.lorachemicals.Backend.model.Label;
+import com.lorachemicals.Backend.model.Labeltype;
+import com.lorachemicals.Backend.repository.LabeltypeRepository;
 
 @Service
 public class LabeltypeService {
 
     @Autowired
     private LabeltypeRepository labeltypeRepository;
+
+    @Autowired
+    private LabelService labelService;
 
     // Get all label types
     public List<LabeltypeResponseDTO> getAllLabeltypes() {
@@ -73,15 +78,30 @@ public class LabeltypeService {
     // Delete a label type
     public boolean deleteLabelType(Long id) {
         try {
-            if (labeltypeRepository.existsById(id)) {
-                labeltypeRepository.deleteById(id);
-                return true;
-            } else {
+            if (!labeltypeRepository.existsById(id)) {
                 return false; // not found
             }
+
+            // Check if there are any labels with this label type
+            List<Label> labels = labelService.getLabelsByLabelTypeId(id);
+            
+            // Check if any label has quantity > 0
+            boolean hasInventory = labels.stream().anyMatch(label -> label.getQuantity() > 0);
+            
+            if (hasInventory) {
+                throw new RuntimeException("Cannot delete label type because it has inventory in stock. Please clear the inventory first.");
+            }
+
+            // Delete all label inventory records with quantity = 0
+            for (Label label : labels) {
+                labelService.deleteLabel(label.getInventoryid());
+            }
+
+            // Now delete the label type
+            labeltypeRepository.deleteById(id);
+            return true;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
