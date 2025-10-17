@@ -10,10 +10,12 @@ import lombok.Setter;
 @Table(name = "sales_rep")
 public class SalesRep {
 
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long srepid;
 
+    @Setter
     @OneToOne
     @JoinColumn(
             name = "userid",
@@ -25,7 +27,7 @@ public class SalesRep {
     )
     private User user;
 
-    @Column(name = "\"Status\"")
+    @Column(name = "status")  // lowercase, matches DB
     private Integer status;
 
     // Constructor
@@ -36,11 +38,6 @@ public class SalesRep {
     public SalesRep(User user) {
         this.user = user;
         this.status = 1; // Initial status is 1 when created by admin
-    }
-
-    public Long getSrepid() { return this.srepid; }
-    public void setUser(User user) {
-        this.user = user;
     }
 
 

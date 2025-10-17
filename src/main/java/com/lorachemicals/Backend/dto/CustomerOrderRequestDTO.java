@@ -15,7 +15,10 @@ public class CustomerOrderRequestDTO {
     private String status;
     private BigDecimal total;
     private Long customerId;
+    private String feedback;
+    private BigDecimal rate;
     private List<CustomerOrderItemRequestDTO> orderItems;
+    private Date orderedDate;
 
     // Directly store batch deductions as a list of maps or a simple inner class
     private List<BatchDeduction> batchDeductions;
@@ -28,6 +31,7 @@ public class CustomerOrderRequestDTO {
         private String type; // "orders" or "extras"
         private Integer boxesToDeduct;
         private LocalDateTime datetime; // add this if using datetime
+
 
 
         @Override
@@ -52,6 +56,9 @@ public class CustomerOrderRequestDTO {
                 ", customerId=" + customerId +
                 ", orderItems=" + orderItems +
                 ", batchDeductions=" + batchDeductions +
+                ", feedback" + feedback +
+                ", rate" + rate +
+                ", ordered Date" + orderedDate +
                 '}';
     }
 }

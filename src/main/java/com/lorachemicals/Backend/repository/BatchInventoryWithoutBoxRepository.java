@@ -18,4 +18,10 @@ public interface BatchInventoryWithoutBoxRepository extends JpaRepository<BatchI
     
     @Query("SELECT biwb FROM BatchInventoryWithoutBox biwb WHERE biwb.parentBatchType.id = :batchTypeId")
     List<BatchInventoryWithoutBox> findByParentBatchTypeId(@Param("batchTypeId") Long batchTypeId);
+
+    @Query("SELECT biwb FROM BatchInventoryWithoutBox biwb " +
+            "WHERE biwb.batch_quantity <= :threshold " +
+            "ORDER BY biwb.inventoryid DESC")
+    List<BatchInventoryWithoutBox> findLowStockWithParentBatchType(@Param("threshold") int threshold);
+
 }

@@ -44,6 +44,18 @@ public class BatchInventoryWithoutBoxController {
         }
     }
 
+    @GetMapping("/low-stock")
+    public ResponseEntity<?> getLowStockBatchInventoriesWithoutBox(HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse", "admin","salesrep");
+        try {
+            List<BatchInventoryWithoutBox> batchInventories = batchInventoryWithoutBoxService.getLowStockBatchInventoriesWithoutBox();
+            return new ResponseEntity<>(batchInventories, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to get batch inventories without box: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     // GET batch inventory without box by inventory ID
     @GetMapping("/{inventoryId}")
     public ResponseEntity<?> getBatchInventoryWithoutBoxById(@PathVariable Long inventoryId, HttpServletRequest request) {
