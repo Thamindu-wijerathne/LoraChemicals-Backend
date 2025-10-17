@@ -19,6 +19,8 @@ public class CustomerOrderResponseDTO {
     private String customerName;  // optional extra for UI display
     private String route;
     private Long routeid;
+    private String feedback;
+    private BigDecimal rate;
 
     private List<CustomerOrderItemResponseDTO> items; // ✅ new
 

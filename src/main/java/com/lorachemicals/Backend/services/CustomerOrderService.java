@@ -112,6 +112,8 @@ public class CustomerOrderService {
             dto.setTotal(order.getTotal());
             dto.setCustomerId(order.getUser().getId());
             dto.setCustomerName(order.getUser().getName());
+            dto.setRate(order.getRate());
+            dto.setFeedback(order.getFeedback());
 
             // Map items (ptvid, quantity, productTotal only)
             List<CustomerOrderItemResponseDTO> itemDTOs = order.getOrderItems().stream().map(item -> {
@@ -152,6 +154,7 @@ public class CustomerOrderService {
             dto.setTotal(order.getTotal());
             dto.setCustomerId(order.getUser().getId());
             dto.setCustomerName(order.getUser().getName());
+
 
             Customer customer = customerRepository.findByUserId(order.getUser().getId());
 
