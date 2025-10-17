@@ -1,6 +1,7 @@
 package com.lorachemicals.Backend.controller;
 
 import com.lorachemicals.Backend.dto.AdminDashboardDTO;
+import com.lorachemicals.Backend.dto.CustomerOrderResponseDTO;
 import com.lorachemicals.Backend.dto.DistrictSalesDTO;
 import com.lorachemicals.Backend.dto.SalesEmployeeDTO;
 import com.lorachemicals.Backend.services.AdminDashboardService;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -26,7 +28,7 @@ public class AdminDashboardController {
     }
 
     @GetMapping("/total-sales")
-    public double getTotalSales(){
+    public BigDecimal getTotalSales(){
         return dashboardService.getTotalSales();
     }
 
