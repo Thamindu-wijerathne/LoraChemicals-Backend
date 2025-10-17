@@ -1,5 +1,6 @@
 package com.lorachemicals.Backend.repository;
 
+import com.lorachemicals.Backend.dto.CustomerOrderResponseDTO;
 import com.lorachemicals.Backend.dto.DistrictSalesDTO;
 import com.lorachemicals.Backend.dto.SalesEmployeeDTO;
 import com.lorachemicals.Backend.dto.TrendingProductsDTO;
@@ -8,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface CustomerOrderRepository extends JpaRepository<CustomerOrder, Long> {
@@ -41,6 +43,9 @@ public interface CustomerOrderRepository extends JpaRepository<CustomerOrder, Lo
     GROUP BY srUser.fname, srUser.lname
 """)
     List<SalesEmployeeDTO> getSalesByEmployee(Pageable pageable);
+
+    @Query("SELECT COALESCE(SUM(o.total), 0) FROM CustomerOrder o")
+    BigDecimal getTotalSales();  // Returns single value, not List
 
 }
 

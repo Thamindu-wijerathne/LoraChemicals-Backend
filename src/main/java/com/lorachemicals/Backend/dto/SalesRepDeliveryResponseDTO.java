@@ -12,7 +12,7 @@ public class SalesRepDeliveryResponseDTO {
     private Long deliveryid;
     private LocalDateTime dispatchdate;
     private LocalDateTime camedate;
-    private int status;
+    private Integer status;
     private Long srepid;
     private String salesRepName;
     private String salesRepEmail;

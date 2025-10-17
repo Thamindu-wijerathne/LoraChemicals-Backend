@@ -3,7 +3,7 @@ package com.lorachemicals.Backend.dto;
 public class SalesRepDTO {
     private final Long srepid;
     private final Long userid;
-    private final int status;
+    private final Integer status;
 
     public SalesRepDTO(Long srepid, Long userid, int status) {
         this.srepid = srepid;

@@ -1,9 +1,9 @@
 package com.lorachemicals.Backend.services;
 
 import com.lorachemicals.Backend.dto.AdminDashboardDTO;
+import com.lorachemicals.Backend.dto.CustomerOrderResponseDTO;
 import com.lorachemicals.Backend.dto.DistrictSalesDTO;
 import com.lorachemicals.Backend.dto.SalesEmployeeDTO;
-import com.lorachemicals.Backend.repository.CustomerOrderItemRepository;
 import com.lorachemicals.Backend.repository.CustomerOrderRepository;
 import com.lorachemicals.Backend.repository.CustomerRepository;
 import com.lorachemicals.Backend.repository.UserRepository;
@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -24,11 +25,9 @@ public class AdminDashboardService {
         return new AdminDashboardDTO((int) count);
     }
 
-    @Autowired
-    private CustomerOrderItemRepository orderItemRepository;
 
-    public double getTotalSales(){
-        return orderItemRepository.getTotalSales();
+    public BigDecimal getTotalSales(){
+        return orderRepository.getTotalSales();
     }
 
     @Autowired

@@ -21,7 +21,7 @@ public class BatchInventory extends Inventory {
     @JoinColumn(name = "parent_batch_type_id", nullable = false)
     private ParentBatchType parentBatchType;
 
-    private int batch_quantity;
+    private Integer batch_quantity;
 
     public void setId(Long id) {
         this.setInventoryid(id);
