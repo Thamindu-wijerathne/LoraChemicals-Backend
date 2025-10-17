@@ -1,20 +1,27 @@
 package com.lorachemicals.Backend.controller;
 
-import com.lorachemicals.Backend.dto.BoxQuantityUpdateDTO;
-import com.lorachemicals.Backend.dto.LabelQuantityUpdateDTO;
-import com.lorachemicals.Backend.dto.LabelRequestDTO;
-import com.lorachemicals.Backend.model.Box;
-import com.lorachemicals.Backend.model.Label;
-import com.lorachemicals.Backend.services.LabelService;
-import com.lorachemicals.Backend.util.AccessControlUtil;
-import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Optional;
+import com.lorachemicals.Backend.dto.LabelQuantityUpdateDTO;
+import com.lorachemicals.Backend.dto.LabelRequestDTO;
+import com.lorachemicals.Backend.model.Label;
+import com.lorachemicals.Backend.services.LabelService;
+import com.lorachemicals.Backend.util.AccessControlUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/label")
@@ -50,6 +57,18 @@ public class LabelController {
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to get label: " + e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // GET all labels by labeltype ID
+    @GetMapping("/labeltype/{labeltypeId}")
+    public ResponseEntity<?> getLabelsByLabeltypeId(@PathVariable Long labeltypeId, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse", "admin");
+        try {
+            List<Label> labels = labelService.getLabelsByLabelTypeId(labeltypeId);
+            return new ResponseEntity<>(labels, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to get labels by labeltype: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
