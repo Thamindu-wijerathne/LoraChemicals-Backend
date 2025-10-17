@@ -8,6 +8,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+
+
 @Getter
 @Setter
 public class CustomerOrderResponseDTO {
@@ -19,6 +21,11 @@ public class CustomerOrderResponseDTO {
     private String customerName;  // optional extra for UI display
     private String route;
     private Long routeid;
+    private String feedback;
+    private BigDecimal rate;
+    private Date orderedDate;
+    private String address;
+
 
     private List<CustomerOrderItemResponseDTO> items; // ✅ new
 
