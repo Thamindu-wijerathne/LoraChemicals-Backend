@@ -24,7 +24,7 @@ public class Delivery {
 
     private LocalDateTime dispatchdate;
     private LocalDateTime camedate;
-    private int status;
+    private Integer status;
 
     @ManyToOne
     @JoinColumn(name = "srepid", nullable = false)
