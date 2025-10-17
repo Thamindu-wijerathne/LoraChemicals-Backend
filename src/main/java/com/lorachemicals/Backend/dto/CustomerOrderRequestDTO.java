@@ -18,6 +18,7 @@ public class CustomerOrderRequestDTO {
     private String feedback;
     private BigDecimal rate;
     private List<CustomerOrderItemRequestDTO> orderItems;
+    private Date orderedDate;
 
     // Directly store batch deductions as a list of maps or a simple inner class
     private List<BatchDeduction> batchDeductions;
@@ -57,6 +58,7 @@ public class CustomerOrderRequestDTO {
                 ", batchDeductions=" + batchDeductions +
                 ", feedback" + feedback +
                 ", rate" + rate +
+                ", ordered Date" + orderedDate +
                 '}';
     }
 }

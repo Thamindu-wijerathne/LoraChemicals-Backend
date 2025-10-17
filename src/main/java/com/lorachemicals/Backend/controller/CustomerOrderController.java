@@ -62,6 +62,7 @@ public class CustomerOrderController {
         AccessControlUtil.checkAccess(request, "warehouse");
         try {
             List<CustomerOrderResponseDTO> orders = customerOrderService.getOrders();
+            System.err.println("complete order runned" + orders);
             return ResponseEntity.ok(orders);
         } catch (Exception e) {
             logger.error("Order detail get failed", e);

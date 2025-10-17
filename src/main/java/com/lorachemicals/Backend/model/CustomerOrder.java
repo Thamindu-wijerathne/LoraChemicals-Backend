@@ -28,6 +28,9 @@ public class CustomerOrder {
 
     private BigDecimal rate;
 
+    private Date orderedDate;
+
+
     @ManyToOne
     @JoinColumn(
             name = "customerid",

@@ -21,6 +21,9 @@ public class CustomerOrderResponseDTO {
     private Long routeid;
     private String feedback;
     private BigDecimal rate;
+    private Date orderedDate;
+    private String address;
+
 
     private List<CustomerOrderItemResponseDTO> items; // ✅ new
 

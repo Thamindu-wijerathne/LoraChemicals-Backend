@@ -70,7 +70,7 @@ public class CustomerOrderService {
             order.setStatus(data.getStatus());
             order.setTotal(data.getTotal());
             order.setDelivered_date(data.getDeliveredDate() != null ? data.getDeliveredDate() : new Date());
-
+            order.setOrderedDate(data.getOrderedDate());
             // Save order to database first
             CustomerOrder savedOrder = orderRepository.save(order);
 
@@ -114,6 +114,8 @@ public class CustomerOrderService {
             dto.setCustomerName(order.getUser().getName());
             dto.setRate(order.getRate());
             dto.setFeedback(order.getFeedback());
+            dto.setOrderedDate(order.getOrderedDate());
+            dto.setAddress(order.getUser().getAddress());
 
             // Map items (ptvid, quantity, productTotal only)
             List<CustomerOrderItemResponseDTO> itemDTOs = order.getOrderItems().stream().map(item -> {
@@ -154,6 +156,9 @@ public class CustomerOrderService {
             dto.setTotal(order.getTotal());
             dto.setCustomerId(order.getUser().getId());
             dto.setCustomerName(order.getUser().getName());
+            dto.setOrderedDate(order.getOrderedDate());
+            System.err.println("test " + order.getOrderedDate());
+
 
 
             Customer customer = customerRepository.findByUserId(order.getUser().getId());
