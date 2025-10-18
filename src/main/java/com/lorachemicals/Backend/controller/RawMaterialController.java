@@ -30,6 +30,16 @@ public class RawMaterialController {
         }
     }
 
+    @GetMapping("/all-low-stock")
+    public ResponseEntity<?> getAllLowStockRawMaterials(HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "admin", "warehouse");
+        try {
+            List<RawMaterial> rawMaterials = rawMaterialService.getAllLowStockRawMaterials();
+            return ResponseEntity.ok(rawMaterials);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Failed to fetch raw materials");
+        }
+    }
     @PostMapping("/add")
     public ResponseEntity<?> addRawMaterial(@RequestBody RawMaterial rawMaterial, HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "admin", "warehouse");
