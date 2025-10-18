@@ -13,7 +13,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // Custom query methods (optional)
     User findByEmail(String email);
     User findByEmailAndNic(String email, String nic);
-    User findByEmailAndPassword(String email, String password);
   
     @Query("SELECT u FROM User u WHERE u.role = 'customer'")
     List<User> findAllCustomers();
