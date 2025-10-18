@@ -1,10 +1,11 @@
 package com.lorachemicals.Backend.repository;
 
-import com.lorachemicals.Backend.dto.BoxResponseDTO;
-import com.lorachemicals.Backend.model.Box;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import com.lorachemicals.Backend.dto.BoxResponseDTO;
+import com.lorachemicals.Backend.model.Box;
 
 public interface BoxRepository extends JpaRepository<Box, Long> {
 

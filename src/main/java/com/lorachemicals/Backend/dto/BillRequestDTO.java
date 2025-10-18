@@ -1,11 +1,10 @@
 package com.lorachemicals.Backend.dto;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.Date;
 import java.util.List;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -19,6 +18,7 @@ public class BillRequestDTO {
     private String address;
     private String phone;
     private String district;
+    private Long deliveryid; // Add delivery ID field
     private List<BillItemRequestDTO> items; // New field
 
 
@@ -32,6 +32,7 @@ public class BillRequestDTO {
                 ", address='" + address + '\'' +
                 ", phone='" + phone + '\'' +
                 ", district='" + district + '\'' +
+                ", deliveryid=" + deliveryid +
                 ", items=" + items +
                 '}';
     }

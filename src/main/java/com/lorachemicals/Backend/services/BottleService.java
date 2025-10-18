@@ -1,17 +1,16 @@
 package com.lorachemicals.Backend.services;
 
-import com.lorachemicals.Backend.model.Bottle;
-import com.lorachemicals.Backend.model.Bottletype;
-import com.lorachemicals.Backend.model.RawChemical;
-import com.lorachemicals.Backend.repository.BottleRepository;
-import com.lorachemicals.Backend.repository.BottletypeRepository;
-import com.lorachemicals.Backend.dto.BottleRequestDTO;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.lorachemicals.Backend.dto.BottleRequestDTO;
+import com.lorachemicals.Backend.model.Bottle;
+import com.lorachemicals.Backend.model.Bottletype;
+import com.lorachemicals.Backend.repository.BottleRepository;
+import com.lorachemicals.Backend.repository.BottletypeRepository;
 
 @Service
 public class BottleService {
@@ -106,6 +105,15 @@ public class BottleService {
             bottleRepository.deleteById(inventoryId);
         } catch (Exception e) {
             throw new RuntimeException("Failed to delete bottle: " + e.getMessage(), e);
+        }
+    }
+
+    // Get bottles by bottle type ID
+    public List<Bottle> getBottlesByBottleTypeId(Long bottleTypeId) {
+        try {
+            return bottleRepository.findAllByBottleType_Bottleid(bottleTypeId);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch bottles by bottle type ID: " + e.getMessage(), e);
         }
     }
 }

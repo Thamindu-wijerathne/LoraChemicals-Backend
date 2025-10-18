@@ -450,9 +450,9 @@ public class DeliveryService {
                 for (DeliveryOrder deliveryOrder : linkedOrders) {
                     CustomerOrder order = deliveryOrder.getCustomerOrder();
                     if (order != null && "ongoing".equalsIgnoreCase(order.getStatus())) {
-                        order.setStatus("pending");
+                        order.setStatus("accepted");
                         customerOrderRepository.save(order);
-                        logger.info("✅ Updated order {} status to 'pending'", order.getOrderid());
+                        logger.info("✅ Updated order {} status to 'accepted'", order.getOrderid());
                     }
                 }
             }
@@ -671,6 +671,109 @@ public class DeliveryService {
         } catch (Exception e) {
             logger.error("Error processing extras deduction: ", e);
             throw new RuntimeException("Failed to deduct extras from vehicle inventory: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Get orders associated with a specific delivery ID
+     */
+    public List<SalesRepDeliveryResponseDTO.DeliveryOrderDetail> getOrdersByDeliveryId(Long deliveryId) {
+        try {
+            // Get all delivery orders for the specific delivery ID
+            List<DeliveryOrder> deliveryOrders = deliveryOrderRepository.findByDelivery_Deliveryid(deliveryId);
+            
+            if (deliveryOrders.isEmpty()) {
+                logger.info("No orders found for delivery ID: {}", deliveryId);
+                return List.of();
+            }
+
+            // Convert to DTOs
+            return deliveryOrders.stream()
+                    .map(deliveryOrder -> {
+                        SalesRepDeliveryResponseDTO.DeliveryOrderDetail orderDetail = 
+                            new SalesRepDeliveryResponseDTO.DeliveryOrderDetail();
+                        
+                        CustomerOrder order = deliveryOrder.getCustomerOrder();
+                        if (order != null) {
+                            orderDetail.setOrderid(order.getOrderid());
+                            orderDetail.setOrderStatus(order.getStatus());
+                            orderDetail.setDeliveryid(deliveryId);
+                            
+                            if (order.getTotal() != null) {
+                                orderDetail.setOrderTotal(order.getTotal().doubleValue());
+                            }
+
+                            // Customer information
+                            if (order.getUser() != null) {
+                                orderDetail.setCustomerId(order.getUser().getId());
+                                orderDetail.setCustomerName(
+                                    (order.getUser().getFname() != null ? order.getUser().getFname() : "") + " " + 
+                                    (order.getUser().getLname() != null ? order.getUser().getLname() : "")
+                                );
+                                orderDetail.setCustomerEmail(order.getUser().getEmail());
+                                orderDetail.setCustomerAddress(order.getUser().getAddress());
+                                orderDetail.setCustomerPhone(order.getUser().getPhone());
+                            }
+
+                            // Order date
+                            if (order.getDelivered_date() != null) {
+                                orderDetail.setOrderDate(
+                                    order.getDelivered_date().toInstant()
+                                        .atZone(ZoneId.systemDefault()).toLocalDateTime()
+                                );
+                            }
+
+                            // Order items
+                            List<SalesRepDeliveryResponseDTO.OrderItem> orderItems = 
+                                customerOrderItemRepository.findByCustomerOrder_Orderid(order.getOrderid())
+                                    .stream()
+                                    .map(item -> {
+                                        SalesRepDeliveryResponseDTO.OrderItem orderItem = 
+                                            new SalesRepDeliveryResponseDTO.OrderItem();
+                                        
+                                        orderItem.setItemid(item.getOrderitemid());
+                                        
+                                        if (item.getQuantity() != null) {
+                                            orderItem.setQuantity(item.getQuantity().intValue());
+                                            
+                                            if (item.getProductTotal() != null && item.getQuantity() > 0) {
+                                                orderItem.setUnitPrice(
+                                                    item.getProductTotal()
+                                                        .divide(BigDecimal.valueOf(item.getQuantity()))
+                                                        .doubleValue()
+                                                );
+                                                orderItem.setTotalPrice(item.getProductTotal().doubleValue());
+                                            }
+                                        }
+
+                                        if (item.getProductTypeVolume() != null) {
+                                            if (item.getProductTypeVolume().getProductType() != null) {
+                                                orderItem.setProductTypeName(
+                                                    item.getProductTypeVolume().getProductType().getName()
+                                                );
+                                            }
+                                            if (item.getProductTypeVolume().getVolume() != null) {
+                                                orderItem.setVolume(
+                                                    item.getProductTypeVolume().getVolume().doubleValue()
+                                                );
+                                            }
+                                            orderItem.setProductImage(item.getProductTypeVolume().getImage());
+                                        }
+
+                                        return orderItem;
+                                    })
+                                    .collect(Collectors.toList());
+                            
+                            orderDetail.setOrderItems(orderItems);
+                        }
+
+                        return orderDetail;
+                    })
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            logger.error("Error getting orders for delivery ID {}: {}", deliveryId, e.getMessage(), e);
+            throw new RuntimeException("Failed to get orders for delivery: " + e.getMessage(), e);
         }
     }
 }

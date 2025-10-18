@@ -17,7 +17,7 @@ public class BatchResponseDTO {
 
     private Long batchtypeid; // Keep for backward compatibility
     private Long parentBatchTypeId;
-    private String uniqueBatchCode;
+    private String T;
     private String batchtypename;
     private LocalDateTime batchdate;
 

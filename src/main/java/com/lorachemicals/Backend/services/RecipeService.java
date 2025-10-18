@@ -1,16 +1,18 @@
 package com.lorachemicals.Backend.services;
 
-import com.lorachemicals.Backend.dto.RecipeRequestDTO;
-import com.lorachemicals.Backend.model.Mixer;
-import com.lorachemicals.Backend.model.ProductType;
-import com.lorachemicals.Backend.model.Recipe;
-import com.lorachemicals.Backend.repository.MixerRepository;
-import com.lorachemicals.Backend.repository.ProductTypeRepository;
-import com.lorachemicals.Backend.repository.RecipeRepository;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import com.lorachemicals.Backend.dto.RecipeRequestDTO;
+import com.lorachemicals.Backend.model.ProductType;
+import com.lorachemicals.Backend.model.Recipe;
+import com.lorachemicals.Backend.repository.ProductTypeRepository;
+import com.lorachemicals.Backend.repository.RecipeItemRawChemicalRepository;
+import com.lorachemicals.Backend.repository.RecipeItemRepository;
+import com.lorachemicals.Backend.repository.RecipeRepository;
 
 @Service
 public class RecipeService {
@@ -20,6 +22,12 @@ public class RecipeService {
 
     @Autowired
     private ProductTypeRepository productTypeRepository;
+
+    @Autowired
+    private RecipeItemRepository recipeItemRepository;
+
+    @Autowired
+    private RecipeItemRawChemicalRepository recipeItemRawChemicalRepository;
 
     // Get all recipes
     public List<Recipe> getAllRecipes() {
@@ -86,11 +94,19 @@ public class RecipeService {
     }
 
     // Delete recipe
+    @Transactional
     public void deleteRecipe(Long recipeid) {
         try {
             Recipe recipe = recipeRepository.findById(recipeid)
                     .orElseThrow(() -> new RuntimeException("Recipe not found with ID: " + recipeid));
 
+            // Step 1: Delete all junction table records for this recipe
+            recipeItemRawChemicalRepository.deleteByRecipeId(recipeid);
+            
+            // Step 2: Delete all recipe items for this recipe
+            recipeItemRepository.deleteByRecipeRecipeid(recipeid);
+            
+            // Step 3: Delete the recipe itself
             recipeRepository.delete(recipe);
         } catch (Exception e) {
             throw new RuntimeException("Failed to delete recipe: " + e.getMessage(), e);

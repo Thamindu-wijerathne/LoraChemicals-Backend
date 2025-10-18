@@ -12,6 +12,7 @@ public class CustomerBillResponseDTO {
     private String phone;
     private String district;
     private Long billid;
+    private Long deliveryid; // Add delivery ID
     private Long salesRepId;
     private String salesRepName;
     private Long total;

@@ -292,7 +292,7 @@ public class BatchService {
         dto.setBatchid(batch.getBatchid());
         dto.setBatchcode(batch.getBatchcode());
         dto.setParentBatchTypeId(batch.getParentBatchType().getId());
-        dto.setUniqueBatchCode(batch.getParentBatchType().getUniqueBatchCode());
+        dto.setBatchcode(batch.getParentBatchType().getUniqueBatchCode());
         dto.setBatchtypename(batch.getParentBatchType().getBatchtypename());
         dto.setBatchdate(batch.getBatchdate());
 
