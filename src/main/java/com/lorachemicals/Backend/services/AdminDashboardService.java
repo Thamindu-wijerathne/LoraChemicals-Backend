@@ -2,6 +2,7 @@ package com.lorachemicals.Backend.services;
 
 import com.lorachemicals.Backend.dto.AdminDashboardDTO;
 import com.lorachemicals.Backend.dto.DistrictSalesDTO;
+import com.lorachemicals.Backend.dto.MonthlyOrderDTO;
 import com.lorachemicals.Backend.dto.SalesEmployeeDTO;
 import com.lorachemicals.Backend.repository.CustomerOrderItemRepository;
 import com.lorachemicals.Backend.repository.CustomerOrderRepository;
@@ -53,7 +54,8 @@ public class AdminDashboardService {
         return orderRepository.getSalesByEmployee(pageable);
     }
 
-
-
+    public List<MonthlyOrderDTO> getMonthlyOrders() {
+        return orderRepository.getOrdersGroupedByMonth();
+    }
 
 }

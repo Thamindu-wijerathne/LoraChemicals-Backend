@@ -1,6 +1,7 @@
 package com.lorachemicals.Backend.repository;
 
 import com.lorachemicals.Backend.dto.DistrictSalesDTO;
+import com.lorachemicals.Backend.dto.MonthlyOrderDTO;
 import com.lorachemicals.Backend.dto.SalesEmployeeDTO;
 import com.lorachemicals.Backend.dto.TrendingProductsDTO;
 import com.lorachemicals.Backend.model.CustomerOrder;
@@ -41,6 +42,15 @@ public interface CustomerOrderRepository extends JpaRepository<CustomerOrder, Lo
     GROUP BY srUser.fname, srUser.lname
 """)
     List<SalesEmployeeDTO> getSalesByEmployee(Pageable pageable);
+
+    @Query(value = "SELECT new com.lorachemicals.Backend.dto.MonthlyOrderDTO(" +
+            "CAST(EXTRACT(MONTH FROM o.orderedDate) AS integer), COUNT(o), SUM(o.total)) " +
+            "FROM CustomerOrder o " +
+            "GROUP BY CAST(EXTRACT(MONTH FROM o.orderedDate) AS integer) " +
+            "ORDER BY CAST(EXTRACT(MONTH FROM o.orderedDate) AS integer)")
+    List<MonthlyOrderDTO> getOrdersGroupedByMonth();
+
+
 
 }
 
