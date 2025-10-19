@@ -31,6 +31,15 @@ public class RawMaterialService {
             return null;
         }
     }
+    public List<RawMaterial> getAllLowStockRawMaterials() {
+        try {
+            List<RawMaterial> RawMaterialList  = rawMaterialRepository.findAll();
+            return rawMaterialRepository.findAll();
+        } catch (Exception e) {
+            System.err.println("Error fetching RawMaterials: " + e.getMessage());
+            return null;
+        }
+    }
 
     public Optional<RawMaterial> getRawMaterialById(Long id) {
         try {

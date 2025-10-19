@@ -1,5 +1,6 @@
 package com.lorachemicals.Backend.controller;
 
+import com.lorachemicals.Backend.dto.CustomerOrderFeedbackDTO;
 import com.lorachemicals.Backend.dto.CustomerOrderRequestDTO;
 import com.lorachemicals.Backend.dto.CustomerOrderResponseDTO;
 import com.lorachemicals.Backend.dto.TrendingProductsDTO;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -56,7 +58,7 @@ public class CustomerOrderController {
             return ResponseEntity.internalServerError().body("Order detail get failed: " + e.getMessage());
         }
     }
-    
+
     @GetMapping("/get-all-orders")
     public ResponseEntity<?> getAllOrders(HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
@@ -131,6 +133,20 @@ public class CustomerOrderController {
          }
     }
 
+    @GetMapping("/get-overall-rating")
+    public ResponseEntity<?> getOverallRating(HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "customer", "admin");
+        try {
+            BigDecimal overallRating = customerOrderService.getOverallRating();
+            return ResponseEntity.ok(overallRating);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Failed to get overall rating :" + e.getMessage());
+        }
+    }
 
-
+    @GetMapping("/get-feedback")
+    public ResponseEntity<List<CustomerOrderFeedbackDTO>> getAllOrdersFeedback() {
+        List<CustomerOrderFeedbackDTO> feedbackList = customerOrderService.getAllOrdersFeedback();
+        return ResponseEntity.ok(feedbackList);
+    }
 }

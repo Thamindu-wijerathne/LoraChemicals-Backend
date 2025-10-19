@@ -1,8 +1,13 @@
 package com.lorachemicals.Backend.dto;
 
+import com.lorachemicals.Backend.model.DamageReport;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
+@Getter
+@Setter
 public class DamageReportResponseDTO {
     private Long id;
     private LocalDate damageDate;
@@ -10,97 +15,38 @@ public class DamageReportResponseDTO {
     private String description;
     private String imageUrl;
     private LocalDate reportDate;
-    private String reportedUser;
+    private UserResponseDTO reportedUser; // Use full DTO now
     private String sourceType;
     private String status;
 
-    // Getters and Setters
+    // ✅ Constructor mapping from entity
+    public DamageReportResponseDTO(DamageReport report) {
+        this.id = report.getId();
+        this.damageItem = report.getDamageItem();
+        this.description = report.getDescription();
+        this.sourceType = report.getSourceType();
+        this.reportDate = report.getReportDate();
+        this.damageDate = report.getDamageDate();
+        this.status = report.getStatus();
+        this.imageUrl = report.getImageUrl();
 
-    public Long getId() {
-        return id;
+        if (report.getReportedUser() != null) {
+            var u = report.getReportedUser();
+            this.reportedUser = new UserResponseDTO(
+                    u.getId(),
+                    u.getFname(),
+                    u.getLname(),
+                    u.getEmail(),
+                    u.getRole(),
+                    u.getAddress(),
+                    u.getPhone(),
+                    u.getNic(),
+                    u.getStatus()
+            );
+        }
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    // ✅ Empty constructor
+    public DamageReportResponseDTO() {}
 
-    public LocalDate getDamageDate() {
-        return damageDate;
-    }
-
-    public void setDamageDate(LocalDate damageDate) {
-        this.damageDate = damageDate;
-    }
-
-    public String getDamageItem() {
-        return damageItem;
-    }
-
-    public void setDamageItem(String damageItem) {
-        this.damageItem = damageItem;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public LocalDate getReportDate() {
-        return reportDate;
-    }
-
-    public void setReportDate(LocalDate reportDate) {
-        this.reportDate = reportDate;
-    }
-
-    public String getReportedUser() {
-        return reportedUser;
-    }
-
-    public void setReportedUser(String reportedUser) {
-        this.reportedUser = reportedUser;
-    }
-
-    public String getSourceType() {
-        return sourceType;
-    }
-
-    public void setSourceType(String sourceType) {
-        this.sourceType = sourceType;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    @Override
-    public String toString() {
-        return "DamageReportResponseDTO{" +
-                "id=" + id +
-                ", damageDate=" + damageDate +
-                ", damageItem='" + damageItem + '\'' +
-                ", description='" + description + '\'' +
-                ", imageUrl='" + imageUrl + '\'' +
-                ", reportDate=" + reportDate +
-                ", status=" + status +
-                ", reportedUser='" + reportedUser + '\'' +
-                ", sourceType='" + sourceType + '\'' +
-                '}';
-    }
 }
-
