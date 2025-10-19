@@ -5,16 +5,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.lorachemicals.Backend.dto.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import com.lorachemicals.Backend.dto.CustomerOrderItemRequestDTO;
-import com.lorachemicals.Backend.dto.CustomerOrderItemResponseDTO;
-import com.lorachemicals.Backend.dto.CustomerOrderRequestDTO;
-import com.lorachemicals.Backend.dto.CustomerOrderResponseDTO;
-import com.lorachemicals.Backend.dto.TrendingProductsDTO;
 import com.lorachemicals.Backend.model.BatchInventoryDelivery;
 import com.lorachemicals.Backend.model.Customer;
 import com.lorachemicals.Backend.model.CustomerOrder;
@@ -335,5 +331,19 @@ public class CustomerOrderService {
 
     public BigDecimal getOverallRating() {
         return orderRepository.getOverallRating();
+    }
+
+    public List<CustomerOrderFeedbackDTO> getAllOrdersFeedback() {
+        List<CustomerOrder> orders = orderRepository.findAll();
+
+        return orders.stream()
+                .filter(order -> "Complete".equalsIgnoreCase(order.getStatus()))
+                .map(order -> new CustomerOrderFeedbackDTO(
+                        order.getDelivered_date(),
+                        order.getFeedback(),
+                        order.getRate(),
+                        order.getStatus()
+                ))
+                .toList();
     }
 }

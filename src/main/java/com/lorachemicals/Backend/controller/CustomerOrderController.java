@@ -1,5 +1,6 @@
 package com.lorachemicals.Backend.controller;
 
+import com.lorachemicals.Backend.dto.CustomerOrderFeedbackDTO;
 import com.lorachemicals.Backend.dto.CustomerOrderRequestDTO;
 import com.lorachemicals.Backend.dto.CustomerOrderResponseDTO;
 import com.lorachemicals.Backend.dto.TrendingProductsDTO;
@@ -57,7 +58,7 @@ public class CustomerOrderController {
             return ResponseEntity.internalServerError().body("Order detail get failed: " + e.getMessage());
         }
     }
-    
+
     @GetMapping("/get-all-orders")
     public ResponseEntity<?> getAllOrders(HttpServletRequest request) {
         AccessControlUtil.checkAccess(request, "warehouse");
@@ -143,6 +144,9 @@ public class CustomerOrderController {
         }
     }
 
-
-
+    @GetMapping("/get-feedback")
+    public ResponseEntity<List<CustomerOrderFeedbackDTO>> getAllOrdersFeedback() {
+        List<CustomerOrderFeedbackDTO> feedbackList = customerOrderService.getAllOrdersFeedback();
+        return ResponseEntity.ok(feedbackList);
+    }
 }
