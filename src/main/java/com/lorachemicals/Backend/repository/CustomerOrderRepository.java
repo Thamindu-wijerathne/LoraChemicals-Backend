@@ -55,6 +55,8 @@ public interface CustomerOrderRepository extends JpaRepository<CustomerOrder, Lo
     @Query("SELECT COALESCE(SUM(o.total), 0) FROM CustomerOrder o")
     BigDecimal getTotalSales();  // Returns single value, not List
 
+    @Query("SELECT AVG(co.rate) FROM CustomerOrder co WHERE co.rate IS NOT NULL")
+    BigDecimal getOverallRating();
 }
 
 

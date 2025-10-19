@@ -1,5 +1,11 @@
 package com.lorachemicals.Backend.dto;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class RouteDTO {
     private final Long routeid;
     private final String district;

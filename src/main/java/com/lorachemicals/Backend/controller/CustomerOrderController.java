@@ -16,6 +16,7 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -129,6 +130,17 @@ public class CustomerOrderController {
          } catch (Exception e) {
              return ResponseEntity.internalServerError().body("Failed to complete order: "+ e.getMessage());
          }
+    }
+
+    @GetMapping("/get-overall-rating")
+    public ResponseEntity<?> getOverallRating(HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "customer", "admin");
+        try {
+            BigDecimal overallRating = customerOrderService.getOverallRating();
+            return ResponseEntity.ok(overallRating);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Failed to get overall rating :" + e.getMessage());
+        }
     }
 
 

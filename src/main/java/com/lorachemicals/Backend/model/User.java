@@ -3,7 +3,9 @@ package com.lorachemicals.Backend.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
+@Setter
 @Getter
 @Entity
 @Table(name = "users")
@@ -44,26 +46,7 @@ public class User {
         this.role = role;
     }
 
-    // Setters
-    public void setId(Long id) { this.id = id; }
 
-    public void setFname(String fname) { this.fname = fname; }
-
-    public void setLname(String lname) { this.lname = lname; }
-
-    public void setNic(String nic) { this.nic = nic; }
-
-    public void setPhone(String phone) { this.phone = phone; }
-
-    public void setAddress(String address) { this.address = address; }
-
-    public void setEmail(String email) { this.email = email; }
-
-    public void setPassword(String password) { this.password = password; }
-
-    public void setRole(String role) { this.role = role; }
-
-    public void setStatus(String status) { this.status = status; }
 
     @Override
     public String toString() {
@@ -77,5 +60,11 @@ public class User {
 
     public String getName() {
         return fname + " " + lname;
+    }
+
+    public void setPassword(String hashedPassword) {
+    }
+
+    public void setLname(String lname) {
     }
 }

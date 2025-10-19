@@ -332,4 +332,8 @@ public class CustomerOrderService {
         orderRepository.save(order);
 
     }
+
+    public BigDecimal getOverallRating() {
+        return orderRepository.getOverallRating();
+    }
 }
