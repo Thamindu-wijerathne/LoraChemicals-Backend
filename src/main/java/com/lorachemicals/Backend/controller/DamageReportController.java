@@ -57,6 +57,25 @@ public class DamageReportController {
         }
     }
 
+    // ✅ Admin reviews (approve or reject)
+    @PutMapping("/review/{id}")
+    public ResponseEntity<?> reviewReport(
+            @PathVariable Long id,
+            @RequestParam String action,
+            HttpServletRequest request) {
+
+        AccessControlUtil.checkAccess(request, "admin");
+
+        try {
+            DamageReportResponseDTO updated = service.reviewReport(id, action);
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to review report");
+        }
+    }
+
     // ✅ Get report by ID
 //    @GetMapping("/byid/{id}")
 //    public ResponseEntity<?> getReportById(@PathVariable Long id, HttpServletRequest request) {

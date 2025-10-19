@@ -64,4 +64,24 @@ public class DamageReportService {
         dto.setStatus(report.getStatus());
         return dto;
     }
+
+    public DamageReportResponseDTO reviewReport(Long id, String action) {
+        DamageReport report = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Report not found"));
+
+        if (!report.getStatus().equalsIgnoreCase("pending")) {
+            throw new RuntimeException("Report already reviewed");
+        }
+
+        if (action.equalsIgnoreCase("approve")) {
+            report.setStatus("approved");
+        } else if (action.equalsIgnoreCase("reject")) {
+            report.setStatus("rejected");
+        } else {
+            throw new RuntimeException("Invalid action");
+        }
+
+        DamageReport updated = repository.save(report);
+        return new DamageReportResponseDTO(updated);
+    }
 }

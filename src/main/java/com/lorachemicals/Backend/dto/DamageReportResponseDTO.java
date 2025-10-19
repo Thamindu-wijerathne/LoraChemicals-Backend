@@ -1,6 +1,8 @@
 package com.lorachemicals.Backend.dto;
 
 
+import com.lorachemicals.Backend.model.DamageReport;
+
 import java.time.LocalDate;
 
 public class DamageReportResponseDTO {
@@ -13,6 +15,21 @@ public class DamageReportResponseDTO {
     private String reportedUser;
     private String sourceType;
     private String status;
+
+    // ✅ Constructor for mapping directly from entity
+    public DamageReportResponseDTO(DamageReport report) {
+        this.id = report.getId();
+        this.damageItem = report.getDamageItem();
+        this.description = report.getDescription();
+        this.sourceType = report.getSourceType();
+        this.reportDate = report.getReportDate();
+        this.damageDate = report.getDamageDate();
+        this.status = report.getStatus();
+        this.reportedUser = report.getReportedUser();
+    }
+
+    // ✅ Empty constructor (required for JSON serialization)
+    public DamageReportResponseDTO() {}
 
     // Getters and Setters
 
