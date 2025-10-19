@@ -1,5 +1,11 @@
 package com.lorachemicals.Backend.services;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.lorachemicals.Backend.dto.RecipeItemRawChemicalRequestDTO;
 import com.lorachemicals.Backend.dto.RecipeItemRequestDTO;
 import com.lorachemicals.Backend.model.RawChemicalType;
@@ -10,10 +16,6 @@ import com.lorachemicals.Backend.repository.RawChemicalTypeRepository;
 import com.lorachemicals.Backend.repository.RecipeItemRawChemicalRepository;
 import com.lorachemicals.Backend.repository.RecipeItemRepository;
 import com.lorachemicals.Backend.repository.RecipeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class RecipeItemService {
@@ -124,8 +126,13 @@ public class RecipeItemService {
     }
 
     // Delete by id
+    @Transactional
     public void deleteRecipeItemById(Long recipeItemid) {
         try {
+            // First delete related records from recipeitem_rawchemical junction table
+            recipeItemRawChemicalRepository.deleteByRecipeItemRecipeitemid(recipeItemid);
+            
+            // Then delete the recipe item
             recipeItemRepository.deleteById(recipeItemid);
         } catch (Exception e) {
             throw new RuntimeException("Failed to delete recipe item with id: " + recipeItemid, e);

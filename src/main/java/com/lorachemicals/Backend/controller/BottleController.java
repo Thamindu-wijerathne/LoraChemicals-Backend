@@ -1,20 +1,27 @@
 package com.lorachemicals.Backend.controller;
 
-import com.lorachemicals.Backend.dto.BottleQuantityUpdateDTO;
-import com.lorachemicals.Backend.dto.BottleRequestDTO;
-import com.lorachemicals.Backend.dto.ChemicalVolumeUpdateDTO;
-import com.lorachemicals.Backend.model.Bottle;
-import com.lorachemicals.Backend.model.RawChemical;
-import com.lorachemicals.Backend.services.BottleService;
-import com.lorachemicals.Backend.util.AccessControlUtil;
-import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Optional;
+import com.lorachemicals.Backend.dto.BottleQuantityUpdateDTO;
+import com.lorachemicals.Backend.dto.BottleRequestDTO;
+import com.lorachemicals.Backend.model.Bottle;
+import com.lorachemicals.Backend.services.BottleService;
+import com.lorachemicals.Backend.util.AccessControlUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/bottle")
@@ -118,6 +125,19 @@ public class BottleController {
             return new ResponseEntity<>("Bottle deleted successfully", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Failed to delete bottle: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // GET bottles by bottle type ID
+    @GetMapping("/by-bottle-type/{bottleTypeId}")
+    public ResponseEntity<?> getBottlesByBottleTypeId(@PathVariable Long bottleTypeId, HttpServletRequest request) {
+        AccessControlUtil.checkAccess(request, "warehouse", "admin");
+        try {
+            List<Bottle> bottles = bottleService.getBottlesByBottleTypeId(bottleTypeId);
+            return new ResponseEntity<>(bottles, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to get bottles by bottle type: " + e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

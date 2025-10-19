@@ -1,6 +1,8 @@
 package com.lorachemicals.Backend.model;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -47,9 +49,17 @@ public class ParentBatchType {
     }
 
     private void generateUniqueBatchCode() {
-        // Generate unique batch code: BATCH + 5 random numbers
-        int randomNumber = (int) (Math.random() * 100000); // 0 to 99999
-        this.uniqueBatchCode = "BATCHTYPE-" + String.format("%05d", randomNumber);
+        // Format the current date as yyyyMMdd
+        String createdDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
+
+        // Use current time in milliseconds for uniqueness
+        long currentTimeMillis = System.currentTimeMillis();
+
+        // Take last 5 digits of time to simulate a random number
+        String timeBasedNumber = String.format("%05d", currentTimeMillis % 100000);
+
+        // Create batch code: BATCHTYPE-<date>-<timeBasedNumber>
+        this.uniqueBatchCode = "BATCHTYPE-" + createdDate + "-" + timeBasedNumber;
     }
 
     public ParentBatchType() {

@@ -1,18 +1,18 @@
 package com.lorachemicals.Backend.services;
 
-import com.lorachemicals.Backend.dto.BoxResponseDTO;
-import com.lorachemicals.Backend.model.Bottle;
-import com.lorachemicals.Backend.model.Box;
-import com.lorachemicals.Backend.model.BoxType;
-import com.lorachemicals.Backend.repository.BoxRepository;
-import com.lorachemicals.Backend.repository.BoxTypeRepository;
-import com.lorachemicals.Backend.dto.BoxRequestDTO;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.lorachemicals.Backend.dto.BoxRequestDTO;
+import com.lorachemicals.Backend.dto.BoxResponseDTO;
+import com.lorachemicals.Backend.model.Box;
+import com.lorachemicals.Backend.model.BoxType;
+import com.lorachemicals.Backend.repository.BoxRepository;
+import com.lorachemicals.Backend.repository.BoxTypeRepository;
 
 @Service
 public class BoxService {
@@ -46,6 +46,17 @@ public class BoxService {
             return boxRepository.findByBoxType_Boxid(boxid);
         } catch (RuntimeException e) {
             throw new RuntimeException("FAILED to fetch box by ID: " + e.getMessage(), e);
+        }
+    }
+
+    // Get all boxes by boxtype ID
+    public List<Box> getBoxesByBoxTypeId(Long boxtypeId) {
+        try {
+            return boxRepository.findAll().stream()
+                    .filter(box -> box.getBoxType().getBoxid().equals(boxtypeId))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch boxes by boxtype ID: " + e.getMessage(), e);
         }
     }
 

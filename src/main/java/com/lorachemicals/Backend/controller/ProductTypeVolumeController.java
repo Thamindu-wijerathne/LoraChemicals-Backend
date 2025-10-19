@@ -44,7 +44,7 @@ public class ProductTypeVolumeController {
             @RequestPart("dto") ProductTypeVolumeRequestDTO dto,
             @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
         try {
-            AccessControlUtil.checkAccess(request,  "admin");
+            AccessControlUtil.checkAccess(request,  "admin", "warehouse");
             // Validate image file if provided
             if (imageFile != null && !imageFile.isEmpty()) {
                 validateImageFile(imageFile);
@@ -112,7 +112,7 @@ public class ProductTypeVolumeController {
             @RequestPart("dto") ProductTypeVolumeRequestDTO dto,
             @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
         try {
-            AccessControlUtil.checkAccess(request,  "admin");
+            AccessControlUtil.checkAccess(request,  "admin", "warehouse");
 
             // Validate image file if provided
             if (imageFile != null && !imageFile.isEmpty()) {
@@ -140,7 +140,7 @@ public class ProductTypeVolumeController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id,HttpServletRequest request) {
         try {
-            AccessControlUtil.checkAccess(request, "admin");
+            AccessControlUtil.checkAccess(request,  "admin", "warehouse");
             boolean deleted = service.delete(id);
             if (deleted) {
                 return ResponseEntity.ok().body("Product deleted successfully");

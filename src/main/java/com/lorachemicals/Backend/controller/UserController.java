@@ -41,6 +41,7 @@ import com.lorachemicals.Backend.services.RouteService;
 import com.lorachemicals.Backend.services.SalesrepService;
 import com.lorachemicals.Backend.services.UserService;
 import com.lorachemicals.Backend.services.WarehouseManagerService;
+import com.lorachemicals.Backend.util.AccessControlUtil;
 import com.lorachemicals.Backend.util.JwtUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -405,6 +406,90 @@ public class UserController {
             }
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Internal Server Error: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> passwordData, HttpServletRequest request) {
+        try {
+            // Extract user ID from JWT token
+            String authHeader = request.getHeader("Authorization");
+            String token = authHeader != null ? authHeader.replace("Bearer ", "") : null;
+            Long userId = JwtUtil.extractUserId(token);
+
+            String currentPassword = passwordData.get("currentPassword");
+            String newPassword = passwordData.get("newPassword");
+
+            if (currentPassword == null || newPassword == null) {
+                return ResponseEntity.badRequest().body("Current password and new password are required");
+            }
+
+            // Get current user
+            User currentUser = userService.getUserById(userId);
+            if (currentUser == null) {
+                return ResponseEntity.status(404).body("User not found");
+            }
+
+            // Verify current password
+            if (!userService.verifyCurrentPassword(currentUser.getEmail(), currentPassword)) {
+                return ResponseEntity.status(401).body("Current password is incorrect");
+            }
+
+            // Update password
+            User updateUser = new User();
+            updateUser.setPassword(newPassword);
+            
+            User updatedUser = userService.updateUser(userId, updateUser);
+            if (updatedUser != null) {
+                return ResponseEntity.ok("Password changed successfully");
+            } else {
+                return ResponseEntity.status(500).body("Failed to update password");
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Internal Server Error: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/debug-login")
+    public ResponseEntity<?> debugLogin(@RequestBody UserResponseDTO loginRequest) {
+        try {
+            String email = loginRequest.getEmail();
+            String password = loginRequest.getPassword();
+            
+            // Find user by email
+            User user = userService.findByEmail(email);
+            if (user == null) {
+                return ResponseEntity.status(404).body("User not found with email: " + email);
+            }
+            
+            // Check password format
+            String storedPassword = user.getPassword();
+            boolean isHashed = storedPassword.startsWith("$2");
+            
+            Map<String, Object> debugInfo = new HashMap<>();
+            debugInfo.put("userFound", true);
+            debugInfo.put("email", email);
+            debugInfo.put("storedPasswordLength", storedPassword.length());
+            debugInfo.put("isPasswordHashed", isHashed);
+            debugInfo.put("inputPasswordLength", password.length());
+            
+            if (isHashed) {
+                // BCrypt verification for hashed password
+                debugInfo.put("bcryptVerificationResult", 
+                    userService.verifyCurrentPassword(email, password));
+            } else {
+                // Direct comparison for plain text
+                debugInfo.put("plainTextMatch", password.equals(storedPassword));
+            }
+            
+            return ResponseEntity.ok(debugInfo);
+            
+        } catch (Exception e) {
+            Map<String, Object> errorInfo = new HashMap<>();
+            errorInfo.put("error", e.getMessage());
+            errorInfo.put("errorType", e.getClass().getSimpleName());
+            return ResponseEntity.status(500).body(errorInfo);
         }
     }
 

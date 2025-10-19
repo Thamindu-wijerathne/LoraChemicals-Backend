@@ -12,11 +12,13 @@ import com.lorachemicals.Backend.dto.BillResponseDTO;
 import com.lorachemicals.Backend.model.Bill;
 import com.lorachemicals.Backend.model.BillItem;
 import com.lorachemicals.Backend.model.CustomerBill;
+import com.lorachemicals.Backend.model.Delivery;
 import com.lorachemicals.Backend.model.ProductTypeVolume;
 import com.lorachemicals.Backend.model.SalesRep;
 import com.lorachemicals.Backend.repository.BillItemRepository;
 import com.lorachemicals.Backend.repository.BillRepository;
 import com.lorachemicals.Backend.repository.CustomerBillRepository;
+import com.lorachemicals.Backend.repository.DeliveryRepository;
 import com.lorachemicals.Backend.repository.ProductTypeVolumeRepository;
 import com.lorachemicals.Backend.repository.SalesRepRepository;
 
@@ -41,6 +43,9 @@ public class BillService {
     @Autowired
     private BillItemRepository billItemRepository;
 
+    @Autowired
+    private DeliveryRepository deliveryRepository;
+
     public Bill createBill(Long srepId, BillRequestDTO data) {
         SalesRep salesRep = salesRepRepository.findById(srepId)
                 .orElseThrow(() -> new RuntimeException("SalesRep not found"));
@@ -59,6 +64,14 @@ public class BillService {
         customerBill.setPhone(data.getPhone());
         customerBill.setDistrict(data.getDistrict());
         customerBill.setBill(bill);
+        
+        // Set delivery if provided
+        if (data.getDeliveryid() != null) {
+            Delivery delivery = deliveryRepository.findById(data.getDeliveryid())
+                    .orElseThrow(() -> new RuntimeException("Delivery not found for ID: " + data.getDeliveryid()));
+            customerBill.setDelivery(delivery);
+        }
+        
         customerBill = customerBillRepository.save(customerBill);
 
         // Save BillItems
@@ -127,6 +140,20 @@ public class BillService {
             dto.setAddress(customerBill.getAddress());
             dto.setPhone(customerBill.getPhone());
             dto.setDistrict(customerBill.getDistrict());
+            
+            // Add delivery information if available
+            if (customerBill.getDelivery() != null) {
+                dto.setDeliveryId(customerBill.getDelivery().getDeliveryid());
+                // Map delivery status (0=Pending, 1=In Transit, 2=Delivered, etc.)
+                String statusText = "Unknown";
+                switch (customerBill.getDelivery().getStatus()) {
+                    case 0: statusText = "Pending"; break;
+                    case 1: statusText = "In Transit"; break;
+                    case 2: statusText = "Delivered"; break;
+                    default: statusText = "Unknown"; break;
+                }
+                dto.setDeliveryStatus(statusText);
+            }
         }
         
         return dto;

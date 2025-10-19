@@ -1,17 +1,17 @@
 package com.lorachemicals.Backend.services;
 
-import com.lorachemicals.Backend.model.Box;
-import com.lorachemicals.Backend.model.Label;
-import com.lorachemicals.Backend.model.Labeltype;
-import com.lorachemicals.Backend.repository.LabelRepository;
-import com.lorachemicals.Backend.repository.LabeltypeRepository;
-import com.lorachemicals.Backend.dto.LabelRequestDTO;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.lorachemicals.Backend.dto.LabelRequestDTO;
+import com.lorachemicals.Backend.model.Label;
+import com.lorachemicals.Backend.model.Labeltype;
+import com.lorachemicals.Backend.repository.LabelRepository;
+import com.lorachemicals.Backend.repository.LabeltypeRepository;
 
 @Service
 public class LabelService {
@@ -106,6 +106,17 @@ public class LabelService {
             labelRepository.deleteById(inventoryId);
         } catch (Exception e) {
             throw new RuntimeException("Failed to delete label: " + e.getMessage(), e);
+        }
+    }
+
+    // Get all labels by labeltype ID
+    public List<Label> getLabelsByLabelTypeId(Long labeltypeId) {
+        try {
+            return labelRepository.findAll().stream()
+                    .filter(label -> label.getLabeltype().getLabelid().equals(labeltypeId))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch labels by labeltype ID: " + e.getMessage(), e);
         }
     }
 }
