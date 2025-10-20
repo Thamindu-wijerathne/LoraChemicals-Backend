@@ -22,11 +22,5 @@ public class DamageReport {
     private String sourceType;
     private String status;
 
-    @ManyToOne
-    @JoinColumn(name = "reported_user_id")
-    private User reportedUser; // link to the User entity
-    // Getters and Setters
-
-
 }
 
