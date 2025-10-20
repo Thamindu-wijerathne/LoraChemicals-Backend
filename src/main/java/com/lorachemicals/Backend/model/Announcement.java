@@ -33,4 +33,5 @@ public class Announcement {
         this.dateTime = dateTime;
         this.targetRoles = targetRoles;
     }
+
 }
