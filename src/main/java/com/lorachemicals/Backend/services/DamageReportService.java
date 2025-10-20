@@ -32,11 +32,6 @@ public class DamageReportService {
         report.setSourceType(dto.getSourceType());
         report.setStatus(dto.getStatus());
 
-        // Fetch the user from DB
-        User user = userRepository.findById(dto.getReportedUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        report.setReportedUser(user);
-
         DamageReport saved = repository.save(report);
         return new DamageReportResponseDTO(saved);
     }
@@ -64,24 +59,6 @@ public class DamageReportService {
         dto.setReportDate(report.getReportDate());
         dto.setSourceType(report.getSourceType());
         dto.setStatus(report.getStatus());
-
-        // Map User -> UserResponseDTO
-        if (report.getReportedUser() != null) {
-            User u = report.getReportedUser();
-            UserResponseDTO userDto = new UserResponseDTO(
-                    u.getId(),
-                    u.getFname(),
-                    u.getLname(),
-                    u.getEmail(),
-                    u.getRole(),
-                    u.getAddress(),
-                    u.getPhone(),
-                    u.getNic(),
-                    u.getStatus()
-            );
-            dto.setReportedUser(userDto); // now compatible type
-        }
-
         return dto;
     }
 
