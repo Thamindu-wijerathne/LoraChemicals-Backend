@@ -29,21 +29,6 @@ public class DamageReportResponseDTO {
         this.damageDate = report.getDamageDate();
         this.status = report.getStatus();
         this.imageUrl = report.getImageUrl();
-
-        if (report.getReportedUser() != null) {
-            var u = report.getReportedUser();
-            this.reportedUser = new UserResponseDTO(
-                    u.getId(),
-                    u.getFname(),
-                    u.getLname(),
-                    u.getEmail(),
-                    u.getRole(),
-                    u.getAddress(),
-                    u.getPhone(),
-                    u.getNic(),
-                    u.getStatus()
-            );
-        }
     }
 
     // ✅ Empty constructor
