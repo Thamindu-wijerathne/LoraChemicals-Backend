@@ -549,6 +549,7 @@ public class DeliveryService {
                                 SalesRepDeliveryResponseDTO.DeliveryOrderDetail od = new SalesRepDeliveryResponseDTO.DeliveryOrderDetail();
                                 Optional.ofNullable(doe.getCustomerOrder()).ifPresent(order -> {
                                     od.setOrderid(order.getOrderid());
+                                    od.setOrdercode(order.getOrdercode());
                                     od.setOrderStatus(order.getStatus());
                                     Optional.ofNullable(order.getTotal()).ifPresent(t -> od.setOrderTotal(t.doubleValue()));
                                     Optional.ofNullable(doe.getDelivery()).ifPresent(d -> od.setDeliveryid(d.getDeliveryid()));

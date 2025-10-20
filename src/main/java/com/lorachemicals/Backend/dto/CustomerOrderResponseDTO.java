@@ -1,12 +1,11 @@
 package com.lorachemicals.Backend.dto;
 
-import com.lorachemicals.Backend.model.Route;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+
+import lombok.Getter;
+import lombok.Setter;
 
 
 
@@ -14,6 +13,7 @@ import java.util.List;
 @Setter
 public class CustomerOrderResponseDTO {
     private Long orderid;
+    private String ordercode;  // Add order code field
     private Date deliveredDate;
     private String status;
     private BigDecimal total;

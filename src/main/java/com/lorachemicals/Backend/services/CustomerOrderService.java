@@ -1,16 +1,23 @@
 package com.lorachemicals.Backend.services;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
-import com.lorachemicals.Backend.dto.*;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import com.lorachemicals.Backend.dto.CustomerOrderFeedbackDTO;
+import com.lorachemicals.Backend.dto.CustomerOrderItemRequestDTO;
+import com.lorachemicals.Backend.dto.CustomerOrderItemResponseDTO;
+import com.lorachemicals.Backend.dto.CustomerOrderRequestDTO;
+import com.lorachemicals.Backend.dto.CustomerOrderResponseDTO;
+import com.lorachemicals.Backend.dto.TrendingProductsDTO;
 import com.lorachemicals.Backend.model.BatchInventoryDelivery;
 import com.lorachemicals.Backend.model.Customer;
 import com.lorachemicals.Backend.model.CustomerOrder;
@@ -63,6 +70,10 @@ public class CustomerOrderService {
             // Create order object
             CustomerOrder order = new CustomerOrder();
             order.setUser(user);
+            
+            // Generate unique order code
+            order.setOrdercode(generateOrderCode());
+            
             order.setStatus(data.getStatus());
             order.setTotal(data.getTotal());
             order.setDelivered_date(data.getDeliveredDate() != null ? data.getDeliveredDate() : new Date());
@@ -103,6 +114,7 @@ public class CustomerOrderService {
         return orders.stream().map(order -> {
             CustomerOrderResponseDTO dto = new CustomerOrderResponseDTO();
             dto.setOrderid(order.getOrderid());
+            dto.setOrdercode(order.getOrdercode()); // Add order code
             dto.setDeliveredDate(order.getDelivered_date());
             dto.setStatus(order.getStatus());
             dto.setTotal(order.getTotal());
@@ -147,6 +159,7 @@ public class CustomerOrderService {
         return orders.stream().map(order -> {
             CustomerOrderResponseDTO dto = new CustomerOrderResponseDTO();
             dto.setOrderid(order.getOrderid());
+            dto.setOrdercode(order.getOrdercode()); // Add order code
             dto.setDeliveredDate(order.getDelivered_date());
             dto.setStatus(order.getStatus());
             dto.setTotal(order.getTotal());
@@ -209,6 +222,7 @@ public class CustomerOrderService {
                 .map(order -> {
                     CustomerOrderResponseDTO dto = new CustomerOrderResponseDTO();
                     dto.setOrderid(order.getOrderid());
+                    dto.setOrdercode(order.getOrdercode()); // Add order code
                     dto.setDeliveredDate(order.getDelivered_date());
                     dto.setStatus(order.getStatus());
                     dto.setTotal(order.getTotal());
@@ -339,11 +353,25 @@ public class CustomerOrderService {
         return orders.stream()
                 .filter(order -> "Complete".equalsIgnoreCase(order.getStatus()))
                 .map(order -> new CustomerOrderFeedbackDTO(
+                        order.getOrdercode(),
                         order.getDelivered_date(),
                         order.getFeedback(),
                         order.getRate(),
                         order.getStatus()
                 ))
                 .toList();
+    }
+
+    // Generate unique order code: ORD + YYYYMMDD + random number
+    private String generateOrderCode() {
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String dateString = currentDate.format(formatter);
+        
+        // Generate random 4-digit number
+        Random random = new Random();
+        int randomNum = 1000 + random.nextInt(9000); // generates 4-digit number (1000-9999)
+        
+        return "ORD" + dateString + randomNum;
     }
 }
