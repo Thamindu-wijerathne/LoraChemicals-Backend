@@ -60,6 +60,7 @@ public class SalesRepDeliveryResponseDTO {
     @Setter
     public static class DeliveryOrderDetail {
         private Long orderid;
+        private String ordercode;
         private Long deliveryid;
         private String orderStatus;
         private Double orderTotal;
